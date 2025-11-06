@@ -1,0 +1,82 @@
+<% layout('/layouts/boiler-plate') %>
+
+<body>
+    <div id="filters">
+        <div class="filter">
+            <div><i class="fa-solid fa-fire"></i></div>
+            <p>Trending</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-mountain-sun"></i></div>
+            <p>Mountains</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-umbrella-beach"></i></div>
+            <p>Beach</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-snowflake"></i></div>
+            <p>Arctic</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-person-swimming"></i></div>
+            <p>Amazing pools</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-city"></i></div>
+            <p>Iconic cities</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-campground"></i></div>
+            <p>Camping</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-chess-rook"></i></div>
+            <p>Castles</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-tree-city"></i></div>
+            <p>Forest Retreats</p>
+        </div>
+        <div class="tax-toggle">
+            <div class="form-check-reverse form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+                <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
+            </div>
+        </div>
+    </div>
+    <div class="row row-cols-lg-3 row-cols-md-2  row-cols-sm-1 listing-card">
+        <% for (let listing of allListings)  { %>
+        <!--allList is an arr-->
+        <a href="/listings/<%=listing._id%>" class="listing-link">
+            <div class="card">
+                <img src="<%=listing.image.url%>" class="card-img-top" alt="<%=listing.image.filename%>"
+                    style="height:14rem">
+                <div class="card-img-overlay"></div>
+                <div class="card-body">
+
+                    <p class="card-text">
+                        <b><%=listing.title%></b>
+                        <br>
+                        &#8377; <%=listing.price.toLocaleString('en-IN')%>/night
+                        <i class="tax-info">&nbsp; &nbsp; +18% GST</i>
+                    </p>
+                </div>
+            </div>
+        </a>
+        <% } %>
+    </div>
+
+    <br>
+    <br>
+
+</body>
+
+<!--/listing/id abs path inside anchor tag explanation 
+ When this link is clicked, go to this absolute path on the server.”
+       Absolute vs Relative Paths
+- Absolute path: Starts with / and always refers to the root of your site.
+- Example: /listings/652f3a1c... → always goes to that listing page, no matter where you are.
+- Relative path: Depends on the current URL.
+- Example: details.html → if you're on /listings, it goes to /listings/details.html.
+-->
