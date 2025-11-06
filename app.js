@@ -18,11 +18,11 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
-const {initDB}=require("./init/index.js");
 
 //Mongoose and MongoDB connection
 //let MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 let ATLAS_URL=process.env.ATLAS_DB_URL;
+module.exports=ATLAS_URL;
 
 main()
   .then(() => console.log("Connected to database!"))
@@ -44,17 +44,16 @@ app.use(express.static(path.join(__dirname, "/public")));
 app.engine("ejs", ejsMate); //layouts
 
 //first we were storing on local store but now we will store session in cloud- mongo
-const store= MongoStore.create({
-  mongoUrl:ATLAS_URL,
-  crypto:{ 
-      secret: process.env.EXPRESS_SESSION_SECRET,
-         },
-   touchAfter:  24*3600  ,//session updates automatically after
-})
-
-store.on("error",()=>{
-  console.log("Error on Mongo Session Store",err);
-});
+let store;
+try {
+  store = MongoStore.create({
+    mongoUrl: ATLAS_URL,
+    crypto: { secret: process.env.EXPRESS_SESSION_SECRET },
+    touchAfter: 24 * 3600,
+  });
+} catch (err) {
+  console.log("Session store failed—using fallback memory store ");
+}
 
 const sessionOptions = { 
   store:store,
@@ -95,6 +94,7 @@ app.use((req, res, next) => {
   // console.log(res.locals.success);
   next();
 });
+
 app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", usersRouter);
