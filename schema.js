@@ -1,4 +1,4 @@
-//server side validation
+//server side validation using joi package
 const Joi=require("joi");
 
 module.exports.listingSchema=Joi.object({

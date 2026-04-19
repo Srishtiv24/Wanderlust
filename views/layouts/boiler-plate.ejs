@@ -38,4 +38,16 @@
 </body>
 </html>
 
-<!--main layout template where all other templates will be inserted -->
+<!--main layout template where all other templates will be inserted
+
+layouts are a way to avoid repeating the same HTML structure 
+(like headers, footers, navigation bars) across multiple pages.
+Instead of duplicating that boilerplate in every .ejs file, you define a
+layout template and then “include” or “extend” it in your views.
+app.engine("ejs", ejsMate);
+
+layouts:Define a master template with placeholders (<percent- body %>). Each page extends the layout.
+Includes: Insert reusable snippets (like navbar, footer, or form fields) into any template:
+Layouts = master page structure (header, body).
+Includes = reusable partials (navbar, form, footer).
+  -->

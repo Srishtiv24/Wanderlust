@@ -66,4 +66,18 @@ req.body = {
     country: 'india'
   }
 } 
+
+extendeed must be true to read urlecoded data which can parse nested objects and arrays in form data.
+Example: user[name]=alice&user[age]=20 → becomes
+
+Methods you cannot send directly
+PUT, PATCH, DELETE → browsers don’t support these in <form method="...">.
+If you try <form method="DELETE">, the browser will actually fall back to GET.
+
+Use method-override middleware in Expres
+The browser sends a POST, but Express sees _method=DELETE and treats it as a DELETE request.
+<form action="/listings/123?_method=DELETE" method="POST">
+  <button type="submit">Delete Listing</button>
+</form>
+
 -->

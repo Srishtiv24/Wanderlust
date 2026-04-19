@@ -21,3 +21,18 @@
     <br>
     <br>
 </body>
+
+<!--
+the action attribute tells the browser where to send the form data when the user submits it.
+When req.body is used?
+POST / PUT / PATCH requests
+These methods send data in the request body (form data or JSON).
+GET requests
+By convention, GET requests do not have a body.
+Browsers send data via the query string instead:
+
+HTML forms typically send data in URL-encoded format (like username=alice&password=123).
+express.urlencoded() is middleware that parses this format and populates req.body.
+extended: true → uses the qs library, which can parse nested objects and arrays in form data.
+Example: user[name]=alice&user[age]=20 
+-->

@@ -7,8 +7,8 @@ module.exports.renderSignupForm=(req, res) => {
 module.exports.signup=async (req, res,next) => {
     try {
       let { username, email, password } = req.body;
-      let newUser = new User({ username, email });
-      let registeredUser = await User.register(newUser, password);
+      let newUser = new User({ username, email });//username schema added by passport 
+      let registeredUser = await User.register(newUser, password);//passport
       console.log(registeredUser);
       req.login(registeredUser,((err)=>
       { if(err){ next(err)}
@@ -25,14 +25,14 @@ module.exports.renderLoginForm= (req, res) => {
     res.render("users/login.ejs");
   }
 
-module.exports.login=async (req, res) => {
+module.exports.login=async (req, res) => { //app.js -serialize & deserilaize user are ofr login part 
     req.flash("success", "Welcome back to Wanderlust !");
     let redirectUrl = res.locals.redirectUrl || "/listings";
     res.redirect(redirectUrl);
   }
 
 module.exports.logout=(req, res, next) => {
-    req.logout((err) => {
+    req.logout((err) => { //user detached 
       if (err) {
         return next(err);
       }
@@ -40,3 +40,12 @@ module.exports.logout=(req, res, next) => {
       res.redirect("/listings");
     });
   }
+
+  /*
+When a user logs in via Passport (passport.authenticate("local")), Passport verifies their credentials.
+If successful, Passport serializes the user into the session and attaches them to req.user.
+
+That’s why, after login, you can access the logged-in user as req.user in any route.
+  passport has already attached the user to req.user before this function runs.  
+  don’t need to manually handle it here — you just flash a success message and redirect.
+  */

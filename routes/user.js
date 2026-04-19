@@ -15,7 +15,7 @@ router
   .get(userController.renderLoginForm)
   .post(
     saveRedirectUrl,
-    passport.authenticate("local", {
+    passport.authenticate("local", { //middleware attaches user by serailzation after verifying username & password
       failureRedirect: "/login",
       failureFlash: true, //if not able to match with data in db
     }), //middleware

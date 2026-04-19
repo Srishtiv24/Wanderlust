@@ -28,3 +28,6 @@ let initDB = async () => {
 
   console.log("data was initialized");
 };
+
+
+//The dotenv package is used in Node.js  projects to load environment variables from a .env file into process.env.
