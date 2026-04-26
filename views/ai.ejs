@@ -1,0 +1,161 @@
+<% layout('/layouts/boiler-plate') %>
+
+<div class="ai-page">
+
+  <!-- SIDEBAR -->
+  <aside class="ai-sidebar">
+    <div class="ai-sidebar-header">
+        <div class="ai-sidebar-logo ai-orb-avatar">✦</div>
+      <div>
+        <div class="ai-sidebar-name">Travel Assistant</div>
+      </div>
+    </div>
+
+    <button class="ai-new-btn" onclick="newChat()">
+      <i class="fa-regular fa-pen-to-square"></i> New conversation
+    </button>
+
+    <nav class="ai-preset-nav">
+
+      <div class="ai-category">
+        <div class="ai-category-label">Plan a Trip</div>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>3-day Himachal Pradesh itinerary</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>5-day Goa beach getaway</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Spiritual tour of Varanasi & Rishikesh</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Kerala backwaters 7-day road trip</span>
+        </button>
+      </div>
+
+      <div class="ai-category">
+        <div class="ai-category-label">Find Stays</div>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Budget stays under ₹1500/night in Manali</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Luxury eco stays in Coorg, Karnataka</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Romantic retreats near Pune</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Family-friendly resorts in Rajasthan</span>
+        </button>
+      </div>
+
+      <div class="ai-category">
+        <div class="ai-category-label">Best Time to Visit</div>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Best time to visit Ladakh</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Monsoon travel tips for South India</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Best winter destinations in India</span>
+        </button>
+      </div>
+
+      <div class="ai-category">
+        <div class="ai-category-label">Travel Tips</div>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>What to pack for a hill station trip</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Solo travel safety tips for women in India</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>How to travel India on a tight budget</span>
+        </button>
+      </div>
+
+    </nav>
+  </aside>
+
+  <!-- MAIN CHAT -->
+  <div class="ai-main">
+
+    <!-- Header -->
+    <header class="ai-header">
+      <div class="ai-header-left">
+        <span class="ai-header-title">AI Travel Assistant</span>
+        <span class="ai-header-sep">·</span>
+        <span class="ai-header-status" id="aiStatusLine">
+          <span class="ai-dot" id="aiDot"></span>
+          <span id="aiStatusText">Ready</span>
+        </span>
+      </div>
+      <button class="ai-header-action" onclick="newChat()" title="New chat">
+        <i class="fa-regular fa-pen-to-square"></i>
+        <span>New chat</span>
+      </button>
+    </header>
+
+    <!-- Messages -->
+    <div class="ai-messages" id="aiMessages">
+
+      <div class="ai-welcome" id="aiWelcome">
+        <div class="ai-welcome-inner"> 
+
+            <div class="ai-welcome-star">✦</div>
+          <h2>How can I help you today<% if(currUser){ %>, <%= currUser.username.charAt(0).toUpperCase() + currUser.username.slice(1) %><% } %>?</h2>
+          <p>Ask me to plan a trip, find the right stay, or get any travel advice for India and beyond.</p>
+
+          <div class="ai-suggestions">
+            <button class="ai-suggestion" onclick="sendPreset(this)">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <span>Plan a 3-day mountain itinerary</span>
+            </button>
+            <button class="ai-suggestion" onclick="sendPreset(this)">
+              <i class="fa-solid fa-bed"></i>
+              <span>Find unique stays in Coorg</span>
+            </button>
+            <button class="ai-suggestion" onclick="sendPreset(this)">
+              <i class="fa-regular fa-calendar"></i>
+              <span>Best time to visit Ladakh</span>
+            </button>
+            <button class="ai-suggestion" onclick="sendPreset(this)">
+              <i class="fa-solid fa-indian-rupee-sign"></i>
+              <span>Travel India on a tight budget</span>
+            </button>
+            <button class="ai-suggestion" onclick="sendPreset(this)">
+              <i class="fa-solid fa-heart"></i>
+              <span>Romantic getaway ideas near Pune</span>
+            </button>
+            <button class="ai-suggestion" onclick="sendPreset(this)">
+              <i class="fa-solid fa-suitcase"></i>
+              <span>What to pack for a hill station trip</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Input -->
+    <div class="ai-input-area">
+      <div class="ai-input-box" id="aiInputBox">
+        <textarea
+          id="aiInput"
+          placeholder="Ask anything about travel…"
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="ai-send" id="aiSendBtn" onclick="sendMessage()">
+          <i class="fa-solid fa-arrow-up"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+

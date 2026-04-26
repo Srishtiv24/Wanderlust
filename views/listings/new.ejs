@@ -1,83 +1,79 @@
 <% layout('/layouts/boiler-plate') %>
 
-<body>
-    <br>
-    <br>
-    <div class="row offset-2" >
-    <h3>Create a New Listing</h3>
+<div class="wl-form-page">
+  <div class="wl-form-card">
+    <div style="display:flex; align-items:center; gap: 0.75rem; margin-bottom: 1.5rem;">
+      <div style="width:44px; height:44px; border-radius:50%; background: var(--primary-soft); display:flex; align-items:center; justify-content:center; color: var(--primary); font-size:1.1rem;">
+        <i class="fa-solid fa-plus"></i>
+      </div>
+      <div>
+        <h2 class="wl-form-title" style="margin-bottom:0;">Create a New Listing</h2>
+        <p style="font-size:0.78rem; color: var(--text-muted); margin:0;">Share your space with the world</p>
+      </div>
+    </div>
+
     <form method="post" action="/listings" class="needs-validation" novalidate enctype="multipart/form-data">
-    <div  class="mb-3 col-8">
-    <label for="title" class="form-label">Title</label>
-    <input type="text" placeholder="Add a catchy title" name="listing[title]" class="form-control" required>
-    <div class="valid-feedback">
-      Looks good!
-    </div>
-    </div>
-    <div class="mb-3  col-8">
-      <label for="description" class="form-label">Description</label>
-    <textarea placeholder="" name="listing[description]" class="form-control" required></textarea>
-    </div>
-    <div class="mb-3 col-8">
-    <label for="image" class="form-label">Upload Image </label>
-    <input type="file" name="listing[image]" class="form-control" required>
-    </div>
-    <div class="row mb-3">
-    <div class="mb-3 col-md-3">
-    <label for="price" class="form-label">Price</label>
-    <input type="number" placeholder="1200" name="listing[price]" class="form-control"required>
-    <div class="invalid-feedback">
-      Please provide a valid price.
-    </div>
-    </div>
-    <div class="mb-3 col-md-5">
-    <label for="country" class="form-label">Country</label>
-    <input type="text" placeholder="India" name="listing[country]" class="form-control" required> 
-    <div class="invalid-feedback">
-      Please provide a valid country.
-    </div>
-    </div>
-    </div>
-    <div class="mb-3 col-8">
-    <label for="location" class="form-label">Location</label>
-    <input type="text" placeholder="Jaipur , Rajasthan " name="listing[location]" class="form-control" required>
-    <div class="invalid-feedback">
-      Please provide a valid location.
-    </div>
-    </div>
-    <button type="submit" class="btn btn-dark add-btn">Add</button>
+
+      <div class="wl-form-group">
+        <label class="wl-form-label">Title <span style="color: var(--primary);">*</span></label>
+        <input type="text" placeholder="Give your listing a catchy title" name="listing[title]" class="wl-form-control" required>
+        <div class="invalid-feedback" style="font-size:0.75rem; color:#dc3545;">Please add a title.</div>
+      </div>
+
+      <div class="wl-form-group">
+        <label class="wl-form-label">Description <span style="color: var(--primary);">*</span></label>
+        <textarea name="listing[description]" class="wl-form-control" rows="4" required placeholder="Describe what makes your place special..."></textarea>
+        <div class="invalid-feedback" style="font-size:0.75rem; color:#dc3545;">Please add a description.</div>
+      </div>
+
+      <div class="wl-form-group">
+        <label class="wl-form-label">Upload Image <span style="color: var(--primary);">*</span></label>
+        <input type="file" name="listing[image]" class="wl-form-control" required accept="image/*">
+        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">PNG, JPG or JPEG. Max 5MB.</div>
+      </div>
+
+      <div class="wl-form-row">
+        <div class="wl-form-group">
+          <label class="wl-form-label">Price / night (₹) <span style="color: var(--primary);">*</span></label>
+          <input type="number" placeholder="1200" name="listing[price]" class="wl-form-control" required min="0">
+          <div class="invalid-feedback" style="font-size:0.75rem; color:#dc3545;">Please enter a valid price.</div>
+        </div>
+        <div class="wl-form-group">
+          <label class="wl-form-label">Country <span style="color: var(--primary);">*</span></label>
+          <input type="text" placeholder="India" name="listing[country]" class="wl-form-control" required>
+          <div class="invalid-feedback" style="font-size:0.75rem; color:#dc3545;">Please enter a country.</div>
+        </div>
+      </div>
+
+      <div class="wl-form-group">
+        <label class="wl-form-label">Location <span style="color: var(--primary);">*</span></label>
+        <input type="text" placeholder="Jaipur, Rajasthan" name="listing[location]" class="wl-form-control" required>
+        <div class="invalid-feedback" style="font-size:0.75rem; color:#dc3545;">Please enter a location.</div>
+      </div>
+
+      <div style="display:flex; gap: 0.75rem; align-items:center; margin-top: 0.5rem;">
+        <button type="submit" class="wl-submit-btn">
+          <i class="fa-solid fa-plus"></i> Create Listing
+        </button>
+        <a href="/listings" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none;">Cancel</a>
+      </div>
+
     </form>
   </div>
-  <br>
-  <br>
+</div>
 
-
-
-</body>
-</html>
-
-<!--express intreprets listing[---] as - 
-req.body = {
-  listing: {
-    title: 'hotel',
-    description: 'sweet place',
-    image: '',
-    price: '100000',
-    location: 'uttrakhand',
-    country: 'india'
-  }
-} 
-
-extendeed must be true to read urlecoded data which can parse nested objects and arrays in form data.
-Example: user[name]=alice&user[age]=20 → becomes
-
-Methods you cannot send directly
-PUT, PATCH, DELETE → browsers don’t support these in <form method="...">.
-If you try <form method="DELETE">, the browser will actually fall back to GET.
-
-Use method-override middleware in Expres
-The browser sends a POST, but Express sees _method=DELETE and treats it as a DELETE request.
-<form action="/listings/123?_method=DELETE" method="POST">
-  <button type="submit">Delete Listing</button>
-</form>
-
--->
+<script>
+(function() {
+  'use strict';
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+})();
+</script>

@@ -12,12 +12,14 @@ const ExpressError = require("./utils/ExpressError.js");
 const listingsRouter = require("./routes/listing.js");
 const reviewsRouter = require("./routes/review.js");
 const usersRouter = require("./routes/user.js");
+const aiRouter = require("./routes/ai.js");
 const session = require("express-session");
 const MongoStore = require('connect-mongo');
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
+
 
 //Mongoose and MongoDB connection
 //let MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
@@ -37,6 +39,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 //Middlewares
+app.use(express.json());
 app.use(express.urlencoded({ extended: true })); //req.body read
 app.use(methodOverride("_method")); //patch and delete
 app.use(express.static(path.join(__dirname, "/public")));//to serve static files 
@@ -95,7 +98,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
 app.get('/', (req, res) => {
   res.redirect('/listings'); // or res.render('explore') if using EJS
 });
@@ -103,6 +105,7 @@ app.get('/', (req, res) => {
 app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", usersRouter);
+app.use("/", aiRouter);   // ← ADD THIS
 
 //for all other routes that does not match
 app.use((req, res, next) => {

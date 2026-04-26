@@ -1,84 +1,84 @@
 <% layout('/layouts/boiler-plate') %>
 
-<body>
-    <br>
-    <br>
-    <div class="row offset-2" >
-    <h3>Edit Listing</h3>
-    <form method="post" action="/listings/<%=listing.id%>?_method=patch"  class="needs-validation" novalidate enctype="multipart/form-data">
-    <div class="col-8 mb-3" >
-    <label for="title" class="form-label">Title</label>
-    <input type="text" value="<%=listing.title%>" name="listing[title]" class="form-control" required>
-    <div class="valid-feedback">
-      Looks good!
-    </div>
-    </div>
-    <div class="col-8 mb-3" >
-    <label for="description" class="form-label">Description</label>
-    <textarea name="listing[description]" class="form-control" required><%=listing.description%></textarea>
-    </div>
-      
-    <div class="mb-3" >
-      Original Listing Image <br>
-    <image src="<%=listing.image.url%>" alt="listing-image"></image>
+<div class="wl-form-page">
+  <div class="wl-form-card">
+    <div style="display:flex; align-items:center; gap: 0.75rem; margin-bottom: 1.5rem;">
+      <div style="width:44px; height:44px; border-radius:50%; background: var(--primary-soft); display:flex; align-items:center; justify-content:center; color: var(--primary); font-size:1.1rem;">
+        <i class="fa-regular fa-pen-to-square"></i>
+      </div>
+      <div>
+        <h2 class="wl-form-title" style="margin-bottom:0;">Edit Listing</h2>
+        <p style="font-size:0.78rem; color: var(--text-muted); margin:0;">Update your listing details</p>
+      </div>
     </div>
 
-    <div class="col-8 mb-3" >
-    <label for="image" class="form-label">Upload New Image</label>
-    <input type="file"  name="listing[image]" class="form-control" >
-    </div>
+    <form method="post" action="/listings/<%= listing.id %>?_method=patch" class="needs-validation" novalidate enctype="multipart/form-data">
 
-    <div class="row  mb-3" >
-      <div class="col-md-3">
+      <div class="wl-form-group">
+        <label class="wl-form-label">Title <span style="color: var(--primary);">*</span></label>
+        <input type="text" value="<%= listing.title %>" name="listing[title]" class="wl-form-control" required>
+        <div class="invalid-feedback" style="font-size:0.75rem;">Title is required.</div>
+      </div>
 
-    <label for="price" class="form-label" >Price</label>
-    <input type="number" value="<%=listing.price%>" name="listing[price]" class="form-control" required>
-    <div class="invalid-feedback">
-      Please provide a valid price.
-    </div>
-    </div>
-    <div class="col-md-5">
-      <label for="country" class="form-label" >Country</label>
-    <input type="text" value="<%=listing.country%>" name="listing[location]" class="form-control" required>
-    <div class="invalid-feedback">
-      Please provide a valid country.
-    </div>
-    </div>
-    </div>
-    <div class="col-8 mb-3" >
-      <label for="location" class="form-label" >Location</label>
-    <input type="text" value="<%=listing.location%>" name="listing[country]" class="form-control" required>
-    <div class="invalid-feedback">
-      Please provide a valid location.
-    </div>
-    </div>
-    <button type="submit" class="btn btn-dark edit-btn">Edit</button>
+      <div class="wl-form-group">
+        <label class="wl-form-label">Description <span style="color: var(--primary);">*</span></label>
+        <textarea name="listing[description]" class="wl-form-control" rows="4" required><%= listing.description %></textarea>
+      </div>
+
+      <!-- Current Image Preview -->
+      <div class="wl-form-group">
+        <label class="wl-form-label">Current Image</label>
+        <div style="border-radius: 10px; overflow: hidden; max-width: 280px;">
+          <img src="<%= listing.image.url %>" alt="Current" style="width:100%; height:160px; object-fit:cover; display:block;">
+        </div>
+      </div>
+
+      <div class="wl-form-group">
+        <label class="wl-form-label">Upload New Image</label>
+        <input type="file" name="listing[image]" class="wl-form-control" accept="image/*">
+        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">Leave empty to keep the current image.</div>
+      </div>
+
+      <div class="wl-form-row">
+        <div class="wl-form-group">
+          <label class="wl-form-label">Price / night (₹) <span style="color: var(--primary);">*</span></label>
+          <input type="number" value="<%= listing.price %>" name="listing[price]" class="wl-form-control" required min="0">
+          <div class="invalid-feedback" style="font-size:0.75rem;">Please enter a valid price.</div>
+        </div>
+        <div class="wl-form-group">
+          <label class="wl-form-label">Country <span style="color: var(--primary);">*</span></label>
+          <input type="text" value="<%= listing.country %>" name="listing[location]" class="wl-form-control" required>
+        </div>
+      </div>
+
+      <div class="wl-form-group">
+        <label class="wl-form-label">Location <span style="color: var(--primary);">*</span></label>
+        <input type="text" value="<%= listing.location %>" name="listing[country]" class="wl-form-control" required>
+      </div>
+
+      <div style="display:flex; gap: 0.75rem; align-items:center; margin-top: 0.5rem;">
+        <button type="submit" class="wl-submit-btn">
+          <i class="fa-solid fa-floppy-disk"></i> Save Changes
+        </button>
+        <a href="/listings/<%= listing._id %>" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none;">Cancel</a>
+      </div>
+
     </form>
   </div>
-  <br>
-  <br>
-</body>
-</html>
+</div>
 
-<!--- The spread operator
- ... takes all key-value pairs from that object and copies them into a new object.
-  listing: {
-    title: "Mountain Cabin",
-    price: "1500",
-    location: "Manali",
-    country: "India"
-  }
-}
-output of {...req.body.listing}
-{
-  title: 'Mountain Cabin',
-  price: '1500',
-  location: 'Manali',
-  country: 'India'
-}
-
-
-< percent = percent > → evaluates the JavaScript expression inside and outputs the result as HTML, escaping special characters.
-<percent- ... %> → similar, but does not escape HTML. Useful if you want to render raw HTML (like <strong> tags).
-<percent  ... %> → runs JavaScript code but does not output anything. Useful for loops or conditionals:
--->
+<script>
+(function() {
+  'use strict';
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+})();
+</script>

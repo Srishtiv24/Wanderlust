@@ -1,27 +1,57 @@
 <% layout('/layouts/boiler-plate') %>
 
-<body>
-    <br>
-    <div class="row offset-4">
-        <h3>SignUp on WanderLust</h3>
-        <br>
-        <br>
-        <form method="post" action="/signup" class="needs-validation" novalidate>
-            <div class="mb-3 col-6">
-                <label for="username" class="form-label">username</label>
-                <input type="text" placeholder="" name="username" class="form-control" required>
-            </div>
-            <div class="mb-3 col-6">
-                <label for="email" class="form-label">email</label>
-                <input type="email" placeholder="" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3 col-6">
-                <label for="password" class="form-label">password</label>
-                <input type="password" placeholder="" name="password" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-md btn-dark add-btn">SignUp</button>
-        </form>
+<div class="wl-auth-page">
+  <div class="wl-auth-card">
+    <div class="wl-auth-logo">
+      <div class="brand-circle">
+        <i class="fa-regular fa-compass"></i>
+      </div>
+      <h2>Wanderlust</h2>
+      <p>Start your journey today</p>
     </div>
-    <br>
-    <br>
-</body>
+
+    <form method="post" action="/signup" class="needs-validation" novalidate>
+      <div class="wl-form-group">
+        <label class="wl-form-label">Username</label>
+        <input type="text" name="username" class="wl-form-control" placeholder="Choose a username" required>
+        <div class="invalid-feedback" style="font-size:0.75rem;">Please choose a username.</div>
+      </div>
+
+      <div class="wl-form-group">
+        <label class="wl-form-label">Email</label>
+        <input type="email" name="email" class="wl-form-control" placeholder="your@email.com" required>
+        <div class="invalid-feedback" style="font-size:0.75rem;">Please enter a valid email.</div>
+      </div>
+
+      <div class="wl-form-group">
+        <label class="wl-form-label">Password</label>
+        <input type="password" name="password" class="wl-form-control" placeholder="Create a strong password" required>
+        <div class="invalid-feedback" style="font-size:0.75rem;">Please create a password.</div>
+      </div>
+
+      <button type="submit" class="wl-submit-btn" style="width:100%; padding: 0.75rem; font-size: 0.95rem;">
+        <i class="fa-solid fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <p style="text-align:center; font-size:0.82rem; color: var(--text-muted); margin-top: 1.25rem;">
+      Already have an account? <a href="/login" style="color: var(--primary); font-weight: 600; text-decoration: none;">Log in</a>
+    </p>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+})();
+</script>

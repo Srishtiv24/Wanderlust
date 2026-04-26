@@ -1,29 +1,80 @@
-<nav class="navbar navbar-expand-md bg-body-tertiary border-bottom sticky-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i>
-    </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-link" href="/listings">Explore</a>
-        </div>
-        <div class="navbar-nav ms-auto">
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search  destinations" aria-label="Search"/>
-          <button class="btn btn-outline-success" type="submit" id="search-btn"><i class="fa-solid fa-magnifying-glass fa" style="color: #ffffff; font-size: 1rem;"></i>Search</button>
-        </form>
-        </div>
-        <div class="navbar-nav ms-auto">
-          <a class="nav-link" href="/listings/new">Airbnb your home</a>
-          <% if(!currUser) { %>
-          <a class="nav-link bold" href="/signup">Sign Up</a>
-          <a class="nav-link bold" href="/login">Log In</a>
-          <% } else {%>
-          <a class="nav-link bold" href="/logout">Log Out</a>
-          <% } %>
-        </div>
-      </div>
+<nav class="wl-navbar">
+  <!-- Brand -->
+  <a class="wl-brand" href="/listings">
+    <div class="wl-brand-icon">
+      <i class="fa-regular fa-compass"></i>
     </div>
-  </nav>
+    <div class="wl-brand-text">
+      <span class="name">Wanderlust</span>
+      <span class="tagline">Travel by Mood</span>
+    </div>
+  </a>
+
+  <!-- Nav Links -->
+  <ul class="wl-nav-links">
+    <li>
+      <a href="/listings" class="<%= typeof page !== 'undefined' && page === 'explore' ? 'active' : '' %>">
+        <i class="fa-regular fa-compass"></i> Explore
+      </a>
+    </li>
+    <li>
+      <a href="/listings?mood=1">
+        <i class="fa-regular fa-face-smile"></i> Mood Search
+      </a>
+    </li>
+    <% if(currUser) { %>
+    <li>
+      <a href="/listings?saved=1">
+        <i class="fa-regular fa-heart"></i> Favorites
+      </a>
+    </li>
+    <% } %>
+    <li>
+      <a href="/ai-assistant">
+        <i class="fa-solid fa-sparkles"></i> AI Assistant
+      </a>
+    </li>
+  </ul>
+
+  <!-- Search Bar -->
+  <div class="wl-search-bar">
+    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    <form action="/listings" method="GET">
+      <input type="search" name="search" placeholder="Search destinations, places..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+    </form>
+  </div>
+
+  <!-- Right Side -->
+  <div class="wl-nav-right">
+    <a href="#" class="wl-globe-btn" title="Language">
+      <i class="fa-solid fa-globe"></i>
+    </a>
+
+    <% if(currUser) { %>
+    <div class="wl-user-pill">
+      <div class="avatar">
+        <%= currUser.username.charAt(0).toUpperCase() %>
+      </div>
+      <div class="user-info">
+        <span class="user-name">Hi, <%= currUser.username.charAt(0).toUpperCase() + currUser.username.slice(1) %></span>
+        <span class="user-role">Traveler</span>
+      </div>
+      <i class="fa-solid fa-chevron-down" style="font-size:0.65rem; color: #717171; margin-left: 0.15rem;"></i>
+    </div>
+    <a href="/logout" class="wl-auth-links" style="text-decoration:none;">
+      <span style="padding: 0.4rem 0.9rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; border: 1.5px solid #e8e8e8; color: #222; background: white; cursor:pointer; display:inline-block;">Log Out</span>
+    </a>
+    <% } else { %>
+    <div class="wl-auth-links">
+      <a href="/signup" class="signup">Sign Up</a>
+      <a href="/login" class="login">Log In</a>
+    </div>
+    <% } %>
+
+    <% if(currUser) { %>
+    <a href="/listings/new" class="wl-btn-primary" style="flex-shrink:0; text-decoration:none;">
+      <i class="fa-solid fa-plus"></i> List Stay
+    </a>
+    <% } %>
+  </div>
+</nav>

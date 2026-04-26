@@ -42,7 +42,7 @@ listingSchema.post("findOneAndDelete",async(listing)=>
 let Listing= mongoose.model("Listing",listingSchema);
 module.exports=Listing;
 
-/*
+/*z
 cascade delete pattern:
 Without it, if you delete a listing, the reviews linked to that listing would remain in the database, becoming “orphaned” documents.
 With this hook, you ensure data integrity: deleting a listing also cleans up its related reviews.

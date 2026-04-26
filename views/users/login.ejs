@@ -1,38 +1,51 @@
 <% layout('/layouts/boiler-plate') %>
 
-<body>
-    <br>
-    <div class="row offset-4">
-        <h3>Login </h3>
-        <br>
-        <br>
-        <form method="post" action="/login" class="needs-validation" novalidate>
-            <div class="mb-3 col-6">
-                <label for="username" class="form-label">username</label>
-                <input type="text" placeholder="" name="username" class="form-control" required>
-            </div>
-            <div class="mb-3 col-6">
-                <label for="password" class="form-label">password</label>
-                <input type="password" placeholder="" name="password" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-md btn-dark add-btn">Login</button>
-        </form>
+<div class="wl-auth-page">
+  <div class="wl-auth-card">
+    <div class="wl-auth-logo">
+      <div class="brand-circle">
+        <i class="fa-regular fa-compass"></i>
+      </div>
+      <h2>Wanderlust</h2>
+      <p>Welcome back, Traveler</p>
     </div>
-    <br>
-    <br>
-</body>
 
-<!--
-the action attribute tells the browser where to send the form data when the user submits it.
-When req.body is used?
-POST / PUT / PATCH requests
-These methods send data in the request body (form data or JSON).
-GET requests
-By convention, GET requests do not have a body.
-Browsers send data via the query string instead:
+    <form method="post" action="/login" class="needs-validation" novalidate>
+      <div class="wl-form-group">
+        <label class="wl-form-label">Username</label>
+        <input type="text" name="username" class="wl-form-control" placeholder="Enter your username" required>
+        <div class="invalid-feedback" style="font-size:0.75rem;">Please enter your username.</div>
+      </div>
 
-HTML forms typically send data in URL-encoded format (like username=alice&password=123).
-express.urlencoded() is middleware that parses this format and populates req.body.
-extended: true → uses the qs library, which can parse nested objects and arrays in form data.
-Example: user[name]=alice&user[age]=20 
--->
+      <div class="wl-form-group">
+        <label class="wl-form-label">Password</label>
+        <input type="password" name="password" class="wl-form-control" placeholder="Enter your password" required>
+        <div class="invalid-feedback" style="font-size:0.75rem;">Please enter your password.</div>
+      </div>
+
+      <button type="submit" class="wl-submit-btn" style="width:100%; padding: 0.75rem; font-size: 0.95rem;">
+        <i class="fa-solid fa-right-to-bracket"></i> Log In
+      </button>
+    </form>
+
+    <p style="text-align:center; font-size:0.82rem; color: var(--text-muted); margin-top: 1.25rem;">
+      New to Wanderlust? <a href="/signup" style="color: var(--primary); font-weight: 600; text-decoration: none;">Create an account</a>
+    </p>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+})();
+</script>
