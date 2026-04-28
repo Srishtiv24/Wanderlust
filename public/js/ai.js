@@ -1,6 +1,26 @@
 let chatHistory = [];
 let isThinking = false;
 
+// ✅ Typewriter effect
+function typeWriterEffect(element, text, speed = 40) {
+  let i = 0;
+
+  function type() {
+    if (i <= text.length) {
+      element.innerHTML = formatMarkdown(text.slice(0, i));
+      i++;
+
+      const msgs = document.getElementById('aiMessages');
+      msgs.scrollTop = msgs.scrollHeight;
+
+      setTimeout(type, speed);
+    }
+  }
+
+  type();
+}
+
+// ✅ preset buttons
 function sendPreset(btn) {
   const span = btn.querySelector('span');
   const text = span ? span.textContent.trim() : btn.textContent.trim();
@@ -8,6 +28,7 @@ function sendPreset(btn) {
   sendMessage();
 }
 
+// ✅ new chat
 function newChat() {
   chatHistory = [];
   const msgs = document.getElementById('aiMessages');
@@ -24,6 +45,7 @@ function newChat() {
   setReady();
 }
 
+// ✅ enter key
 function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -31,11 +53,13 @@ function handleKey(e) {
   }
 }
 
+// ✅ textarea resize
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 140) + 'px';
 }
 
+// ✅ status
 function setReady() {
   document.getElementById('aiDot').className = 'ai-dot';
   document.getElementById('aiStatusText').textContent = 'Ready';
@@ -46,6 +70,7 @@ function setBusy() {
   document.getElementById('aiStatusText').textContent = 'Thinking…';
 }
 
+// ✅ append message
 function appendMsg(text, role, isTemp = false) {
   const welcome = document.getElementById('aiWelcome');
   if (welcome) welcome.remove();
@@ -80,6 +105,7 @@ function appendMsg(text, role, isTemp = false) {
   return row;
 }
 
+// ✅ markdown formatting
 function formatMarkdown(text) {
   return text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -87,10 +113,12 @@ function formatMarkdown(text) {
     .replace(/\n/g, '<br>');
 }
 
+// ✅ escape html
 function escapeHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// ✅ MAIN FUNCTION (FIXED)
 async function sendMessage() {
   if (isThinking) return;
 
@@ -108,7 +136,6 @@ async function sendMessage() {
   setBusy();
   document.getElementById('aiSendBtn').disabled = true;
 
-  // ✅ Only ONE thinking message
   const botMsgEl = appendMsg("", "bot", true);
 
   try {
@@ -118,59 +145,29 @@ async function sendMessage() {
       body: JSON.stringify({ messages: chatHistory })
     });
 
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder("utf-8");
+    if (!res.ok) throw new Error("API failed");
 
-    let buffer = "";
-    let fullText = "";
-    let started = false;
+    const data = await res.json();
+    const reply = data.reply || "No response";
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    // remove thinking UI
+    botMsgEl.classList.remove("ai-thinking-row");
 
-      buffer += decoder.decode(value, { stream: true });
+    const target = botMsgEl.querySelector(".ai-msg-text");
 
-      let parts = buffer.split("\n\n");
-      buffer = parts.pop();
+    // clear thinking text
+    target.innerHTML = "";
 
-      for (let part of parts) {
-        const line = part.trim();
-        if (!line.startsWith("data:")) continue;
+    // ✨ typewriter animation
+    typeWriterEffect(target, reply);
 
-        const data = line.replace("data:", "").trim();
-        if (data === "[DONE]") break;
-
-        try {
-          const json = JSON.parse(data);
-          const token = json.choices?.[0]?.delta?.content;
-
-          if (token) {
-            // first token → remove thinking UI
-            if (!started) {
-              botMsgEl.classList.remove("ai-thinking-row");
-              botMsgEl.querySelector(".ai-msg-text").innerHTML = "";
-              started = true;
-            }
-
-            fullText += token;
-
-            botMsgEl.querySelector(".ai-msg-text").innerHTML =
-              formatMarkdown(fullText);
-
-            const msgs = document.getElementById('aiMessages');
-            msgs.scrollTop = msgs.scrollHeight;
-          }
-        } catch (e) {
-          console.error("Parse error", e);
-        }
-      }
-    }
-
-    chatHistory.push({ role: "assistant", content: fullText });
+    chatHistory.push({ role: "assistant", content: reply });
 
   } catch (err) {
-    botMsgEl.querySelector(".ai-msg-text").innerHTML = "Connection error.";
+    botMsgEl.classList.remove("ai-thinking-row");
+    botMsgEl.querySelector(".ai-msg-text").innerHTML =
+      "⚠️ Connection error.";
+    console.error(err);
   }
 
   isThinking = false;
@@ -179,6 +176,7 @@ async function sendMessage() {
   input.focus();
 }
 
+// ✅ autofocus
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('aiInput').focus();
 });

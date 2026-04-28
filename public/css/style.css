@@ -339,6 +339,10 @@ body {
   gap: 0.5rem;
 }
 
+
+.wl-mood-grid a{
+  text-decoration: none;
+}
 .wl-mood-tag {
   padding: 0.5rem 0.6rem;
   border-radius: 8px;
@@ -1368,3 +1372,20 @@ body {
   margin-left: 0.2rem;
   vertical-align: middle;
 }
+/* ===== MULTI-FILTER: active states ===== */
+/* Mood tag active (currently selected mood) */
+a.wl-mood-tag.active {
+  box-shadow: 0 0 0 2.5px currentColor;
+  font-weight: 700;
+  opacity: 1;
+}
+
+/* Category filter link — render like the old divs */
+a.filter {
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+a.filter:hover, a.filter.active { color: var(--primary); }

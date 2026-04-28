@@ -2,7 +2,8 @@ const express = require("express");
 const router  = express.Router();
 
 router.get("/ai-assistant", (req, res) => {
-  res.render("ai.ejs");
+  const autoPrompt = req.query.prompt ? req.query.prompt.trim() : "";
+  res.render("ai.ejs", { autoPrompt });
 });
 
 router.post("/api/ai-chat", async (req, res) => {

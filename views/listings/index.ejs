@@ -27,12 +27,12 @@
       <div class="wl-mood-panel">
         <h4>How do you feel today?</h4>
         <div class="wl-mood-grid">
-          <a href="/listings?mood=healing"     class="wl-mood-tag healing">    <span>🌿</span> Healing</a>
-          <a href="/listings?mood=celebration" class="wl-mood-tag celebration"><span>🎉</span> Celebration</a>
-          <a href="/listings?mood=solitude"    class="wl-mood-tag solitude">   <span>🧘</span> Solitude</a>
-          <a href="/listings?mood=sisterhood"  class="wl-mood-tag sisterhood"> <span>💖</span> Sisterhood</a>
-          <a href="/listings?mood=adventure"   class="wl-mood-tag adventure">  <span>🧗</span> Adventure</a>
-          <a href="/listings?mood=monsoon"     class="wl-mood-tag monsoon">    <span>🌧️</span> Monsoon Magic</a>
+          <a href="#" class="wl-mood-tag wl-filter-link healing <%= activeMood==='healing' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="healing"><i class="fa-solid fa-leaf"></i> Healing</a>
+          <a href="#" class="wl-mood-tag wl-filter-link celebration <%= activeMood==='celebration' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="celebration"><i class="fa-solid fa-champagne-glasses"></i> Celebration</a>
+          <a href="#" class="wl-mood-tag wl-filter-link solitude <%= activeMood==='solitude' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="solitude"><i class="fa-solid fa-moon"></i> Solitude</a>
+          <a href="#" class="wl-mood-tag wl-filter-link sisterhood <%= activeMood==='sisterhood' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="sisterhood"><i class="fa-solid fa-heart"></i> Sisterhood</a>
+          <a href="#" class="wl-mood-tag wl-filter-link adventure <%= activeMood==='adventure' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="adventure"><i class="fa-solid fa-person-hiking"></i> Adventure</a>
+          <a href="#" class="wl-mood-tag wl-filter-link monsoon <%= activeMood==='monsoon' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="monsoon"><i class="fa-solid fa-cloud-rain"></i> Monsoon Magic</a>
         </div>
       </div>
     </div>
@@ -51,31 +51,31 @@
 
     <!-- ===== CATEGORY FILTER BAR ===== -->
     <div id="filters">
-      <a href="/listings" class="filter <%= !activeCategory && !activeMood && !searchQuery ? 'active' : '' %>">
+      <a href="/listings" class="filter wl-filter-link <%= !activeCategory && !activeMood && !searchQuery ? 'active' : '' %>" data-filter-clear="true">
         <div><i class="fa-solid fa-fire"></i></div><p>Trending</p>
       </a>
-      <a href="/listings?category=mountains" class="filter <%= activeCategory==='mountains' ? 'active' : '' %>">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='mountains' ? 'active' : '' %>" data-filter-key="category" data-filter-val="mountains">
         <div><i class="fa-solid fa-mountain-sun"></i></div><p>Mountains</p>
       </a>
-      <a href="/listings?category=beach" class="filter <%= activeCategory==='beach' ? 'active' : '' %>">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='beach' ? 'active' : '' %>" data-filter-key="category" data-filter-val="beach">
         <div><i class="fa-solid fa-umbrella-beach"></i></div><p>Beach</p>
       </a>
-      <a href="/listings?category=arctic" class="filter <%= activeCategory==='arctic' ? 'active' : '' %>">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='arctic' ? 'active' : '' %>" data-filter-key="category" data-filter-val="arctic">
         <div><i class="fa-solid fa-snowflake"></i></div><p>Arctic</p>
       </a>
-      <a href="/listings?category=pools" class="filter <%= activeCategory==='pools' ? 'active' : '' %>">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='pools' ? 'active' : '' %>" data-filter-key="category" data-filter-val="pools">
         <div><i class="fa-solid fa-person-swimming"></i></div><p>Pools</p>
       </a>
-      <a href="/listings?category=cities" class="filter <%= activeCategory==='cities' ? 'active' : '' %>">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='cities' ? 'active' : '' %>" data-filter-key="category" data-filter-val="cities">
         <div><i class="fa-solid fa-city"></i></div><p>Cities</p>
       </a>
-      <a href="/listings?category=camping" class="filter <%= activeCategory==='camping' ? 'active' : '' %>">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='camping' ? 'active' : '' %>" data-filter-key="category" data-filter-val="camping">
         <div><i class="fa-solid fa-campground"></i></div><p>Camping</p>
       </a>
-      <a href="/listings?category=castles" class="filter <%= activeCategory==='castles' ? 'active' : '' %>">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='castles' ? 'active' : '' %>" data-filter-key="category" data-filter-val="castles">
         <div><i class="fa-solid fa-chess-rook"></i></div><p>Castles</p>
       </a>
-      <a href="/listings?category=forests" class="filter <%= activeCategory==='forests' ? 'active' : '' %>">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='forests' ? 'active' : '' %>" data-filter-key="category" data-filter-val="forests">
         <div><i class="fa-solid fa-tree-city"></i></div><p>Forests</p>
       </a>
 
@@ -285,7 +285,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Tax toggle
+
+  // ── Tax toggle ────────────────────────────────────────────
   const taxSwitch = document.getElementById('switchCheckDefault');
   if (taxSwitch) {
     taxSwitch.addEventListener('change', () => {
@@ -295,15 +296,85 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Refresh fav button states on load
+  // ── Multi-filter navigation ───────────────────────────────
+  // Clicking a category or mood filter ADDS it to current params
+  // instead of wiping out search/price/mood that are already active
+  document.querySelectorAll('.wl-filter-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      // "Trending" clears everything
+      if (this.dataset.filterClear) {
+        window.location.href = '/listings';
+        return;
+      }
+
+      const key = this.dataset.filterKey;   // 'category' | 'mood'
+      const val = this.dataset.filterVal;
+
+      // Start from current URL params so other filters survive
+      const params = new URLSearchParams(window.location.search);
+
+      // Toggle: clicking the already-active filter removes it
+      if (params.get(key) === val) {
+        params.delete(key);
+      } else {
+        params.set(key, val);
+      }
+
+      const qs = params.toString();
+      window.location.href = qs ? `/listings?${qs}` : '/listings';
+    });
+  });
+
+  // ── Debounced navbar search ───────────────────────────────
+  // Fires 400 ms after the user stops typing; preserves other active filters
+  const navbarForm = document.querySelector('.wl-search-bar form');
+  const navbarInput = navbarForm ? navbarForm.querySelector('input[name="search"]') : null;
+  if (navbarInput) {
+    // Intercept form submit so hidden params aren't needed —
+    // instead we merge into current URL params
+    let navTimer;
+    navbarInput.addEventListener('input', function() {
+      clearTimeout(navTimer);
+      const val = this.value.trim();
+      navTimer = setTimeout(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (val.length >= 2) {
+          params.set('search', val);
+        } else if (val.length === 0) {
+          params.delete('search');
+        } else {
+          return; // wait for at least 2 chars
+        }
+        const qs = params.toString();
+        window.location.href = qs ? `/listings?${qs}` : '/listings';
+      }, 400);
+    });
+
+    // Also intercept Enter / form submit to merge params
+    navbarForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const val = navbarInput.value.trim();
+      const params = new URLSearchParams(window.location.search);
+      if (val) {
+        params.set('search', val);
+      } else {
+        params.delete('search');
+      }
+      const qs = params.toString();
+      window.location.href = qs ? `/listings?${qs}` : '/listings';
+    });
+  }
+
+  // ── Fav button states on load ─────────────────────────────
   if (typeof refreshFavButtons === 'function') refreshFavButtons();
 });
 
-// Fav click handler — uses functions defined in navbar.ejs
+// ── Fav click handler ─────────────────────────────────────
 function handleFavClick(btn) {
   const { favId, favTitle, favImg, favLocation, favPrice } = btn.dataset;
   const added = toggleFav(favId, favTitle, favImg, favLocation, favPrice);
-  // Visual feedback
   btn.classList.toggle('active', added);
   btn.innerHTML = added
     ? '<i class="fa-solid fa-heart" style="color:var(--primary)"></i>'

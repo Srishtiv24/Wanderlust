@@ -17,21 +17,23 @@
         <i class="fa-regular fa-compass"></i> Explore
       </a>
     </li>
-    <li>
-      <a href="/listings?mood=1">
-        <i class="fa-regular fa-face-smile"></i> Mood Search
-      </a>
-    </li>
+
     <% if(currUser) { %>
-    <li>
-      <a href="/listings?saved=1">
-        <i class="fa-regular fa-heart"></i> Favorites
-      </a>
-    </li>
+      <li>
+        <a href="/wishlist">
+          <i class="fa-regular fa-heart"></i> Favorites
+          <span class="fav-count" id="navFavCount" style="display:none;"></span>
+        </a>
+      </li>
     <% } %>
     <li>
       <a href="/ai-assistant">
-        <i class="fa-solid fa-sparkles"></i> AI Assistant
+        <span style="font-size:1.3rem;">✦</span> AI Assistant
+      </a>
+    </li>
+    <li>
+      <a href="/listings?mood=1">
+        <i class="fa-regular fa-face-smile"></i> Itinerary Planner
       </a>
     </li>
   </ul>

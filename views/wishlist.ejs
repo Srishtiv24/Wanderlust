@@ -1,0 +1,649 @@
+<% layout('/layouts/boiler-plate') -%>
+<% activePage = 'wishlist' %>
+
+<style>
+/* ── WISHLIST PAGE ────────────────────────────────────────────────── */
+.wl-page { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+/* PAGE HEADER */
+.wl-page-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+}
+.wl-page-header-left {}
+.wl-page-eyebrow {
+  font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--primary); margin-bottom: .4rem;
+}
+.wl-page-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-weight: 700; color: var(--text); margin: 0;
+  display: flex; align-items: center; gap: .6rem;
+}
+.wl-page-title .count-badge {
+  font-size: 1rem; font-weight: 700;
+  background: var(--primary-soft); color: var(--primary);
+  padding: .2rem .65rem; border-radius: 50px;
+  font-family: 'DM Sans', sans-serif;
+}
+.wl-page-sub { font-size: .88rem; color: var(--text-muted); margin-top: .4rem; }
+
+.wl-header-actions { display: flex; gap: .65rem; align-items: center; }
+.wl-hdr-btn {
+  padding: .45rem 1rem; border-radius: 8px; border: 1.5px solid var(--border);
+  font-size: .82rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; background: #fff; color: var(--text);
+  display: inline-flex; align-items: center; gap: .35rem; text-decoration: none;
+  transition: all .2s;
+}
+.wl-hdr-btn:hover { border-color: var(--primary); color: var(--primary); }
+.wl-hdr-btn.danger:hover { background: #fff0f0; border-color: #dc3545; color: #dc3545; }
+
+/* SORT / FILTER BAR */
+.wl-toolbar {
+  display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
+  padding: .85rem 1.1rem;
+  background: #fff; border-radius: 12px;
+  box-shadow: var(--card-shadow); margin-bottom: 1.5rem;
+}
+.wl-toolbar-label { font-size: .78rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+.wl-sort-pills { display: flex; gap: .4rem; flex-wrap: wrap; }
+.wl-sort-pill {
+  padding: .32rem .75rem; border-radius: 50px;
+  border: 1.5px solid var(--border); font-size: .78rem; font-weight: 600;
+  cursor: pointer; background: #fff; color: var(--text); transition: all .18s;
+}
+.wl-sort-pill:hover, .wl-sort-pill.active {
+  border-color: var(--primary); background: var(--primary-soft); color: var(--primary);
+}
+.wl-toolbar-divider { width: 1px; height: 22px; background: var(--border); flex-shrink: 0; }
+.wl-search-filter {
+  flex: 1; min-width: 180px; position: relative;
+}
+.wl-search-filter input {
+  width: 100%; padding: .38rem .8rem .38rem 2rem;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: .8rem; font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color .2s;
+}
+.wl-search-filter input:focus { border-color: var(--primary); }
+.wl-search-filter i { position: absolute; left: .65rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: .75rem; }
+
+/* LOADING STATE */
+.wl-loading {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 5rem 2rem; gap: 1rem;
+}
+.wl-spinner {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 3px solid var(--border); border-top-color: var(--primary);
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.wl-loading p { font-size: .88rem; color: var(--text-muted); }
+
+/* EMPTY STATE */
+.wl-empty {
+  text-align: center; padding: 5rem 2rem;
+  display: flex; flex-direction: column; align-items: center; gap: 1.1rem;
+}
+.wl-empty-icon {
+  width: 90px; height: 90px; border-radius: 50%;
+  background: var(--primary-soft); display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+}
+.wl-empty h3 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.4rem; font-weight: 700; color: var(--text);
+}
+.wl-empty p { font-size: .9rem; color: var(--text-muted); max-width: 360px; line-height: 1.6; }
+.wl-empty-btn {
+  padding: .65rem 1.75rem; background: var(--primary); color: #fff;
+  border-radius: 10px; text-decoration: none; font-weight: 700; font-size: .9rem;
+  transition: background .2s; display: inline-flex; align-items: center; gap: .4rem;
+}
+.wl-empty-btn:hover { background: #c62f22; color: #fff; }
+
+/* GRID */
+.wl-wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: 1.15rem;
+}
+
+/* CARD */
+.wl-wish-card {
+  background: #fff; border-radius: 16px; overflow: hidden;
+  box-shadow: var(--card-shadow); transition: all .25s;
+  position: relative; display: flex; flex-direction: column;
+}
+.wl-wish-card:hover { box-shadow: var(--card-hover-shadow); transform: translateY(-3px); }
+.wl-wish-card-img-wrap { position: relative; flex-shrink: 0; }
+.wl-wish-card-img { width: 100%; height: 185px; object-fit: cover; display: block; }
+
+/* Remove button */
+.wl-wish-remove {
+  position: absolute; top: .65rem; right: .65rem;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #fff; border: none; cursor: pointer; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem; color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,.18); transition: all .2s;
+}
+.wl-wish-remove:hover { background: var(--primary); color: #fff; transform: scale(1.1); }
+
+/* Hidden gem badge */
+.wl-gem-badge {
+  position: absolute; top: .65rem; left: .65rem;
+  background: #1a1a2e; color: #fff;
+  padding: .18rem .6rem; border-radius: 20px;
+  font-size: .67rem; font-weight: 700; z-index: 2;
+  display: flex; align-items: center; gap: .25rem;
+}
+
+/* Card body */
+.wl-wish-card-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+.wl-wish-badges { display: flex; gap: .35rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.wl-wish-badge {
+  padding: .18rem .55rem; border-radius: 20px;
+  font-size: .67rem; font-weight: 700;
+}
+.wl-wish-badge.mood { background: var(--primary-soft); color: var(--primary); }
+.wl-wish-badge.cat  { background: #f0f0f0; color: #555; }
+
+.wl-wish-name {
+  font-weight: 700; font-size: .95rem; margin-bottom: .2rem;
+  color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.wl-wish-loc {
+  font-size: .76rem; color: var(--text-muted);
+  display: flex; align-items: center; gap: .3rem; margin-bottom: .6rem;
+}
+.wl-wish-loc i { color: var(--primary); font-size: .7rem; }
+
+.wl-wish-meta {
+  display: flex; gap: .5rem; flex-wrap: wrap;
+  margin-bottom: .85rem; margin-top: auto;
+}
+.wl-wish-meta-chip {
+  padding: .22rem .6rem; border-radius: 6px;
+  background: var(--bg); border: 1px solid var(--border);
+  font-size: .72rem; color: var(--text-muted);
+  display: flex; align-items: center; gap: .25rem;
+}
+
+/* Card footer actions */
+.wl-wish-actions {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .5rem;
+  padding-top: .75rem; border-top: 1px solid var(--border); margin-top: auto;
+}
+.wl-wish-action-btn {
+  padding: .45rem .5rem; border-radius: 8px; font-size: .78rem; font-weight: 600;
+  font-family: 'DM Sans', sans-serif; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: .3rem;
+  text-decoration: none; transition: all .2s; border: 1.5px solid var(--border);
+  background: #fff; color: var(--text);
+}
+.wl-wish-action-btn:hover { border-color: var(--primary); color: var(--primary); }
+.wl-wish-action-btn.primary {
+  background: var(--primary); color: #fff; border-color: var(--primary);
+}
+.wl-wish-action-btn.primary:hover { background: #c62f22; }
+
+/* STATS SUMMARY BAR */
+.wl-stats-bar {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+  gap: .85rem; margin-bottom: 1.5rem;
+}
+.wl-stat-card {
+  background: #fff; border-radius: 12px; padding: 1rem 1.1rem;
+  box-shadow: var(--card-shadow); display: flex; align-items: center; gap: .75rem;
+}
+.wl-stat-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;
+}
+.wl-stat-icon.red    { background: var(--primary-soft); }
+.wl-stat-icon.green  { background: #e8f5e9; }
+.wl-stat-icon.blue   { background: #e3f2fd; }
+.wl-stat-icon.yellow { background: #fff8e1; }
+.wl-stat-val   { font-size: 1.2rem; font-weight: 700; color: var(--text); line-height: 1; }
+.wl-stat-label { font-size: .72rem; color: var(--text-muted); margin-top: .15rem; }
+
+/* PLAN TOGETHER BANNER */
+.wl-plan-banner {
+  background: linear-gradient(135deg, #1a1a2e, #2d2d50);
+  border-radius: 16px; padding: 1.75rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1.5rem; margin-top: 2.5rem; flex-wrap: wrap;
+}
+.wl-plan-banner-text h3 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: .35rem;
+}
+.wl-plan-banner-text p { font-size: .84rem; color: rgba(255,255,255,.65); line-height: 1.5; }
+.wl-plan-banner-btns { display: flex; gap: .75rem; flex-shrink: 0; flex-wrap: wrap; }
+.wl-plan-btn {
+  padding: .55rem 1.25rem; border-radius: 8px;
+  font-size: .84rem; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: .4rem;
+  transition: all .2s;
+}
+.wl-plan-btn.primary { background: var(--primary); color: #fff; }
+.wl-plan-btn.primary:hover { background: #c62f22; }
+.wl-plan-btn.secondary { background: rgba(255,255,255,.12); color: #fff; border: 1.5px solid rgba(255,255,255,.25); }
+.wl-plan-btn.secondary:hover { background: rgba(255,255,255,.2); }
+
+/* CLEAR CONFIRM MODAL */
+.wl-modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.45); z-index: 500;
+  align-items: center; justify-content: center;
+}
+.wl-modal-overlay.open { display: flex; }
+.wl-modal {
+  background: #fff; border-radius: 18px; padding: 2rem;
+  max-width: 380px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  text-align: center;
+}
+.wl-modal h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: .5rem; }
+.wl-modal p  { font-size: .85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; }
+.wl-modal-btns { display: flex; gap: .65rem; justify-content: center; }
+.wl-modal-btn {
+  padding: .55rem 1.4rem; border-radius: 8px;
+  font-size: .875rem; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; border: none; transition: all .2s;
+}
+.wl-modal-btn.cancel { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
+.wl-modal-btn.cancel:hover { border-color: var(--primary); color: var(--primary); }
+.wl-modal-btn.confirm { background: #dc3545; color: #fff; }
+.wl-modal-btn.confirm:hover { background: #b02a37; }
+
+/* RESPONSIVE */
+@media(max-width: 600px) {
+  .wl-page { padding: 1.5rem 1rem 4rem; }
+  .wl-stats-bar { grid-template-columns: 1fr 1fr; }
+  .wl-plan-banner { flex-direction: column; }
+}
+</style>
+
+<!-- Clear confirm modal -->
+<div class="wl-modal-overlay" id="clearModal">
+  <div class="wl-modal">
+    <div style="font-size:2.5rem;margin-bottom:.75rem;">🗑️</div>
+    <h3>Clear wishlist?</h3>
+    <p>This will remove all <span id="clearCount">0</span> saved destinations from your wishlist. This cannot be undone.</p>
+    <div class="wl-modal-btns">
+      <button class="wl-modal-btn cancel" onclick="closeClearModal()">Cancel</button>
+      <button class="wl-modal-btn confirm" onclick="confirmClear()">Yes, Clear All</button>
+    </div>
+  </div>
+</div>
+
+<div class="wl-page">
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="wl-page-header">
+    <div class="wl-page-header-left">
+      <div class="wl-page-eyebrow">✦ Your saved places</div>
+      <h1 class="wl-page-title">
+        <i class="fa-solid fa-heart" style="color:var(--primary);font-size:1.4rem;"></i>
+        My Wishlist
+        <span class="count-badge" id="headerCount">0</span>
+      </h1>
+      <p class="wl-page-sub">All the destinations you've fallen in love with — in one place.</p>
+    </div>
+    <div class="wl-header-actions">
+      <button class="wl-hdr-btn" onclick="exportWishlist()">
+        <i class="fa-solid fa-download"></i> Export
+      </button>
+      <button class="wl-hdr-btn danger" onclick="openClearModal()" id="clearAllBtn" style="display:none;">
+        <i class="fa-regular fa-trash-can"></i> Clear All
+      </button>
+    </div>
+  </div>
+
+  <!-- ── STATS BAR ── -->
+  <div class="wl-stats-bar" id="statsBar" style="display:none;">
+    <div class="wl-stat-card">
+      <div class="wl-stat-icon red">❤️</div>
+      <div>
+        <div class="wl-stat-val" id="statTotal">0</div>
+        <div class="wl-stat-label">Saved Destinations</div>
+      </div>
+    </div>
+    <div class="wl-stat-card">
+      <div class="wl-stat-icon green">💎</div>
+      <div>
+        <div class="wl-stat-val" id="statGems">0</div>
+        <div class="wl-stat-label">Hidden Gems</div>
+      </div>
+    </div>
+    <div class="wl-stat-card">
+      <div class="wl-stat-icon blue">🌍</div>
+      <div>
+        <div class="wl-stat-val" id="statCountries">0</div>
+        <div class="wl-stat-label">Countries</div>
+      </div>
+    </div>
+    <div class="wl-stat-card">
+      <div class="wl-stat-icon yellow">🗂</div>
+      <div>
+        <div class="wl-stat-val" id="statCategories">0</div>
+        <div class="wl-stat-label">Categories</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOOLBAR ── -->
+  <div class="wl-toolbar" id="toolbar" style="display:none;">
+    <span class="wl-toolbar-label">Sort:</span>
+    <div class="wl-sort-pills">
+      <button class="wl-sort-pill active" data-sort="saved">Recently Saved</button>
+      <button class="wl-sort-pill" data-sort="az">A → Z</button>
+      <button class="wl-sort-pill" data-sort="gems">Gems First</button>
+    </div>
+    <div class="wl-toolbar-divider"></div>
+    <div class="wl-search-filter">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="wishlistSearch" placeholder="Filter saved places…">
+    </div>
+  </div>
+
+  <!-- ── LOADING ── -->
+  <div class="wl-loading" id="loadingState">
+    <div class="wl-spinner"></div>
+    <p>Loading your saved destinations…</p>
+  </div>
+
+  <!-- ── EMPTY STATE ── -->
+  <div class="wl-empty" id="emptyState" style="display:none;">
+    <div class="wl-empty-icon">🗺️</div>
+    <h3>Your wishlist is empty</h3>
+    <p>Start exploring and tap the <i class="fa-regular fa-heart" style="color:var(--primary);"></i> heart on any destination to save it here.</p>
+    <a href="/listings" class="wl-empty-btn">
+      <i class="fa-regular fa-compass"></i> Explore Destinations
+    </a>
+  </div>
+
+  <!-- ── NO SEARCH RESULTS ── -->
+  <div class="wl-empty" id="noFilterResults" style="display:none;">
+    <div class="wl-empty-icon">🔍</div>
+    <h3>No matches found</h3>
+    <p>Try a different search term to filter your saved destinations.</p>
+    <button class="wl-empty-btn" onclick="document.getElementById('wishlistSearch').value=''; renderCards(allFetched);">
+      Clear filter
+    </button>
+  </div>
+
+  <!-- ── GRID ── -->
+  <div class="wl-wishlist-grid" id="wishlistGrid"></div>
+
+  <!-- ── PLAN TOGETHER BANNER ── -->
+  <div class="wl-plan-banner" id="planBanner" style="display:none;">
+    <div class="wl-plan-banner-text">
+      <h3>🗺️ Ready to plan your next trip?</h3>
+      <p>Use our AI Planner to turn your saved destinations into a complete day-by-day itinerary — just enter your dates and budget.</p>
+    </div>
+    <div class="wl-plan-banner-btns">
+      <a href="/itinerary" class="wl-plan-btn primary">
+        <i class="fa-solid fa-route"></i> Generate Itinerary
+      </a>
+      <a href="/ai-assistant" class="wl-plan-btn secondary">
+        <i class="fa-solid fa-sparkles"></i> Ask AI
+      </a>
+    </div>
+  </div>
+
+</div><!-- end .wl-page -->
+
+<script>
+let allFetched    = [];   // full array from API
+let currentSort   = 'saved';
+
+// ── STORAGE HELPERS ──────────────────────────────────────────
+function getFavs() {
+  try { return JSON.parse(localStorage.getItem('wl_favs') || '[]'); } catch { return []; }
+}
+function saveFavs(arr) {
+  localStorage.setItem('wl_favs', JSON.stringify(arr));
+  if (window.updateWishlistBadge) window.updateWishlistBadge();
+}
+function removeFav(id) {
+  saveFavs(getFavs().filter(f => f !== id));
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  const ids = getFavs();
+  if (ids.length === 0) {
+    showEmpty();
+    return;
+  }
+  await fetchAndRender(ids);
+});
+
+async function fetchAndRender(ids) {
+  showLoading();
+  try {
+    const res  = await fetch('/api/listings-by-ids?ids=' + ids.join(','));
+    const data = await res.json();
+    allFetched = data.listings || [];
+
+    if (allFetched.length === 0) { showEmpty(); return; }
+
+    showGrid();
+    updateStats(allFetched);
+    renderCards(allFetched);
+    setupToolbar();
+  } catch(err) {
+    console.error(err);
+    document.getElementById('loadingState').innerHTML = `
+      <div style="text-align:center;padding:3rem;color:var(--text-muted);">
+        <div style="font-size:2.5rem;margin-bottom:1rem;">⚠️</div>
+        <p>Couldn't load your saved destinations. Please refresh and try again.</p>
+      </div>`;
+  }
+}
+
+// ── RENDER CARDS ─────────────────────────────────────────────
+function renderCards(listings) {
+  const grid = document.getElementById('wishlistGrid');
+  grid.innerHTML = '';
+
+  const sorted = sortListings([...listings], currentSort);
+
+  if (sorted.length === 0) {
+    document.getElementById('noFilterResults').style.display = 'flex';
+    return;
+  }
+  document.getElementById('noFilterResults').style.display = 'none';
+
+  sorted.forEach(listing => {
+    const card = createCard(listing);
+    grid.appendChild(card);
+  });
+}
+
+function createCard(listing) {
+  const id         = listing._id;
+  const reviewCount = listing.reviews ? listing.reviews.length : 0;
+  const moods      = listing.mood && listing.mood.length ? listing.mood : [];
+  const category   = listing.category || '';
+  const cost       = listing.estimatedCost || '';
+  const season     = listing.bestSeason   || '';
+
+  const card = document.createElement('div');
+  card.className = 'wl-wish-card';
+  card.dataset.id = id;
+  card.dataset.name = listing.title.toLowerCase();
+
+  card.innerHTML = `
+    <div class="wl-wish-card-img-wrap">
+      <img src="${listing.image?.url || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&auto=format&fit=crop'}"
+           alt="${listing.title}" class="wl-wish-card-img" loading="lazy">
+      ${listing.isHiddenGem ? '<div class="wl-gem-badge">💎 Hidden Gem</div>' : ''}
+      <button class="wl-wish-remove" onclick="handleRemove('${id}', this)" title="Remove from wishlist">
+        <i class="fa-solid fa-heart-crack"></i>
+      </button>
+    </div>
+
+    <div class="wl-wish-card-body">
+      <div class="wl-wish-badges">
+        ${category ? `<span class="wl-wish-badge cat">🗂 ${category.charAt(0).toUpperCase()+category.slice(1)}</span>` : ''}
+        ${moods.slice(0,1).map(m => `<span class="wl-wish-badge mood">${m.charAt(0).toUpperCase()+m.slice(1)}</span>`).join('')}
+      </div>
+
+      <div class="wl-wish-name" title="${listing.title}">${listing.title}</div>
+      <div class="wl-wish-loc">
+        <i class="fa-solid fa-location-dot"></i>
+        ${listing.location}, ${listing.country}
+      </div>
+
+      <div class="wl-wish-meta">
+        ${cost   ? `<span class="wl-wish-meta-chip">💰 ${cost}</span>` : ''}
+        ${season ? `<span class="wl-wish-meta-chip">🌤 ${season}</span>` : ''}
+        <span class="wl-wish-meta-chip">⭐ ${reviewCount} review${reviewCount !== 1 ? 's' : ''}</span>
+      </div>
+
+      <div class="wl-wish-actions">
+        <a href="/listings/${id}" class="wl-wish-action-btn primary">
+          <i class="fa-regular fa-compass"></i> Explore
+        </a>
+        <a href="/ai-assistant?prompt=${encodeURIComponent('Plan a trip to ' + listing.title + ', ' + listing.location + '. Give a detailed itinerary with activities, local food, hidden gems and estimated costs in INR.')}"
+           class="wl-wish-action-btn">
+          <i class="fa-solid fa-route"></i> Plan Trip
+        </a>
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+// ── REMOVE ───────────────────────────────────────────────────
+function handleRemove(id, btn) {
+  removeFav(id);
+  allFetched = allFetched.filter(l => l._id !== id);
+
+  // Animate card out
+  const card = btn.closest('.wl-wish-card');
+  card.style.transition = 'all .3s ease';
+  card.style.opacity    = '0';
+  card.style.transform  = 'scale(.9)';
+  setTimeout(() => {
+    card.remove();
+    if (allFetched.length === 0) {
+      showEmpty();
+    } else {
+      updateStats(allFetched);
+      document.getElementById('headerCount').textContent = allFetched.length;
+    }
+  }, 300);
+}
+
+// ── SORT ─────────────────────────────────────────────────────
+function sortListings(arr, mode) {
+  if (mode === 'az')   return arr.sort((a,b) => a.title.localeCompare(b.title));
+  if (mode === 'gems') return arr.sort((a,b) => (b.isHiddenGem ? 1 : 0) - (a.isHiddenGem ? 1 : 0));
+  return arr; // 'saved' = localStorage order (already ordered by API)
+}
+
+// ── FILTER (search) ───────────────────────────────────────────
+function setupToolbar() {
+  // Sort pills
+  document.querySelectorAll('.wl-sort-pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.wl-sort-pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      currentSort = this.dataset.sort;
+      const q = document.getElementById('wishlistSearch').value.toLowerCase().trim();
+      const filtered = q ? allFetched.filter(l => filterMatch(l, q)) : allFetched;
+      renderCards(filtered);
+    });
+  });
+
+  // Search
+  document.getElementById('wishlistSearch').addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    const filtered = q ? allFetched.filter(l => filterMatch(l, q)) : allFetched;
+    renderCards(filtered);
+  });
+}
+
+function filterMatch(l, q) {
+  return (l.title       || '').toLowerCase().includes(q) ||
+         (l.location    || '').toLowerCase().includes(q) ||
+         (l.country     || '').toLowerCase().includes(q) ||
+         (l.category    || '').toLowerCase().includes(q) ||
+         (l.mood        || []).some(m => m.toLowerCase().includes(q));
+}
+
+// ── STATS ────────────────────────────────────────────────────
+function updateStats(listings) {
+  document.getElementById('statTotal').textContent     = listings.length;
+  document.getElementById('statGems').textContent      = listings.filter(l => l.isHiddenGem).length;
+  document.getElementById('statCountries').textContent = new Set(listings.map(l => l.country)).size;
+  document.getElementById('statCategories').textContent= new Set(listings.map(l => l.category).filter(Boolean)).size;
+  document.getElementById('headerCount').textContent   = listings.length;
+}
+
+// ── CLEAR ALL ────────────────────────────────────────────────
+function openClearModal() {
+  document.getElementById('clearCount').textContent = getFavs().length;
+  document.getElementById('clearModal').classList.add('open');
+}
+function closeClearModal() {
+  document.getElementById('clearModal').classList.remove('open');
+}
+function confirmClear() {
+  saveFavs([]);
+  closeClearModal();
+  allFetched = [];
+  showEmpty();
+}
+
+// ── EXPORT ───────────────────────────────────────────────────
+function exportWishlist() {
+  if (!allFetched.length) return;
+  const lines = allFetched.map(l =>
+    `${l.title} | ${l.location}, ${l.country}${l.estimatedCost ? ' | ' + l.estimatedCost : ''}${l.bestSeason ? ' | Best: ' + l.bestSeason : ''}`
+  );
+  const content = `My Wanderlust Wishlist\n${'─'.repeat(40)}\n\n` + lines.join('\n') + `\n\n— Exported from Wanderlust`;
+  const blob = new Blob([content], { type: 'text/plain' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = 'wanderlust-wishlist.txt';
+  a.click();
+}
+
+// ── STATE HELPERS ────────────────────────────────────────────
+function showLoading() {
+  document.getElementById('loadingState').style.display  = 'flex';
+  document.getElementById('emptyState').style.display    = 'none';
+  document.getElementById('wishlistGrid').style.display  = 'none';
+  document.getElementById('statsBar').style.display      = 'none';
+  document.getElementById('toolbar').style.display       = 'none';
+  document.getElementById('planBanner').style.display    = 'none';
+  document.getElementById('clearAllBtn').style.display   = 'none';
+}
+function showEmpty() {
+  document.getElementById('loadingState').style.display  = 'none';
+  document.getElementById('emptyState').style.display    = 'flex';
+  document.getElementById('wishlistGrid').style.display  = 'none';
+  document.getElementById('statsBar').style.display      = 'none';
+  document.getElementById('toolbar').style.display       = 'none';
+  document.getElementById('planBanner').style.display    = 'none';
+  document.getElementById('clearAllBtn').style.display   = 'none';
+  document.getElementById('headerCount').textContent     = '0';
+}
+function showGrid() {
+  document.getElementById('loadingState').style.display  = 'none';
+  document.getElementById('emptyState').style.display    = 'none';
+  document.getElementById('wishlistGrid').style.display  = 'grid';
+  document.getElementById('statsBar').style.display      = 'grid';
+  document.getElementById('toolbar').style.display       = 'flex';
+  document.getElementById('planBanner').style.display    = 'flex';
+  document.getElementById('clearAllBtn').style.display   = 'inline-flex';
+}
+</script>

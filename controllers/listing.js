@@ -3,74 +3,107 @@ const opencage = require('opencage-api-client');
 
 module.exports.index = async (req, res) => {
   const { search, mood, minPrice, maxPrice, category } = req.query;
-  let filter = {};
 
-  // Text search
+  let filter = {};
+  let sortOption = {};
+  let projection = {}; // ⚡ important fix
+
+  // ===== HYBRID SEARCH =====
   if (search && search.trim()) {
-    const regex = new RegExp(search.trim(), 'i');
-    filter.$or = [
-      { title: regex },
-      { description: regex },
-      { location: regex },
-      { country: regex }
-    ];
+    const query = search.trim();
+
+    if (query.length < 3) {
+      // 🔹 REGEX SEARCH
+      const regex = new RegExp(query, "i");
+      filter.$or = [
+        { title: regex },
+        { description: regex },
+        { location: regex },
+        { country: regex },
+      ];
+    } else {
+      // 🔹 TEXT SEARCH
+      filter.$text = { $search: query };
+      sortOption = { score: { $meta: "textScore" } };
+      projection = { score: { $meta: "textScore" } }; // ⚡ ONLY here
+    }
   }
 
-  // Mood → keyword mapping
+  // ===== MOOD FILTER =====
   const moodKeywords = {
-    healing:     ['spa','wellness','peaceful','retreat','calm','nature','forest','lake','mountain','cozy','serene','quiet'],
-    celebration: ['luxury','party','villa','resort','beach','pool','penthouse','island','celebration'],
-    solitude:    ['cabin','remote','secluded','quiet','countryside','rural','highlands','mountain','treehouse'],
-    adventure:   ['mountain','trek','camp','safari','wild','hiking','ski','adventure','outdoor','chalet'],
-    monsoon:     ['india','kerala','goa','coorg','tropical','rainforest','beach','bali','phuket'],
-    sisterhood:  ['bali','greece','tuscany','villa','retreat','boutique','beachfront','island'],
+    healing: ["spa", "wellness", "peaceful", "retreat", "nature", "forest", "lake"],
+    celebration: ["luxury", "party", "villa", "resort", "beach", "pool"],
+    solitude: ["cabin", "remote", "quiet", "countryside"],
+    adventure: ["mountain", "trek", "camp", "hiking"],
+    monsoon: ["kerala", "goa", "coorg", "rainforest"],
+    sisterhood: ["bali", "greece", "villa", "retreat"],
   };
 
   if (mood && moodKeywords[mood]) {
-    const regexes = moodKeywords[mood].map(k => new RegExp(k, 'i'));
-    const moodFilter = { $or: [
-      { title: { $in: regexes } }, { description: { $in: regexes } },
-      { location: { $in: regexes } }, { country: { $in: regexes } }
-    ]};
-    filter = filter.$or ? { $and: [filter, moodFilter] } : moodFilter;
+    const regexes = moodKeywords[mood].map((k) => new RegExp(k, "i"));
+
+    const moodFilter = {
+      $or: [
+        { title: { $in: regexes } },
+        { description: { $in: regexes } },
+        { location: { $in: regexes } },
+        { country: { $in: regexes } },
+      ],
+    };
+
+    filter = Object.keys(filter).length
+      ? { $and: [filter, moodFilter] }
+      : moodFilter;
   }
 
-  // Category filter
+  // ===== CATEGORY FILTER =====
   const categoryKeywords = {
-    mountains: ['mountain','alpine','ski','summit','highland','aspen','banff','verbier','chalet'],
-    beach:     ['beach','coastal','ocean','sea','malibu','cancun','bali','phuket','miami','mykonos','beachfront'],
-    arctic:    ['arctic','iceland','ski','snow','winter','chalet','verbier'],
-    pools:     ['pool','villa','resort','luxury','penthouse','infinity'],
-    cities:    ['city','urban','downtown','loft','apartment','tokyo','new york','miami','los angeles','boston','amsterdam'],
-    camping:   ['camp','tent','outdoor','wild','safari','nature','treehouse'],
-    castles:   ['castle','historic','manor','estate','brownstone','cottage','canal'],
-    forests:   ['forest','tree','treehouse','jungle','woods','cabin','log'],
+    mountains: ["mountain", "alpine", "ski"],
+    beach: ["beach", "coastal", "ocean"],
+    cities: ["city", "urban", "downtown"],
+    camping: ["camp", "tent", "outdoor"],
   };
 
   if (category && categoryKeywords[category]) {
-    const regexes = categoryKeywords[category].map(k => new RegExp(k, 'i'));
-    const catFilter = { $or: [
-      { title: { $in: regexes } }, { description: { $in: regexes } },
-      { location: { $in: regexes } }, { country: { $in: regexes } }
-    ]};
-    filter = filter.$or ? { $and: [filter, catFilter] } : catFilter;
+    const regexes = categoryKeywords[category].map((k) => new RegExp(k, "i"));
+
+    const catFilter = {
+      $or: [
+        { title: { $in: regexes } },
+        { description: { $in: regexes } },
+        { location: { $in: regexes } },
+        { country: { $in: regexes } },
+      ],
+    };
+
+    filter = Object.keys(filter).length
+      ? { $and: [filter, catFilter] }
+      : catFilter;
   }
 
-  // Price filter
+  // ===== PRICE FILTER =====
   if (minPrice || maxPrice) {
     filter.price = {};
     if (minPrice) filter.price.$gte = Number(minPrice);
     if (maxPrice) filter.price.$lte = Number(maxPrice);
   }
 
-  const allListings = await Listing.find(filter);
+  // ===== FINAL QUERY =====
+  let query = Listing.find(filter, projection);
+
+  if (Object.keys(sortOption).length) {
+    query = query.sort(sortOption);
+  }
+
+  const allListings = await query;
+
   res.render("listings/index.ejs", {
     allListings,
-    searchQuery:     search || '',
-    activeMood:      mood || '',
-    activeCategory:  category || '',
-    activeMinPrice:  minPrice || '',
-    activeMaxPrice:  maxPrice || '',
+    searchQuery: search || "",
+    activeMood: mood || "",
+    activeCategory: category || "",
+    activeMinPrice: minPrice || "",
+    activeMaxPrice: maxPrice || "",
   });
 };
 

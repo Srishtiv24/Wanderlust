@@ -12,6 +12,7 @@ const ExpressError = require("./utils/ExpressError.js");
 const listingsRouter = require("./routes/listing.js");
 const reviewsRouter = require("./routes/review.js");
 const usersRouter = require("./routes/user.js");
+const pagesRouter = require("./routes/pages.js");
 const aiRouter = require("./routes/ai.js");
 const session = require("express-session");
 const MongoStore = require('connect-mongo');
@@ -19,7 +20,7 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
-
+const Listing = require("./models/listing");
 
 //Mongoose and MongoDB connection
 //let MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
@@ -27,7 +28,11 @@ let ATLAS_URL=process.env.ATLAS_DB_URL;
 module.exports=ATLAS_URL;
 
 main()
-  .then(() => console.log("Connected to database!"))
+  .then(async () => {console.log("Connected to database!");
+    await Listing.syncIndexes();
+  
+    console.log("Indexes synced");
+  })
   .catch(() => console.log("unable to connect to database"));
 
 async function main() {
@@ -105,7 +110,8 @@ app.get('/', (req, res) => {
 app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", usersRouter);
-app.use("/", aiRouter);   // ← ADD THIS
+app.use("/", aiRouter);  
+app.use("/", pagesRouter);  
 
 //for all other routes that does not match
 app.use((req, res, next) => {

@@ -13,10 +13,8 @@ const listingSchema=new Schema(
       },
       description:String,
       image: {
-            type:{
               url:String,
               filename:String
-            }
       },    
       price:Number,
       location:String,
@@ -30,6 +28,23 @@ const listingSchema=new Schema(
         ref:"User"
       }
     }
+);
+
+listingSchema.index(
+  {
+    title: "text",
+    description: "text",
+    location: "text",
+    country: "text"
+  },
+  {
+    weights: {
+      title: 5,
+      location: 3,
+      description: 2,
+      country: 1
+    }
+  }
 );
 
 listingSchema.post("findOneAndDelete",async(listing)=>

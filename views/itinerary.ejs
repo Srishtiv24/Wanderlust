@@ -1,0 +1,424 @@
+<% layout('/layouts/boiler-plate') -%>
+<% activePage = 'itinerary' %>
+
+<style>
+/* ── ITINERARY PAGE ─────────────────────────────────────────── */
+.itin-page { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+/* PAGE HEADER */
+.itin-hero {
+  background: linear-gradient(135deg, #1a1a2e 0%, #2d2d50 100%);
+  border-radius: 20px; padding: 3rem 2.5rem;
+  display: flex; align-items: center; gap: 2.5rem;
+  margin-bottom: 2rem; flex-wrap: wrap;
+  position: relative; overflow: hidden;
+}
+.itin-hero::before {
+  content: '🗺️';
+  position: absolute; right: 2rem; top: 50%; transform: translateY(-50%);
+  font-size: 8rem; opacity: .07; pointer-events: none;
+}
+.itin-hero-text { flex: 1; min-width: 260px; }
+.itin-eyebrow {
+  font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .12em; color: rgba(255,255,255,.5); margin-bottom: .5rem;
+}
+.itin-hero h1 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 700;
+  color: #fff; line-height: 1.15; margin-bottom: .65rem;
+}
+.itin-hero h1 span { color: #ff8a70; }
+.itin-hero p { font-size: .9rem; color: rgba(255,255,255,.65); line-height: 1.6; max-width: 440px; }
+
+/* FORM CARD */
+.itin-form-card {
+  background: #fff; border-radius: 20px;
+  box-shadow: var(--card-shadow); padding: 2rem;
+  margin-bottom: 2rem;
+}
+.itin-form-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.15rem; font-weight: 700; color: var(--text);
+  margin-bottom: 1.5rem; display: flex; align-items: center; gap: .5rem;
+}
+.itin-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem; margin-bottom: 1rem;
+}
+@media(max-width: 700px) { .itin-form-grid { grid-template-columns: 1fr; } }
+.itin-form-group { display: flex; flex-direction: column; gap: .35rem; }
+.itin-form-group.full { grid-column: 1 / -1; }
+.itin-label {
+  font-size: .8rem; font-weight: 600; color: var(--text);
+  display: flex; align-items: center; gap: .3rem;
+}
+.itin-label span { color: var(--primary); }
+.itin-input {
+  padding: .6rem .85rem; border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: .875rem; font-family: 'DM Sans', sans-serif;
+  color: var(--text); background: #fff; outline: none; transition: border-color .2s;
+}
+.itin-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,57,42,.1); }
+.itin-input::placeholder { color: var(--text-muted); }
+
+/* Mood pills inside form */
+.itin-mood-row { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .25rem; }
+.itin-mood-pill {
+  padding: .32rem .75rem; border-radius: 50px;
+  border: 1.5px solid var(--border); font-size: .78rem; font-weight: 600;
+  cursor: pointer; background: #fff; color: var(--text); transition: all .18s;
+  user-select: none;
+}
+.itin-mood-pill.sel { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+
+/* Generate button */
+.itin-gen-btn {
+  width: 100%; padding: .8rem; background: var(--primary); color: #fff;
+  border: none; border-radius: 12px; font-size: 1rem; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  margin-top: 1.25rem;
+}
+.itin-gen-btn:hover:not(:disabled) { background: #c62f22; transform: translateY(-1px); }
+.itin-gen-btn:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+/* LOADING STATE */
+.itin-loading {
+  display: none; text-align: center; padding: 3.5rem 2rem;
+  background: #fff; border-radius: 20px; box-shadow: var(--card-shadow);
+  margin-bottom: 2rem;
+}
+.itin-loading-ring {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 4px solid var(--border); border-top-color: var(--primary);
+  animation: spin .9s linear infinite; margin: 0 auto 1.25rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.itin-loading h3 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: .4rem;
+}
+.itin-loading p { font-size: .85rem; color: var(--text-muted); }
+.itin-loading-steps { display: flex; flex-direction: column; gap: .4rem; margin-top: 1.25rem; max-width: 320px; margin-left: auto; margin-right: auto; }
+.itin-loading-step {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .5rem .75rem; border-radius: 8px; background: var(--bg);
+  font-size: .8rem; color: var(--text-muted); transition: all .4s;
+}
+.itin-loading-step.done { background: #e8f5e9; color: #2e7d32; }
+.itin-loading-step.active { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+.itin-step-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+/* ── RESULT SECTION ── */
+.itin-result { display: none; }
+
+/* Summary bar */
+.itin-summary {
+  background: linear-gradient(135deg, #1a1a2e, #2d2d50);
+  border-radius: 16px; padding: 1.5rem 2rem; margin-bottom: 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+}
+.itin-summary-left h2 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: .25rem;
+}
+.itin-summary-pills { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
+.itin-sum-pill {
+  padding: .25rem .75rem; border-radius: 50px;
+  background: rgba(255,255,255,.12); color: rgba(255,255,255,.85);
+  font-size: .78rem; font-weight: 600; border: 1px solid rgba(255,255,255,.2);
+}
+.itin-summary-actions { display: flex; gap: .6rem; }
+.itin-sum-btn {
+  padding: .45rem 1rem; border-radius: 8px; font-size: .8rem; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; gap: .35rem; text-decoration: none;
+}
+.itin-sum-btn.light { background: rgba(255,255,255,.15); color: #fff; border: 1.5px solid rgba(255,255,255,.3); }
+.itin-sum-btn.light:hover { background: rgba(255,255,255,.25); }
+.itin-sum-btn.red { background: var(--primary); color: #fff; border: none; }
+.itin-sum-btn.red:hover { background: #c62f22; }
+
+/* Highlights */
+.itin-highlights {
+  background: #fff; border-radius: 16px; padding: 1.25rem 1.5rem;
+  box-shadow: var(--card-shadow); margin-bottom: 1.5rem;
+}
+.itin-highlights h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: .85rem; }
+.itin-hl-list { display: flex; gap: .65rem; flex-wrap: wrap; }
+.itin-hl-pill {
+  padding: .4rem .9rem; border-radius: 50px;
+  background: var(--bg); border: 1.5px solid var(--border);
+  font-size: .82rem; font-weight: 600; color: var(--text);
+  display: flex; align-items: center; gap: .3rem;
+}
+
+/* Day timeline */
+.itin-timeline { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.5rem; }
+
+.itin-day-card {
+  background: #fff; border-radius: 16px;
+  box-shadow: var(--card-shadow); overflow: hidden;
+}
+.itin-day-header {
+  display: flex; align-items: center; gap: .85rem;
+  padding: 1rem 1.25rem; cursor: pointer;
+  border-bottom: 1px solid transparent; transition: border-color .2s;
+}
+.itin-day-header:hover { background: var(--bg); }
+.itin-day-header.open { border-color: var(--border); }
+.itin-day-number {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--primary); color: #fff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: .95rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.itin-day-title { font-weight: 700; font-size: .95rem; flex: 1; }
+.itin-day-chevron { color: var(--text-muted); transition: transform .25s; font-size: .8rem; }
+.itin-day-chevron.open { transform: rotate(180deg); }
+.itin-day-foods { display: flex; gap: .35rem; flex-wrap: wrap; }
+.itin-day-food-tag {
+  padding: .18rem .55rem; border-radius: 20px;
+  background: #fff8e1; color: #795548; font-size: .68rem; font-weight: 600;
+}
+
+.itin-day-body { display: none; padding: 0 1.25rem 1.25rem; }
+.itin-day-body.open { display: block; }
+
+/* Time slots */
+.itin-slots { display: flex; flex-direction: column; gap: .75rem; margin-bottom: 1rem; }
+.itin-slot {
+  display: flex; gap: .85rem; align-items: flex-start;
+  padding: .85rem; border-radius: 12px; background: var(--bg);
+}
+.itin-slot-time {
+  font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; min-width: 70px; padding-top: .1rem;
+  display: flex; flex-direction: column; align-items: center; gap: .25rem;
+}
+.itin-slot-time .slot-icon { font-size: 1.2rem; }
+.itin-slot-time .slot-label { color: var(--text-muted); }
+.itin-slot-content { flex: 1; }
+.itin-slot-activity { font-weight: 600; font-size: .88rem; color: var(--text); margin-bottom: .25rem; }
+.itin-slot-tip {
+  font-size: .78rem; color: var(--text-muted); line-height: 1.5;
+  display: flex; gap: .3rem; align-items: flex-start;
+}
+.itin-slot-tip i { color: #f59e0b; flex-shrink: 0; margin-top: .15rem; }
+.itin-slot-cost {
+  font-size: .75rem; font-weight: 700; color: var(--primary);
+  margin-top: .35rem; display: inline-block;
+  background: var(--primary-soft); padding: .15rem .55rem; border-radius: 6px;
+}
+
+/* Hidden gem highlight */
+.itin-hidden-gem {
+  display: flex; gap: .75rem; align-items: flex-start;
+  background: linear-gradient(135deg, #f0f0ff, #e8e8f5);
+  border-radius: 10px; padding: .85rem 1rem; border-left: 3px solid #7c6af5;
+}
+.itin-hidden-gem .gem-icon { font-size: 1.3rem; flex-shrink: 0; }
+.itin-hidden-gem .gem-text strong { display: block; font-size: .8rem; font-weight: 700; color: #5c4fd4; margin-bottom: .2rem; text-transform: uppercase; letter-spacing: .05em; }
+.itin-hidden-gem .gem-text p { font-size: .82rem; color: #444; line-height: 1.5; margin: 0; }
+
+/* Tips + Phrases */
+.itin-extras-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1.25rem; margin-bottom: 1.5rem;
+}
+@media(max-width: 650px) { .itin-extras-grid { grid-template-columns: 1fr; } }
+.itin-extra-card {
+  background: #fff; border-radius: 16px;
+  box-shadow: var(--card-shadow); padding: 1.25rem 1.5rem;
+}
+.itin-extra-card h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: .85rem; }
+.itin-tip-item {
+  display: flex; gap: .6rem; align-items: flex-start;
+  padding: .5rem 0; border-bottom: 1px solid var(--border); font-size: .83rem; color: var(--text-muted);
+}
+.itin-tip-item:last-child { border: none; }
+.itin-tip-item i { color: #4caf9a; flex-shrink: 0; margin-top: .15rem; }
+.itin-phrase-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .5rem 0; border-bottom: 1px solid var(--border);
+}
+.itin-phrase-row:last-child { border: none; }
+.itin-phrase { font-weight: 700; font-size: .88rem; color: var(--primary); }
+.itin-meaning { font-size: .8rem; color: var(--text-muted); }
+
+/* CTA */
+.itin-cta {
+  background: var(--bg); border-radius: 16px; padding: 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+}
+.itin-cta p { font-size: .88rem; color: var(--text-muted); }
+.itin-cta-btns { display: flex; gap: .6rem; flex-wrap: wrap; }
+.itin-cta-btn {
+  padding: .5rem 1.1rem; border-radius: 8px; font-size: .82rem; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; cursor: pointer;
+  display: flex; align-items: center; gap: .35rem; text-decoration: none; transition: all .2s;
+}
+.itin-cta-btn.primary { background: var(--primary); color: #fff; border: none; }
+.itin-cta-btn.primary:hover { background: #c62f22; }
+.itin-cta-btn.outline { background: #fff; color: var(--text); border: 1.5px solid var(--border); }
+.itin-cta-btn.outline:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ERROR */
+.itin-error {
+  display: none; background: #fff5f5; border: 1.5px solid #ffcdd2;
+  border-radius: 16px; padding: 1.5rem; text-align: center;
+  color: #c62828; font-size: .88rem; margin-bottom: 1.5rem;
+}
+.itin-error i { font-size: 1.5rem; display: block; margin-bottom: .5rem; }
+</style>
+
+<div class="itin-page">
+
+  <!-- HERO -->
+  <div class="itin-hero">
+    <div class="itin-hero-text">
+      <div class="itin-eyebrow">✦ AI-Powered · Personalised</div>
+      <h1>Your perfect trip,<br><span>planned in seconds</span></h1>
+      <p>
+        Enter your destination, budget and travel style.
+        Our AI builds a complete day-by-day itinerary with hidden gems,
+        local food picks, insider tips and estimated costs.
+      </p>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="itin-form-card">
+    <div class="itin-form-title">
+      <i class="fa-solid fa-route" style="color:var(--primary);"></i> Plan My Trip
+    </div>
+
+    <div class="itin-form-grid">
+      <!-- Destination -->
+      <div class="itin-form-group full">
+        <label class="itin-label">Destination <span>*</span></label>
+        <input type="text" id="itinDestination" class="itin-input"
+               placeholder="e.g. Coorg, Karnataka  or  Spiti Valley, Himachal Pradesh"
+               value="<%= typeof query !== 'undefined' && query.destination ? query.destination : '' %>">
+      </div>
+
+      <!-- Days -->
+      <div class="itin-form-group">
+        <label class="itin-label">Trip Duration <span>*</span></label>
+        <select id="itinDays" class="itin-input">
+          <option value="1">1 Day</option>
+          <option value="2">2 Days</option>
+          <option value="3" selected>3 Days</option>
+          <option value="4">4 Days</option>
+          <option value="5">5 Days</option>
+          <option value="7">7 Days</option>
+          <option value="10">10 Days</option>
+        </select>
+      </div>
+
+      <!-- Budget -->
+      <div class="itin-form-group">
+        <label class="itin-label">Budget</label>
+        <select id="itinBudget" class="itin-input">
+          <option value="budget">💰 Budget (under ₹1500/day)</option>
+          <option value="moderate" selected>💳 Moderate (₹1500–4000/day)</option>
+          <option value="comfortable">✨ Comfortable (₹4000–8000/day)</option>
+          <option value="luxury">👑 Luxury (₹8000+/day)</option>
+        </select>
+      </div>
+
+      <!-- Group Size -->
+      <div class="itin-form-group">
+        <label class="itin-label">Travelling as</label>
+        <select id="itinGroup" class="itin-input">
+          <option value="solo traveller">🧍 Solo</option>
+          <option value="a couple" selected>👫 Couple</option>
+          <option value="a family with kids">👨‍👩‍👧 Family</option>
+          <option value="a group of friends">👯 Friends Group</option>
+        </select>
+      </div>
+
+      <!-- Interests -->
+      <div class="itin-form-group full">
+        <label class="itin-label">Interests / What you enjoy</label>
+        <input type="text" id="itinInterests" class="itin-input"
+               placeholder="e.g. trekking, local food, photography, temples, waterfalls…">
+      </div>
+
+      <!-- Travel Style (mood) -->
+      <div class="itin-form-group full">
+        <label class="itin-label">Travel Style</label>
+        <div class="itin-mood-row">
+          <% [
+            {val:'relaxed',    emoji:'😌', label:'Relaxed'},
+            {val:'adventurous',emoji:'🧗', label:'Adventurous'},
+            {val:'cultural',   emoji:'🏛️', label:'Cultural'},
+            {val:'offbeat',    emoji:'💎', label:'Offbeat'},
+            {val:'romantic',   emoji:'💑', label:'Romantic'},
+            {val:'family',     emoji:'👨‍👩‍👧', label:'Family-friendly'},
+          ].forEach(s => { %>
+          <span class="itin-mood-pill" data-val="<%= s.val %>" onclick="toggleStyle(this)">
+            <%= s.emoji %> <%= s.label %>
+          </span>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+
+    <button class="itin-gen-btn" id="generateBtn" onclick="generateItinerary()">
+      <i class="fa-solid fa-sparkles"></i> Generate My Itinerary with AI
+    </button>
+  </div>
+
+</div>
+
+<script>
+let selectedStyle = '';
+
+function toggleStyle(el) {
+  document.querySelectorAll('.itin-mood-pill').forEach(p => p.classList.remove('sel'));
+  if (selectedStyle === el.dataset.val) { selectedStyle = ''; return; }
+  el.classList.add('sel');
+  selectedStyle = el.dataset.val;
+}
+
+// Pre-fill destination from query param (when linked from show page)
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const dest   = params.get('destination');
+  if (dest) document.getElementById('itinDestination').value = dest;
+})();
+
+function generateItinerary() {
+  const destination = document.getElementById('itinDestination').value.trim();
+  const days        = document.getElementById('itinDays').value;
+  const budget      = document.getElementById('itinBudget').value;
+  const groupSize   = document.getElementById('itinGroup').value;
+  const interests   = document.getElementById('itinInterests').value.trim();
+  const travelStyle = selectedStyle;
+
+  if (!destination) {
+    document.getElementById('itinDestination').focus();
+    document.getElementById('itinDestination').style.borderColor = 'var(--primary)';
+    return;
+  }
+
+  // Build a natural-language prompt to send to the AI assistant
+  const budgetLabel = {
+    budget: 'budget (under ₹1500/day)',
+    moderate: 'moderate (₹1500–4000/day)',
+    comfortable: 'comfortable (₹4000–8000/day)',
+    luxury: 'luxury (₹8000+/day)',
+  }[budget] || budget;
+
+  let prompt = `Plan a ${days}-day trip to ${destination} for ${groupSize} on a ${budgetLabel} budget.`;
+  if (interests) prompt += ` We enjoy: ${interests}.`;
+  if (travelStyle) prompt += ` Travel style: ${travelStyle}.`;
+  prompt += ` Give a detailed day-by-day itinerary with morning, afternoon and evening activities, local food recommendations, hidden gems, packing tips, and estimated costs in INR.`;
+
+  // Redirect to AI assistant with the prompt pre-loaded
+  window.location.href = '/ai-assistant?prompt=' + encodeURIComponent(prompt);
+}
+</script>

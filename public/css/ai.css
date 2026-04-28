@@ -352,15 +352,17 @@
   color: var(--primary);
 }
 
-/* Message rows */
+/* ── Message rows ── */
 .ai-msg-row {
-  padding: 0.15rem 0;
+  padding: 0.2rem 0;
   animation: msgIn 0.2s ease;
 }
+
 @keyframes msgIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
 .ai-msg-inner {
   max-width: 680px;
   margin: 0 auto;
@@ -370,39 +372,76 @@
   align-items: flex-start;
 }
 
-/* USER → RIGHT SIDE */
+/* USER → RIGHT */
 .ai-msg-row.user-row .ai-msg-inner {
   flex-direction: row-reverse;
 }
 
-/* ALIGN TEXT BLOCK */
+/* Content box */
 .ai-msg-content {
   max-width: 75%;
-}
-
-/* USER MESSAGE ALIGN RIGHT */
-.ai-msg-row.user-row .ai-msg-content {
   display: flex;
   flex-direction: column;
+}
+
+/* Alignments */
+.ai-msg-row.user-row .ai-msg-content {
   align-items: flex-end;
 }
-
-/* BOT MESSAGE ALIGN LEFT */
 .ai-msg-row.bot-row .ai-msg-content {
-  display: flex;
-  flex-direction: column;
   align-items: flex-start;
 }
 
-/* USER BUBBLE */
+/* ── USER MESSAGE (Theme Color) ── */
 .ai-msg-row.user-row .ai-msg-text {
-  background: var(--bg);
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
   border-radius: 12px 4px 12px 12px;
   padding: 0.65rem 0.9rem;
   display: inline-block;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
+/* ── BOT MESSAGE (Soft White Card) ── */
+.ai-msg-row.bot-row .ai-msg-text {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px 12px 12px 4px;
+  padding: 0.65rem 0.9rem;
+  display: inline-block;
+  color: var(--text);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* ── Text Styling ── */
+.ai-msg-text {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  word-wrap: break-word;
+}
+
+/* Labels */
+.ai-msg-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+.ai-msg-row.bot-row .ai-msg-text {
+  background: linear-gradient(
+    135deg,
+    rgba(232, 57, 42, 0.08),
+    rgba(255, 122, 24, 0.12)
+  );
+  border: 1px solid rgba(232, 57, 42, 0.15);
+  color: var(--text);
+  border-radius: 12px 12px 12px 4px;
+  padding: 0.65rem 0.9rem;
+  display: inline-block;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
 /* BOT BUBBLE */
 .ai-msg-row.bot-row .ai-msg-text {
   background: transparent;
