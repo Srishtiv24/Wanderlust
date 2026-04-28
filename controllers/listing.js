@@ -96,7 +96,9 @@ module.exports.index = async (req, res) => {
   }
 
   const allListings = await query;
-
+  if (req.xhr) {
+    return res.json({ allListings });
+  }
   res.render("listings/index.ejs", {
     allListings,
     searchQuery: search || "",

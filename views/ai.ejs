@@ -18,60 +18,57 @@
     <nav class="ai-preset-nav">
 
       <div class="ai-category">
-        <div class="ai-category-label">Plan a Trip</div>
+        <div class="ai-category-label">Browse by Type</div>
         <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>3-day Himachal Pradesh itinerary</span>
+          <span>Show me all beach listings</span>
         </button>
         <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>5-day Goa beach getaway</span>
+          <span>Show me mountain and ski stays</span>
         </button>
         <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>Spiritual tour of Varanasi & Rishikesh</span>
+          <span>Show me unique stays like treehouses or castles</span>
         </button>
         <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>Kerala backwaters 7-day road trip</span>
-        </button>
-      </div>
-
-      <div class="ai-category">
-        <div class="ai-category-label">Find Stays</div>
-        <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>Budget stays under ₹1500/night in Manali</span>
-        </button>
-        <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>Luxury eco stays in Coorg, Karnataka</span>
-        </button>
-        <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>Romantic retreats near Pune</span>
-        </button>
-        <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>Family-friendly resorts in Rajasthan</span>
+          <span>Show me city apartment listings</span>
         </button>
       </div>
 
       <div class="ai-category">
-        <div class="ai-category-label">Best Time to Visit</div>
+        <div class="ai-category-label">Find by Budget</div>
         <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>Best time to visit Ladakh</span>
+          <span>What listings are under ₹1000/night?</span>
         </button>
         <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>Monsoon travel tips for South India</span>
+          <span>Best value listings on Wanderlust</span>
         </button>
         <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>Best winter destinations in India</span>
+          <span>What are the most luxurious listings?</span>
         </button>
       </div>
 
       <div class="ai-category">
-        <div class="ai-category-label">Travel Tips</div>
+        <div class="ai-category-label">By Destination</div>
         <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>What to pack for a hill station trip</span>
+          <span>Do you have listings in Asia?</span>
         </button>
         <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>Solo travel safety tips for women in India</span>
+          <span>Show listings in Europe</span>
         </button>
         <button onclick="sendPreset(this)" class="ai-preset-item">
-          <span>How to travel India on a tight budget</span>
+          <span>Any listings in the USA?</span>
+        </button>
+      </div>
+
+      <div class="ai-category">
+        <div class="ai-category-label">Help Me Choose</div>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Best listing for a romantic trip</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>Best listing for a solo traveller</span>
+        </button>
+        <button onclick="sendPreset(this)" class="ai-preset-item">
+          <span>What is the most popular listing?</span>
         </button>
       </div>
 
@@ -105,32 +102,32 @@
 
             <div class="ai-welcome-star">✦</div>
           <h2>How can I help you today<% if(currUser){ %>, <%= currUser.username.charAt(0).toUpperCase() + currUser.username.slice(1) %><% } %>?</h2>
-          <p>Ask me to plan a trip, find the right stay, or get any travel advice for India and beyond.</p>
+          <p>Ask me to find the perfect Wanderlust listing, compare stays, or help you choose based on your budget and destination.</p>
 
           <div class="ai-suggestions">
             <button class="ai-suggestion" onclick="sendPreset(this)">
-              <i class="fa-solid fa-map-location-dot"></i>
-              <span>Plan a 3-day mountain itinerary</span>
+              <i class="fa-solid fa-umbrella-beach"></i>
+              <span>Show me all beach listings</span>
             </button>
             <button class="ai-suggestion" onclick="sendPreset(this)">
-              <i class="fa-solid fa-bed"></i>
-              <span>Find unique stays in Coorg</span>
-            </button>
-            <button class="ai-suggestion" onclick="sendPreset(this)">
-              <i class="fa-regular fa-calendar"></i>
-              <span>Best time to visit Ladakh</span>
+              <i class="fa-solid fa-mountain-sun"></i>
+              <span>Show me mountain and ski stays</span>
             </button>
             <button class="ai-suggestion" onclick="sendPreset(this)">
               <i class="fa-solid fa-indian-rupee-sign"></i>
-              <span>Travel India on a tight budget</span>
+              <span>What listings are under ₹1000/night?</span>
+            </button>
+            <button class="ai-suggestion" onclick="sendPreset(this)">
+              <i class="fa-solid fa-crown"></i>
+              <span>What are the most luxurious listings?</span>
             </button>
             <button class="ai-suggestion" onclick="sendPreset(this)">
               <i class="fa-solid fa-heart"></i>
-              <span>Romantic getaway ideas near Pune</span>
+              <span>Best listing for a romantic trip</span>
             </button>
             <button class="ai-suggestion" onclick="sendPreset(this)">
-              <i class="fa-solid fa-suitcase"></i>
-              <span>What to pack for a hill station trip</span>
+              <i class="fa-solid fa-earth-americas"></i>
+              <span>Show listings in Europe</span>
             </button>
           </div>
         </div>
@@ -143,7 +140,7 @@
       <div class="ai-input-box" id="aiInputBox">
         <textarea
           id="aiInput"
-          placeholder="Ask anything about travel…"
+          placeholder="Ask about listings, prices, destinations…"
           rows="1"
           onkeydown="handleKey(event)"
           oninput="autoResize(this)"
