@@ -1,0 +1,101 @@
+<% layout('/layouts/boiler-plate') -%>
+<% activePage = 'wishlist' %>
+
+<!-- Clear confirm modal -->
+<div class="wl-modal-overlay" id="clearModal">
+  <div class="wl-modal">
+    <div style="font-size:2.5rem;margin-bottom:.75rem;">🗑️</div>
+    <h3>Clear wishlist?</h3>
+    <p>This will remove all <span id="clearCount">0</span> saved destinations from your wishlist. This cannot be undone.</p>
+    <div class="wl-modal-btns">
+      <button class="wl-modal-btn cancel" onclick="closeClearModal()">Cancel</button>
+      <button class="wl-modal-btn confirm" onclick="confirmClear()">Yes, Clear All</button>
+    </div>
+  </div>
+</div>
+
+<div class="wl-page">
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="wl-page-header">
+    <div class="wl-page-header-left">
+      <div class="wl-page-eyebrow">✦ Your saved places</div>
+      <h1 class="wl-page-title">
+        <i class="fa-solid fa-heart" style="color:var(--primary);font-size:1.4rem;"></i>
+        My Wishlist
+        <span class="count-badge" id="headerCount">0</span>
+      </h1>
+      <p class="wl-page-sub">All the destinations you've fallen in love with — in one place.</p>
+    </div>
+    <div class="wl-header-actions">
+      <button class="wl-hdr-btn" onclick="exportWishlist()">
+        <i class="fa-solid fa-download"></i> Export
+      </button>
+      <button class="wl-hdr-btn danger" onclick="openClearModal()" id="clearAllBtn" style="display:none;">
+        <i class="fa-regular fa-trash-can"></i> Clear All
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ── TOOLBAR ── -->
+  <div class="wl-toolbar" id="toolbar" style="display:none;">
+    <span class="wl-toolbar-label">Sort:</span>
+    <div class="wl-sort-pills">
+      <button class="wl-sort-pill active" data-sort="saved">Recently Saved</button>
+      <button class="wl-sort-pill" data-sort="az">A → Z</button>
+    </div>
+    <div class="wl-toolbar-divider"></div>
+    <div class="wl-search-filter">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="wishlistSearch" placeholder="Filter saved places…">
+    </div>
+  </div>
+
+  <!-- ── LOADING ── -->
+  <div class="wl-loading" id="loadingState">
+    <div class="wl-spinner"></div>
+    <p>Loading your saved destinations…</p>
+  </div>
+
+  <!-- ── EMPTY STATE ── -->
+  <div class="wl-empty" id="emptyState" style="display:none;">
+    <div class="wl-empty-icon">🗺️</div>
+    <h3>Your wishlist is empty</h3>
+    <p>Start exploring and tap the <i class="fa-regular fa-heart" style="color:var(--primary);"></i> heart on any destination to save it here.</p>
+    <a href="/listings" class="wl-empty-btn">
+      <i class="fa-regular fa-compass"></i> Explore Destinations
+    </a>
+  </div>
+
+  <!-- ── NO SEARCH RESULTS ── -->
+  <div class="wl-empty" id="noFilterResults" style="display:none;">
+    <div class="wl-empty-icon">🔍</div>
+    <h3>No matches found</h3>
+    <p>Try a different search term to filter your saved destinations.</p>
+    <button class="wl-empty-btn" onclick="document.getElementById('wishlistSearch').value=''; renderCards(allFetched);">
+      Clear filter
+    </button>
+  </div>
+
+  <!-- ── GRID ── -->
+  <div class="wl-wishlist-grid" id="wishlistGrid"></div>
+
+  <!-- ── PLAN TOGETHER BANNER ── -->
+  <div class="wl-plan-banner" id="planBanner" style="display:none;">
+    <div class="wl-plan-banner-text">
+      <h3>🗺️ Ready to plan your next trip?</h3>
+      <p>Use our AI Planner to turn your saved destinations into a complete day-by-day itinerary — just enter your dates and budget.</p>
+    </div>
+    <div class="wl-plan-banner-btns">
+      <a href="/itinerary" class="wl-plan-btn primary">
+        <i class="fa-solid fa-route"></i> Generate Itinerary
+      </a>
+      <a href="/ai-assistant" class="wl-plan-btn secondary">
+        <i class="fa-solid fa-sparkles"></i> Ask AI
+      </a>
+    </div>
+  </div>
+
+</div><!-- end .wl-page -->
+

@@ -1,29 +1,544 @@
-<nav class="navbar navbar-expand-md bg-body-tertiary border-bottom sticky-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i>
-    </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-link" href="/listings">Explore</a>
+<nav class="wl-navbar">
+  <!-- Brand -->
+  <a class="wl-brand" href="/listings">
+    <div class="wl-brand-icon">
+      <i class="fa-regular fa-compass"></i>
+    </div>
+    <div class="wl-brand-text">
+      <span class="name">Wanderlust</span>
+      <span class="tagline">Plan Smarter, Travel Better.</span>
+    </div>
+  </a>
+
+  <!-- Nav Links -->
+  <ul class="wl-nav-links" id="wlNavLinks">
+    <li>
+      <a href="/listings" data-path="/listings"> <i class="fa-regular fa-compass"></i> Explore
+      </a>
+    </li>
+
+    <% if(currUser) { %>
+    <li>
+      <a href="/wishlist" data-path="/wishlist"> <i class="fa-regular fa-heart"></i> Favorites
+        <span class="fav-count" id="navFavCount" style="display:none;"></span>
+      </a>
+    </li>
+    <% } %>
+
+    <li>
+      <a href="/ai-assistant" data-path="/ai-assistant"> <span class="wl-ai-star">✦</span> AI Assistant
+      </a>
+    </li>
+
+    <li>
+      <a href="/itinerary" data-path="/itinerary"> <i class="fa-solid fa-route"></i> Itinerary Planner
+      </a>
+    </li>
+  </ul>
+
+  <!-- Search Bar -->
+  <div class="wl-search-bar">
+    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    <form action="/listings" method="GET">
+      <input type="search" name="search" placeholder="Search"
+        value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+    </form>
+  </div>
+
+  <!-- Right Side -->
+
+  <% if(currUser) { %>
+  <div class="wl-user-pill">
+    <div class="avatar"><%= currUser.username.charAt(0).toUpperCase() %></div>
+    <div class="user-info">
+      <span class="user-name"><%= currUser.username.charAt(0).toUpperCase() + currUser.username.slice(1) %></span>
+      <span class="user-role">Traveler</span>
+    </div>
+  </div>
+  <a href="/logout" class="wl-auth-links" style="text-decoration:none;">
+    <span class="wl-logout-btn">Log Out</span>
+  </a>
+  <% } else { %>
+  <div class="wl-auth-links">
+    <a href="/signup" class="signup">Sign Up</a>
+    <a href="/login" class="login">Log In</a>
+  </div>
+  <% } %>
+
+  <% if(currUser) { %>
+  <a href="/listings/new" class="wl-btn-primary" style="flex-shrink:0; text-decoration:none;">
+    <i class="fa-solid fa-plus"></i> List Stay
+  </a>
+  <% } %>
+  </div>
+
+  <!-- Hamburger (mobile only) -->
+  <button class="wl-hamburger" id="wlHamburger" aria-label="Toggle menu" aria-expanded="false">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- Mobile Drawer -->
+<div class="wl-mobile-drawer" id="wlMobileDrawer">
+  <div class="wl-drawer-inner">
+
+    <!-- Mobile Nav Links -->
+    <ul class="wl-drawer-links">
+      <li>
+        <a href="/listings">
+          <i class="fa-regular fa-compass"></i> Explore
+        </a>
+      </li>
+      <% if(currUser) { %>
+      <li>
+        <a href="/wishlist">
+          <i class="fa-regular fa-heart"></i> Favorites
+        </a>
+      </li>
+      <% } %>
+      <li>
+        <a href="/ai-assistant">
+          <span class="wl-ai-star">✦</span> AI Assistant
+        </a>
+      </li>
+      <li>
+        <a href="/listings?mood=1">
+          <i class="fa-regular fa-map"></i> Itinerary Planner
+        </a>
+      </li>
+    </ul>
+
+    <div class="wl-drawer-divider"></div>
+
+    <!-- Mobile Search -->
+    <form action="/listings" method="GET" class="wl-drawer-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" name="search" placeholder="Search destinations..."
+        value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+    </form>
+
+    <div class="wl-drawer-divider"></div>
+
+    <!-- Mobile Auth -->
+    <% if(currUser) { %>
+    <div class="wl-drawer-user">
+      <div class="wl-drawer-avatar"><%= currUser.username.charAt(0).toUpperCase() %></div>
+      <div>
+        <div class="wl-drawer-username"><%= currUser.username.charAt(0).toUpperCase() + currUser.username.slice(1) %>
         </div>
-        <div class="navbar-nav ms-auto">
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search  destinations" aria-label="Search"/>
-          <button class="btn btn-outline-success" type="submit" id="search-btn"><i class="fa-solid fa-magnifying-glass fa" style="color: #ffffff; font-size: 1rem;"></i>Search</button>
-        </form>
-        </div>
-        <div class="navbar-nav ms-auto">
-          <a class="nav-link" href="/listings/new">Airbnb your home</a>
-          <% if(!currUser) { %>
-          <a class="nav-link bold" href="/signup">Sign Up</a>
-          <a class="nav-link bold" href="/login">Log In</a>
-          <% } else {%>
-          <a class="nav-link bold" href="/logout">Log Out</a>
-          <% } %>
-        </div>
+        <div class="wl-drawer-role">Traveler</div>
       </div>
     </div>
-  </nav>
+    <a href="/listings/new" class="wl-drawer-cta">
+      <i class="fa-solid fa-plus"></i> List your Stay
+    </a>
+    <a href="/logout" class="wl-drawer-logout">Log Out</a>
+    <% } else { %>
+    <div class="wl-drawer-auth">
+      <a href="/signup" class="wl-drawer-signup">Sign Up</a>
+      <a href="/login" class="wl-drawer-login">Log In</a>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div class="wl-overlay" id="wlOverlay"></div>
+
+<style>
+  /* ── Responsive Navbar ── */
+
+  /* Hamburger — hidden on desktop */
+  .wl-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    margin-left: auto;
+    z-index: 1001;
+  }
+
+  .wl-hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #222;
+    border-radius: 2px;
+    transition: transform 0.28s ease, opacity 0.2s ease;
+    transform-origin: center;
+  }
+
+  /* Animate to X when open */
+  .wl-hamburger.open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .wl-hamburger.open span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .wl-hamburger.open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* Logout button style */
+  .wl-logout-btn {
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1.5px solid #e8e8e8;
+    color: #222;
+    background: white;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  /* AI star */
+  .wl-ai-star {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  /* ── Mobile Drawer ── */
+  .wl-mobile-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(320px, 85vw);
+    height: 100vh;
+    background: white;
+    z-index: 1050;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
+    overflow-y: auto;
+  }
+
+  .wl-mobile-drawer.open {
+    transform: translateX(0);
+  }
+
+  .wl-drawer-inner {
+    padding: 5rem 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .wl-drawer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wl-drawer-links li a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #222;
+    text-decoration: none;
+    border-bottom: 1px solid #f0f0f0;
+    transition: color 0.15s;
+  }
+
+  .wl-drawer-links li a:hover {
+    color: #fe424d;
+  }
+
+  .wl-drawer-links li a i,
+  .wl-drawer-links li a .wl-ai-star {
+    color: #fe424d;
+    width: 18px;
+    text-align: center;
+  }
+
+  .wl-drawer-divider {
+    height: 1px;
+    background: #f0f0f0;
+    margin: 1rem 0;
+  }
+
+  .wl-drawer-search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 25px;
+    padding: 0.55rem 1rem;
+  }
+
+  .wl-drawer-search i {
+    color: #aaa;
+    font-size: 0.85rem;
+  }
+
+  .wl-drawer-search input {
+    border: none;
+    outline: none;
+    font-size: 0.875rem;
+    flex: 1;
+    background: transparent;
+    color: #222;
+  }
+
+  .wl-drawer-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .wl-drawer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fe424d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .wl-drawer-username {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #222;
+  }
+
+  .wl-drawer-role {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .wl-drawer-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #fe424d;
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    transition: opacity 0.15s;
+  }
+
+  .wl-drawer-cta:hover {
+    opacity: 0.88;
+    color: white;
+  }
+
+  .wl-drawer-logout {
+    display: block;
+    text-align: center;
+    padding: 0.65rem;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 10px;
+    color: #444;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .wl-drawer-logout:hover {
+    border-color: #fe424d;
+    color: #fe424d;
+  }
+
+  .wl-drawer-auth {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .wl-drawer-signup,
+  .wl-drawer-login {
+    flex: 1;
+    text-align: center;
+    padding: 0.7rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+
+  .wl-drawer-signup {
+    background: #fe424d;
+    color: white;
+  }
+
+  .wl-drawer-signup:hover {
+    opacity: 0.88;
+    color: white;
+  }
+
+  .wl-drawer-login {
+    border: 1.5px solid #e8e8e8;
+    color: #222;
+  }
+
+  .wl-drawer-login:hover {
+    border-color: #fe424d;
+    color: #fe424d;
+  }
+
+  /* Overlay */
+  .wl-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1040;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .wl-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .wl-nav-links a.active {
+    color: #fe424d;
+    font-weight: 600;
+  }
+
+  .wl-nav-links a.active i,
+  .wl-nav-links a.active .wl-ai-star {
+    color: #fe424d;
+  }
+
+  /* ── Breakpoints ── */
+
+  /* Tablet — hide search bar and some text */
+  @media (max-width: 1024px) {
+    .wl-search-bar {
+      display: none;
+    }
+
+    .wl-brand-text .tagline {
+      display: none;
+    }
+
+    .wl-user-pill .user-info {
+      display: none;
+    }
+  }
+
+  /* Mobile — show hamburger, hide nav links and right side */
+  @media (max-width: 768px) {
+    .wl-nav-links {
+      display: none;
+    }
+
+    .wl-nav-right {
+      display: none;
+    }
+
+    .wl-globe-btn {
+      display: none;
+    }
+
+    .wl-hamburger {
+      display: flex;
+    }
+
+    /* Keep brand visible */
+    .wl-navbar {
+      padding: 0 1rem;
+      justify-content: space-between;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .wl-brand-text .name {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    const path = window.location.pathname;
+    const search = window.location.search;
+
+    // all nav links in both desktop and mobile drawer
+    document.querySelectorAll('a[data-path]').forEach(link => {
+      const linkPath = link.getAttribute('data-path');
+      const linkQuery = link.getAttribute('data-query'); // e.g. "mood"
+
+      let isActive = false;
+
+      if (linkQuery) {
+        // itinerary: must match BOTH path AND query param
+        isActive = path === linkPath && search.includes(linkQuery);
+      } else if (linkPath === '/listings') {
+        // explore: active on /listings WITHOUT mood param
+        isActive = path === linkPath && !search.includes('mood');
+      } else {
+        // all other links: just match path
+        isActive = path === linkPath;
+      }
+
+      if (isActive) link.classList.add('active');
+    });
+  })();
+
+  (function () {
+    const hamburger = document.getElementById('wlHamburger');
+    const drawer = document.getElementById('wlMobileDrawer');
+    const overlay = document.getElementById('wlOverlay');
+
+    function openDrawer() {
+      drawer.classList.add('open');
+      overlay.classList.add('show');
+      hamburger.classList.add('open');
+      hamburger.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove('open');
+      overlay.classList.remove('show');
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    hamburger.addEventListener('click', () => {
+      drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+    });
+
+    overlay.addEventListener('click', closeDrawer);
+
+    // Close on ESC
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeDrawer();
+    });
+
+    // Close drawer when a link inside it is clicked
+    drawer.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', closeDrawer);
+    });
+  })();
+</script>

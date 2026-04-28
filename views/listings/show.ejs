@@ -1,113 +1,254 @@
 <% layout('/layouts/boiler-plate') %>
 
-<body>
-    <br>
-    <br>
-    <div class="row offset-2 listing-card">
-        <h3><%=listing.title%></h3>
-        <div class="card">
-            <div class="col-5">
-                <img src="<%=listing.image.url%>" class="card-img-top" alt="<%=listing.image.filename%>"
-                    style="height:13.5rem">
-            </div>
-            <div class="card-img-overlay"></div>
-            <div class="card-body">
-                <p class="card-text">Owned by <i><%=listing.owner.username%></i></p>
-                <p class="card-text"><%=listing.description%></p>
-                <p class="card-text"> &#8377; <%=listing.price.toLocaleString('en-IN')%>/night</p>
-                <p class="card-text"> <%=listing.location%></p>
-                <p class="card-text"><%=listing.country%></p>
-            </div>
-        </div>
+<div class="wl-show-layout">
+
+  <!-- LEFT: Listing Details -->
+  <div>
+    <!-- Image Hero -->
+    <div class="wl-show-img-hero">
+      <img src="<%= listing.image.url %>" alt="<%= listing.title %>">
     </div>
-    <% if (currUser && currUser._id.equals(listing.owner._id)) {%>
-    <div class="row offset-2">
-        <div class="col-1">
-            <form method="get" action="/listings/<%=listing._id%>/edit">
-                <button type="submit" class="btn btn-dark edit-btn">Edit </button>
-            </form>
-        </div>
-        <div class="col-1">
-            <form method="post" action="/listings/<%=listing._id%>?_method=Delete">
-                <button type="submit" class="btn btn-dark delete-btn">Delete</button>
-            </form>
-        </div>
+
+    <!-- Title + Actions -->
+    <div class="wl-show-meta">
+      <div>
+        <h1 class="wl-show-title"><%= listing.title %></h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i>
+          <%= listing.location %>, <%= listing.country %>
+          &nbsp;·&nbsp;
+          Owned by <strong><%= listing.owner.username %></strong>
+        </p>
+      </div>
+
+      <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
+      <div class="wl-show-actions">
+        <form method="get" action="/listings/<%= listing._id %>/edit">
+          <button type="submit" class="wl-action-btn">
+            <i class="fa-regular fa-pen-to-square"></i> Edit
+          </button>
+        </form>
+        <form method="post" action="/listings/<%= listing._id %>?_method=Delete">
+          <button type="submit" class="wl-action-btn danger">
+            <i class="fa-regular fa-trash-can"></i> Delete
+          </button>
+        </form>
+      </div>
+      <% } %>
     </div>
-    <br>
+
+    <!-- Info Cards Row -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
+      <div style="background: white; border-radius: 10px; padding: 1rem; text-align: center; box-shadow: var(--card-shadow);">
+        <div style="font-size: 1.4rem; margin-bottom: 0.25rem;">💰</div>
+        <div style="font-weight: 700; color: var(--primary); font-size: 1rem;">₹<%= listing.price.toLocaleString('en-IN') %></div>
+        <div style="font-size: 0.72rem; color: var(--text-muted);">per night</div>
+      </div>
+      <div style="background: white; border-radius: 10px; padding: 1rem; text-align: center; box-shadow: var(--card-shadow);">
+        <div style="font-size: 1.4rem; margin-bottom: 0.25rem;">⭐</div>
+        <div style="font-weight: 700; font-size: 1rem;">4.8</div>
+        <div style="font-size: 0.72rem; color: var(--text-muted);"><%= listing.reviews.length %> reviews</div>
+      </div>
+      <div style="background: white; border-radius: 10px; padding: 1rem; text-align: center; box-shadow: var(--card-shadow);">
+        <div style="font-size: 1.4rem; margin-bottom: 0.25rem;">🌍</div>
+        <div style="font-weight: 700; font-size: 0.9rem;"><%= listing.country %></div>
+        <div style="font-size: 0.72rem; color: var(--text-muted);">Country</div>
+      </div>
+      <div style="background: white; border-radius: 10px; padding: 1rem; text-align: center; box-shadow: var(--card-shadow);">
+        <div style="font-size: 1.4rem; margin-bottom: 0.25rem;">✅</div>
+        <div style="font-weight: 700; font-size: 0.9rem;">Verified</div>
+        <div style="font-size: 0.72rem; color: var(--text-muted);">Safe Stay</div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div style="background: white; border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--card-shadow);">
+      <h3 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;">About this stay</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.7;"><%= listing.description %></p>
+    </div>
+
+    <!-- Map -->
+    <div style="background: white; border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--card-shadow);">
+      <h3 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;">
+        📍 Where you'll be
+      </h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;"><%= listing.location %>, <%= listing.country %></p>
+      <div id="map"></div>
+      <script id="listing-coordinates" type="application/json">
+        <%- JSON.stringify({ lat, lng, title: listing.title }) %>
+      </script>
+    </div>
+
+    <!-- Review Form -->
+    <% if (currUser) { %>
+    <div style="background: white; border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--card-shadow);">
+      <h3 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Leave a Review</h3>
+      <form method="post" action="/listings/<%= listing._id %>/reviews" class="needs-validation" novalidate>
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">Rating</label>
+          <fieldset class="starability-slot">
+            <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+            <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+            <label for="first-rate1" title="Terrible">1 star</label>
+            <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+            <label for="first-rate2" title="Not good">2 stars</label>
+            <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+            <label for="first-rate3" title="Average">3 stars</label>
+            <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+            <label for="first-rate4" title="Very good">4 stars</label>
+            <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+            <label for="first-rate5" title="Amazing">5 stars</label>
+          </fieldset>
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label class="wl-form-label">Comments</label>
+          <textarea name="review[comment]" rows="4" class="wl-form-control" required placeholder="Share your experience..."></textarea>
+          <div class="invalid-feedback">Please add a comment for your review.</div>
+        </div>
+        <button type="submit" class="wl-submit-btn">
+          <i class="fa-regular fa-paper-plane"></i> Submit Review
+        </button>
+      </form>
+    </div>
+    <% } else { %>
+    <div style="background: var(--primary-soft); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; border: 1.5px solid rgba(232,57,42,0.2);">
+      <p style="font-size: 0.88rem; color: var(--primary); margin: 0;">
+        <i class="fa-solid fa-lock"></i>
+        <a href="/login" style="color: var(--primary); font-weight: 600;">Log in</a> to leave a review.
+      </p>
+    </div>
     <% } %>
-    <div class="row offset-2">
-        <div class="col-8 mb-3">
-            <% if (currUser) { %>
-            <hr>
-            <h5>Leave a Review</h5>
-            <form method="post" action="/listings/<%=listing._id%>/reviews" class="needs-validation" novalidate>
-                <div class="row ">
-                    <div class="col mb-3">
-                        <label for="rating" class="form-label">Rating</label>
-                        <fieldset class="starability-slot">
-                            <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1"
-                                checked aria-label="No rating." />
-                            <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-                            <label for="first-rate1" title="Terrible">1 star</label>
-                            <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-                            <label for="first-rate2" title="Not good">2 stars</label>
-                            <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-                            <label for="first-rate3" title="Average">3 stars</label>
-                            <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-                            <label for="first-rate4" title="Very good">4 stars</label>
-                            <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-                            <label for="first-rate5" title="Amazing">5 stars</label>
-                        </fieldset>
-                    </div>
-                    <div class="col-12 mb-3">
-                        <label for="comment" class="form-label">Comments</label>
-                        <textarea name="review[comment]" id="comment" cols="30" rows="5" class="form-control"
-                            required></textarea>
-                        <div class="invalid-feedback">Please submit some comments for review</div>
-                    </div>
-                </div>
-                <button class="btn btn-outline-dark" id="review-btn">Submit</button>
-            </form>
-            <br>
-            <% } %>
-            <hr>
-            <%if(listing.reviews.length>0) {%>
-            <h6>All Reviews</h6>
-                <% for(let review of listing.reviews)
-            { %>
-                <div class="col-6 mb-2">
-                    <div class="review-card card">
-                        <div class="card-body">
-                            <h6 class="card-title">@<%=review.author.username%></h6>
-                            <p class="starability-result card-text" data-rating="<%=review.rating%>"></p>
-                            <p class="card-text"><%=review.comment%></p>
-                            <form method="post"
-                                action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=Delete">
-                                <button class="btn btn-sm delete-btn btn-dark">Delete</button>
-                            </form>
-                        </div>
 
-                        </div>
-                <% } %>
+    <!-- All Reviews -->
+    <% if(listing.reviews.length > 0) { %>
+    <div style="background: white; border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--card-shadow);">
+      <h3 style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">
+        All Reviews <span style="color: var(--text-muted); font-weight: 400; font-size: 0.88rem;">(<%= listing.reviews.length %>)</span>
+      </h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem;">
+        <% for(let review of listing.reviews) { %>
+        <div class="wl-review-card">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;">
+            <div style="display:flex; align-items:center; gap: 0.5rem;">
+              <div style="width:30px; height:30px; border-radius:50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display:flex; align-items:center; justify-content:center; color:white; font-size:0.75rem; font-weight:700;">
+                <%= review.author.username.charAt(0).toUpperCase() %>
+              </div>
+              <span class="wl-review-author">@<%= review.author.username %></span>
             </div>
-            <% }%>
+            <% if(currUser && currUser._id.equals(review.author._id)) { %>
+            <form method="post" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=Delete">
+              <button type="submit" style="background:none; border:none; color: var(--text-muted); font-size: 0.75rem; cursor:pointer; padding: 0.2rem 0.4rem; border-radius: 4px;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </form>
+            <% } %>
+          </div>
+          <p class="starability-result" data-rating="<%= review.rating %>" style="margin-bottom: 0.3rem;"></p>
+          <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;"><%= review.comment %></p>
         </div>
+        <% } %>
+      </div>
     </div>
-    <div class="row offset-2">
-        <div class="col-6">
-            <h4>Where you'll be</h4>
-            <div id="map"></div>
-            <script id="listing-coordinates" type="application/json">
-                <%-JSON.stringify({
-                    lat,
-                    lng,
-                    title: listing.title
-                }) %>
-            </script>
+    <% } %>
+  </div>
 
+  <!-- RIGHT: Booking Card -->
+  <div>
+    <div class="wl-booking-card">
+      <div class="wl-booking-price">
+        ₹<%= listing.price.toLocaleString('en-IN') %> <small>/ night</small>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 1rem; font-size: 0.85rem;">
+        <i class="fa-solid fa-star" style="color: #f59e0b;"></i>
+        <strong>4.8</strong>
+        <span style="color: var(--text-muted);">· <%= listing.reviews.length %> reviews</span>
+      </div>
+
+      <div style="border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 0.75rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1.5px solid var(--border);">
+          <div style="padding: 0.75rem; border-right: 1px solid var(--border);">
+            <div style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.2rem;">Check-in</div>
+            <input type="date" style="border:none; outline:none; font-size:0.82rem; font-family:'DM Sans',sans-serif; width:100%; cursor:pointer;">
+          </div>
+          <div style="padding: 0.75rem;">
+            <div style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.2rem;">Check-out</div>
+            <input type="date" style="border:none; outline:none; font-size:0.82rem; font-family:'DM Sans',sans-serif; width:100%; cursor:pointer;">
+          </div>
         </div>
-    </div>
-    <br>
-    <br>
-</body>
+        <div style="padding: 0.75rem;">
+          <div style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.2rem;">Guests</div>
+          <select style="border:none; outline:none; font-size:0.82rem; font-family:'DM Sans',sans-serif; width:100%; cursor:pointer; background:transparent;">
+            <option>1 guest</option>
+            <option>2 guests</option>
+            <option>3 guests</option>
+            <option>4+ guests</option>
+          </select>
+        </div>
+      </div>
 
+      <% if(currUser) { %>
+      <button class="wl-booking-btn">Reserve Now</button>
+      <% } else { %>
+      <a href="/login" class="wl-booking-btn" style="display:block; text-align:center; text-decoration:none;">Log in to Reserve</a>
+      <% } %>
+
+      <p style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.75rem;">You won't be charged yet</p>
+
+      <hr style="border: none; border-top: 1px solid var(--border); margin: 1rem 0;">
+
+      <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+        <span>₹<%= listing.price.toLocaleString('en-IN') %> × 5 nights</span>
+        <span>₹<%= (listing.price * 5).toLocaleString('en-IN') %></span>
+      </div>
+      <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+        <span>Service fee</span>
+        <span>₹<%= Math.floor(listing.price * 0.12).toLocaleString('en-IN') %></span>
+      </div>
+      <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+        <span>GST (18%)</span>
+        <span>₹<%= Math.floor(listing.price * 5 * 0.18).toLocaleString('en-IN') %></span>
+      </div>
+      <hr style="border: none; border-top: 1px solid var(--border); margin: 0.75rem 0;">
+      <div style="font-size: 0.9rem; font-weight: 700; display: flex; justify-content: space-between;">
+        <span>Total</span>
+        <span>₹<%= Math.floor(listing.price * 5 * 1.18 + listing.price * 0.12).toLocaleString('en-IN') %></span>
+      </div>
+    </div>
+
+    <!-- Host Card -->
+    <div style="background: white; border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--card-shadow); margin-top: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1rem;">
+          <%= listing.owner.username.charAt(0).toUpperCase() %>
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.9rem;">Hosted by <%= listing.owner.username %></div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Joined Wanderlust 2024</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.75rem; font-size: 0.78rem; color: var(--text-muted);">
+        <span><i class="fa-solid fa-star" style="color: #f59e0b;"></i> 4.9 rating</span>
+        <span><i class="fa-solid fa-shield-halved" style="color: #4caf9a;"></i> Verified host</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Form validation
+(function() {
+  'use strict';
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+})();
+</script>

@@ -13,10 +13,8 @@ const listingSchema=new Schema(
       },
       description:String,
       image: {
-            type:{
               url:String,
               filename:String
-            }
       },    
       price:Number,
       location:String,
@@ -32,6 +30,23 @@ const listingSchema=new Schema(
     }
 );
 
+listingSchema.index(
+  {
+    title: "text",
+    description: "text",
+    location: "text",
+    country: "text"
+  },
+  {
+    weights: {
+      title: 5,
+      location: 3,
+      description: 2,
+      country: 1
+    }
+  }
+);
+
 listingSchema.post("findOneAndDelete",async(listing)=>
 { if(listing && listing.reviews.length)
  { await Review.deleteMany({_id:{$in:listing.reviews}});}
@@ -42,7 +57,7 @@ listingSchema.post("findOneAndDelete",async(listing)=>
 let Listing= mongoose.model("Listing",listingSchema);
 module.exports=Listing;
 
-/*
+/*z
 cascade delete pattern:
 Without it, if you delete a listing, the reviews linked to that listing would remain in the database, becoming “orphaned” documents.
 With this hook, you ensure data integrity: deleting a listing also cleans up its related reviews.
