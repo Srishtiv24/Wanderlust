@@ -20,7 +20,7 @@ router.get("/api/listings-by-ids", async (req, res) => {
     if (!idArr.length) return res.json({ listings: [] });
 
     const listings = await Listing.find({ _id: { $in: idArr } }).select(
-      "title location country image mood category isHiddenGem estimatedCost bestSeason reviews tags"
+      "title location country image mood category estimatedCost reviews tags"
     );
 
     const ordered = idArr

@@ -10,14 +10,14 @@
       <div class="wl-hero-bg"></div>
 
       <div class="wl-hero-content">
-        <div class="wl-hero-eyebrow">✦ Discover India's Soul</div>
+        <div class="wl-hero-eyebrow">✦ Where Every Stay Tells a Story</div>
         <h1>Find places that<br><span>feel like you</span></h1>
         <p>Plan Smarter, Travel Better. Stay with meaning. Discover destinations that heal, inspire and connect you.</p>
         <div class="wl-hero-actions">
-          <button class="wl-btn-primary" onclick="openMoodModal()">
-            <i class="fa-regular fa-compass"></i> Explore by Mood
-          </button>
-          <a href="#popular-section" class="wl-btn-secondary">
+          <a href="/itenary" class="wl-btn-primary">
+            <i class="fa-solid fa-map-location-dot"></i> Plan a Trip
+          </a>
+          <a href="#" class="wl-btn-secondary" onclick="event.preventDefault(); document.querySelector('.wl-search-bar input').focus();">
             <i class="fa-solid fa-magnifying-glass"></i> Search Destinations
           </a>
         </div>
@@ -93,6 +93,11 @@
         </form>
       </div>
 
+      <!-- ===== EXPLORE ALL LISTINGS BUTTON ===== -->
+      <button class="wl-btn-primary" onclick="toggleAllListings()" id="exploreAllBtn" style="padding: 0.4rem 1rem; font-size: 0.78rem; border-radius: 20px; margin-left: 0.25rem;">
+        <i class="fa-solid fa-grid-2"></i> Explore All
+      </button>
+
       <div class="tax-toggle">
         <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
         <label for="switchCheckDefault">Show with taxes</label>
@@ -110,6 +115,16 @@
       <% } %>
     </div>
 
+    <!-- ===== ALL LISTINGS WITH PAGINATION ===== -->
+    <div id="allListingsSection" style="display:none;">
+      <div class="wl-section-header">
+        <h2 class="wl-section-title">All Listings</h2>
+        <span id="paginationInfo" style="font-size:0.82rem; color:var(--text-muted);"></span>
+      </div>
+      <div class="wl-stays-grid" id="allListingsGrid"></div>
+      <div id="paginationControls" style="display:flex; justify-content:center; align-items:center; gap:0.5rem; margin:1.25rem 0;"></div>
+    </div>
+
     <!-- ===== POPULAR DESTINATIONS ===== -->
     <% if (allListings.length > 0) { %>
     <div id="popular-section">
@@ -124,7 +139,7 @@
       </div>
 
       <div class="wl-cards-scroll">
-        <% for(let i = 0; i < Math.min(allListings.length, 8); i++) {
+        <% for(let i = 0; i < Math.min(allListings.length, 12); i++) {
            const listing = allListings[i];
            const rating = (4.3 + ((listing.price % 7) * 0.08)).toFixed(1);
            const reviews = 150 + (listing.price % 300);
@@ -167,7 +182,6 @@
     <div id="stays-section">
       <div class="wl-section-header">
         <h2 class="wl-section-title">Top Stays for You</h2>
-        <a href="/listings" class="wl-view-all">View all →</a>
       </div>
 
       <div class="wl-stays-grid">
@@ -229,7 +243,7 @@
       <h2 class="wl-section-title">More Results</h2>
     </div>
     <div class="wl-stays-grid">
-      <% for(let i = 8; i < allListings.length; i++) {
+      <% for(let i = 12; i < allListings.length; i++) {
          const s = allListings[i];
          const rating = (4.3 + ((s.price % 7) * 0.08)).toFixed(1);
       %>
@@ -269,7 +283,7 @@
         <div class="wl-trust-text"><strong>Mood-Based Search</strong><span>Find places that match how you feel.</span></div>
       </div>
       <div class="wl-trust-item">
-        <div class="wl-trust-icon purple"><i class="fa-solid fa-sparkles"></i></div>
+        <div class="wl-trust-icon purple"><span class="wl-ai-star">✦</span></div>
         <div class="wl-trust-text"><strong>AI-Powered Help</strong><span>Get itinerary ideas instantly.</span></div>
       </div>
       <div class="wl-trust-item">
@@ -297,25 +311,20 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // ── Multi-filter navigation ───────────────────────────────
-  // Clicking a category or mood filter ADDS it to current params
-  // instead of wiping out search/price/mood that are already active
   document.querySelectorAll('.wl-filter-link').forEach(link => {
     link.addEventListener('click', function(e) {
       e.preventDefault();
 
-      // "Trending" clears everything
       if (this.dataset.filterClear) {
         window.location.href = '/listings';
         return;
       }
 
-      const key = this.dataset.filterKey;   // 'category' | 'mood'
+      const key = this.dataset.filterKey;
       const val = this.dataset.filterVal;
 
-      // Start from current URL params so other filters survive
       const params = new URLSearchParams(window.location.search);
 
-      // Toggle: clicking the already-active filter removes it
       if (params.get(key) === val) {
         params.delete(key);
       } else {
@@ -328,12 +337,9 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // ── Debounced navbar search ───────────────────────────────
-  // Fires 400 ms after the user stops typing; preserves other active filters
   const navbarForm = document.querySelector('.wl-search-bar form');
   const navbarInput = navbarForm ? navbarForm.querySelector('input[name="search"]') : null;
   if (navbarInput) {
-    // Intercept form submit so hidden params aren't needed —
-    // instead we merge into current URL params
     let navTimer;
     navbarInput.addEventListener('input', function() {
       clearTimeout(navTimer);
@@ -345,14 +351,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (val.length === 0) {
           params.delete('search');
         } else {
-          return; // wait for at least 2 chars
+          return;
         }
         const qs = params.toString();
         window.location.href = qs ? `/listings?${qs}` : '/listings';
       }, 400);
     });
 
-    // Also intercept Enter / form submit to merge params
     navbarForm.addEventListener('submit', function(e) {
       e.preventDefault();
       const val = navbarInput.value.trim();
@@ -380,4 +385,108 @@ function handleFavClick(btn) {
     ? '<i class="fa-solid fa-heart" style="color:var(--primary)"></i>'
     : '<i class="fa-regular fa-heart"></i>';
 }
+
+// ===== EXPLORE ALL LISTINGS WITH PAGINATION =====
+const ALL_LISTINGS = <%- JSON.stringify(allListings) %>;
+const PAGE_SIZE = 12;
+let currentPage = 1;
+let allSectionOpen = false;
+
+function toggleAllListings() {
+  const section = document.getElementById('allListingsSection');
+  const btn = document.getElementById('exploreAllBtn');
+  allSectionOpen = !allSectionOpen;
+  section.style.display = allSectionOpen ? 'block' : 'none';
+  btn.innerHTML = allSectionOpen
+    ? '<i class="fa-solid fa-xmark"></i> Close'
+    : '<i class="fa-solid fa-grid-2"></i> Explore All';
+  if (allSectionOpen) {
+    currentPage = 1;
+    renderPage(currentPage);
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function renderPage(page) {
+  const total = ALL_LISTINGS.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const start = (page - 1) * PAGE_SIZE;
+  const end = Math.min(start + PAGE_SIZE, total);
+  const slice = ALL_LISTINGS.slice(start, end);
+
+  document.getElementById('paginationInfo').textContent =
+    `Showing ${start + 1}–${end} of ${total} listing${total !== 1 ? 's' : ''}`;
+
+  const grid = document.getElementById('allListingsGrid');
+  grid.innerHTML = slice.map(s => {
+    const rating = (4.3 + ((s.price % 7) * 0.08)).toFixed(1);
+    const reviews = 50 + (s.price % 250);
+    return `
+      <div class="wl-stay-card">
+        <button class="wl-stay-card-fav"
+          data-fav-id="${s._id}" data-fav-title="${s.title}"
+          data-fav-img="${s.image.url}" data-fav-location="${s.location}"
+          data-fav-price="${s.price}" onclick="handleFavClick(this)">
+          <i class="fa-regular fa-heart"></i>
+        </button>
+        <a href="/listings/${s._id}">
+          <img src="${s.image.url}" alt="${s.title}" class="wl-stay-card-img" loading="lazy">
+        </a>
+        <div class="wl-stay-card-body">
+          <div class="wl-stay-name">${s.title}</div>
+          <div class="wl-stay-location">
+            <i class="fa-solid fa-location-dot" style="font-size:0.65rem;"></i>
+            ${s.location}, ${s.country}
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.35rem;">
+            <div class="wl-stay-price">₹${s.price.toLocaleString('en-IN')}<small>/night</small></div>
+            <div class="wl-rating" style="font-size:0.72rem;">
+              <i class="fa-solid fa-star"></i> ${rating} <span>(${reviews})</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  if (typeof refreshFavButtons === 'function') refreshFavButtons();
+
+  // Pagination controls
+  const controls = document.getElementById('paginationControls');
+  let html = '';
+
+  html += `<button class="wl-scroll-btn" onclick="goToPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:0.35;cursor:not-allowed;"' : ''}>
+    <i class="fa-solid fa-chevron-left"></i>
+  </button>`;
+
+  for (let p = 1; p <= totalPages; p++) {
+    if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) {
+      html += `<button onclick="goToPage(${p})" style="
+        width:32px; height:32px; border-radius:50%;
+        border:1.5px solid ${p === page ? 'var(--primary)' : 'var(--border)'};
+        background:${p === page ? 'var(--primary)' : 'white'};
+        color:${p === page ? 'white' : 'var(--text-muted)'};
+        font-size:0.75rem; font-weight:600; cursor:pointer;
+        font-family:'DM Sans',sans-serif;
+        display:inline-flex; align-items:center; justify-content:center;
+        transition:all 0.2s;">${p}</button>`;
+    } else if (p === page - 2 || p === page + 2) {
+      html += `<span style="color:var(--text-muted); font-size:0.8rem;">…</span>`;
+    }
+  }
+
+  html += `<button class="wl-scroll-btn" onclick="goToPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:0.35;cursor:not-allowed;"' : ''}>
+    <i class="fa-solid fa-chevron-right"></i>
+  </button>`;
+
+  controls.innerHTML = html;
+}
+
+function goToPage(page) {
+  const totalPages = Math.ceil(ALL_LISTINGS.length / PAGE_SIZE);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderPage(currentPage);
+  document.getElementById('allListingsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 </script>
+

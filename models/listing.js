@@ -1,34 +1,43 @@
-//Model and Schema to represent  our data 
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const Review = require("./review.js");
+const { generateListingEmbedding } = require("../utils/embeddings.js");
 
-const mongoose=require("mongoose");
-const {Schema}=mongoose;
-const Review = require("./review");
-
-//schema
-const listingSchema=new Schema(
+const listingSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  description: String,
+  image: {
+    url: String,
+    filename: String,
+  },
+  // Additional photos/videos added by host
+  gallery: [
     {
-      title:{
-       type:String,
-       required:true
-      },
-      description:String,
-      image: {
-              url:String,
-              filename:String
-      },    
-      price:Number,
-      location:String,
-      country:String,
-      reviews: [{
-        type: Schema.Types.ObjectId,
-        ref: "Review"
-      }],
-      owner: {
-        type:Schema.Types.ObjectId,
-        ref:"User"
-      }
-    }
-);
+      url: String,
+      filename: String,
+      type: { type: String, enum: ["image", "video"], default: "image" },
+    },
+  ],
+  price: Number,
+  location: String,
+  country: String,
+  reviews: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Review",
+    },
+  ],
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
+  embedding:   { type: [Number], default: undefined, select: false }
+
+});
+
 
 listingSchema.index(
   {
@@ -47,25 +56,31 @@ listingSchema.index(
   }
 );
 
-listingSchema.post("findOneAndDelete",async(listing)=>
-{ if(listing && listing.reviews.length)
- { await Review.deleteMany({_id:{$in:listing.reviews}});}
+listingSchema.pre("save", async function(next) {
+  const changed = this.isNew ||
+    this.isModified("title") ||
+    this.isModified("description") ||
+    this.isModified("location") ||
+    this.isModified("country") ||
+    this.isModified("price");
+
+  if (!changed) return next();
+
+  try {
+    this.embedding = await generateListingEmbedding(this);
+  } catch (err) {
+    console.warn("[Embedding] Skipped:", err.message);
+    // Don't block the save if embedding fails
+  }
+  next();
 });
-//is a Mongoose middleware hook — specifically a post hook that runs after a findOneAndDelete operation on your Listing model.
 
-//model
-let Listing= mongoose.model("Listing",listingSchema);
-module.exports=Listing;
+// Delete associated reviews when listing is deleted
+listingSchema.post("findOneAndDelete", async (listing) => {
+  if (listing) {
+    await Review.deleteMany({ _id: { $in: listing.reviews } });
+  }
+});
 
-/*z
-cascade delete pattern:
-Without it, if you delete a listing, the reviews linked to that listing would remain in the database, becoming “orphaned” documents.
-With this hook, you ensure data integrity: deleting a listing also cleans up its related reviews.
-
-Key points about post middleware
-post("findOneAndDelete") runs after the deletion is complete.
-You get access to the deleted document (listing).
-If you used pre("findOneAndDelete"), you’d get the query object instead, not the deleted doc.
-Summary:  
-This is a custom Mongoose middleware that automatically deletes all reviews linked to a listing once that listing is removed. It’s a neat way to enforce referential integrity in MongoDB, since MongoDB itself doesn’t have built-in cascade deletes like SQL.
-*/
+const Listing = mongoose.model("Listing", listingSchema);
+module.exports = Listing;
