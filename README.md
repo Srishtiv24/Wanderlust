@@ -1,55 +1,87 @@
 # 🌍 Wanderlust – AI-Powered Travel Listing & Planning Platform
 
-Wanderlust is a full-stack travel listing and intelligent trip planning application designed to deliver personalized travel experiences through a combination of traditional web systems and modern AI-driven search capabilities.
+![Live](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![AI](https://img.shields.io/badge/AI--Powered-System-blue?style=for-the-badge)
 
-The platform integrates **hybrid search architecture, AI-based recommendation systems, and scalable backend design** to provide users with efficient discovery and planning of travel destinations.
-
----
-
-## 🚀 Live Application  
-https://wanderlust-aqw0.onrender.com/
+**Live Application:** https://wanderlust-aqw0.onrender.com/
 
 ---
 
-## 📌 Project Overview
+## 📌 Overview
 
-Wanderlust enables users to explore, create, and manage travel listings while leveraging AI to enhance search relevance and travel recommendations. The system combines structured database querying with semantic understanding to support both precise and natural language-based search inputs.
+Wanderlust is a production-style full-stack travel discovery and itinerary planning platform that integrates **AI-powered semantic search, traditional database querying, and intelligent recommendation systems**.
+
+The system is designed to support both structured filters and natural language queries through a **hybrid search architecture (MongoDB + Vector Search + LLM reasoning)**.
+
+---
+
+## 🧭 Table of Contents
+
+- Project Overview
+- Core Features
+- System Architecture
+- AI & Search Pipeline
+- Tech Stack
+- Key System Highlights
+- Future Enhancements
+- Author
 
 ---
 
 ## ⚙️ Core Features
 
-### Travel Listings System
-- Full CRUD operations for travel listings
-- Wishlist, reviews, and rating functionality
-- Secure image upload and storage using Cloudinary + Multer
-- Server-side validation implemented using Joi
+### 🏡 Travel Listings System
+- Full CRUD functionality for travel listings
+- Wishlist, reviews, and ratings system
+- Cloud image storage using **Cloudinary + Multer**
+- Robust server-side validation using **Joi**
 
-### Authentication & Authorization
-- Secure user authentication using Passport.js
-- Session management with Connect-Mongo
-- Protected routes and role-based access control
+### 🔐 Authentication System
+- Secure login/signup using **Passport.js**
+- Session persistence via **Connect-Mongo**
+- Protected routes and authorization middleware
 
-### Hybrid Search Architecture
-- MongoDB Full-Text Search for fast keyword-based queries  
-- Vector-Based Semantic Search for natural language and mood-based queries  
-- Intelligent query routing between keyword and semantic search
-- Debounced input handling to reduce unnecessary API calls
+### 🔎 Hybrid Search Engine
+- MongoDB **full-text search** for structured queries
+- Vector-based **semantic search** for natural language inputs
+- Intelligent routing between keyword and semantic search
+- Debounced input handling to minimize API calls
 - Multi-criteria filtering (price, category, mood)
-- Pagination for optimized data retrieval and rendering
+- Pagination for scalable result rendering
 
-### AI-Powered Travel Assistant (Hybrid RAG System)
-- NLP-driven query interpretation
-- Retrieval-Augmented Generation (RAG) architecture combining:
-  - MongoDB filtered retrieval
-  - Vector similarity search
-  - LLM-based response generation
-- Context-aware travel recommendations and itinerary suggestions
+---
 
-### Location & Planning Features
-- Interactive map integration using OpenCage API
-- Smart itinerary planner for structured day-wise trip creation
-- Location-based enrichment of listings
+## 🤖 AI Search & Recommendation Pipeline
+
+```
+User Query → Intent Detection → Routing Layer
+        ↓
+   ┌──────────────┬─────────────────┐
+   │              │                 │
+Keyword Query   Semantic Query   Hybrid Query
+(MongoDB)       (Vector DB)      (Combined)
+   │              │                 │
+   └─────── Retrieval Layer (Mongo + Vectors) ───────┘
+                        ↓
+              LLM (Kilo AI / Transformers)
+                        ↓
+         Context-Aware Travel Recommendations
+```
+
+### 🧠 AI Capabilities
+- Natural language understanding (NLP)
+- Retrieval-Augmented Generation (RAG)
+- Context-aware itinerary generation
+- Semantic ranking of listings
+
+---
+
+## 🗺️ Location & Planning Features
+- Geolocation integration using **OpenCage API**
+- Smart day-wise itinerary planner
+- Location enrichment for travel listings
 
 ---
 
@@ -64,56 +96,51 @@ Wanderlust enables users to explore, create, and manage travel listings while le
 
 ### Backend
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge)
+![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge)
 
 ### Database
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=for-the-badge)
 
-### Authentication
-![Passport.js](https://img.shields.io/badge/Passport.js-34E27A?style=for-the-badge)
-![Connect-Mongo](https://img.shields.io/badge/Session%20Store-FF6F00?style=for-the-badge)
-
-### AI & Search
-![Vector Search](https://img.shields.io/badge/Vector%20Search-AI-blue?style=for-the-badge)
+### AI & Search Layer
+![Vector Search](https://img.shields.io/badge/Vector_Search-Semantic-blue?style=for-the-badge)
 ![HuggingFace](https://img.shields.io/badge/HuggingFace-FFCC4D?style=for-the-badge)
-![Kilo AI](https://img.shields.io/badge/Kilo%20AI-FF4B4B?style=for-the-badge)
+![Kilo AI](https://img.shields.io/badge/Kilo_AI-FF4B4B?style=for-the-badge)
 
 ### Services
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge)
-![OpenCage](https://img.shields.io/badge/OpenCage%20API-1E90FF?style=for-the-badge)
+![OpenCage](https://img.shields.io/badge/OpenCage_API-1E90FF?style=for-the-badge)
 
 ---
 
-## 🧠 System Highlights
+## 🚀 System Highlights
 
-- Hybrid keyword + semantic search architecture
-- AI-driven context-aware recommendation system
-- Optimized backend performance using debouncing and pagination
-- Scalable authentication and session management system
-- Production-ready full-stack architecture with real-world use case
+- Hybrid **keyword + semantic + AI routing architecture**
+- Retrieval-Augmented Generation (RAG) based recommendation engine
+- Optimized performance using **debouncing + pagination**
+- Scalable authentication & session management system
+- Production-ready full-stack architecture
 
 ---
 
 ## 📈 Impact
 
-This project demonstrates strong capabilities in:
-
-- Full-stack system design and implementation
-- AI integration into traditional web applications
-- Search system optimization (lexical + semantic fusion)
-- Backend scalability and performance optimization
-- Real-world problem-solving using modern web technologies
+This project demonstrates expertise in:
+- Full-stack system design and architecture
+- AI integration into web applications (RAG systems)
+- Advanced search optimization (lexical + semantic fusion)
+- Backend scalability and performance engineering
+- Real-world product-level system design thinking
 
 ---
 
 ## 🔮 Future Enhancements
 
-- AI-based dynamic pricing estimation for trips
-- Real-time booking and reservation system
-- Social travel feed with user-generated itineraries
+- AI-based dynamic pricing engine
+- Real-time booking system integration
+- Social travel feed with user itineraries
 - Mobile application (React Native / Flutter)
-- Personalized recommendation engine using user behavior tracking
+- Personalized recommendation engine using user behavior analytics
 
 ---
 
