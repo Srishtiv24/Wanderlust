@@ -3,7 +3,7 @@
 **Live Application:** https://wanderlust-aqw0.onrender.com/
 
 ## About
-Wanderlust is a full-stack travel discovery and planning application that allows users to explore travel listings, create their own listings, and receive intelligent recommendations using a hybrid search system combining MongoDB full-text search and vector-based semantic search (RAG-based approach).
+Wanderlust is a full-stack travel discovery and planning application that allows users to explore travel listings, create their own listings, and receive intelligent recommendations using a hybrid search system combining MongoDB full-text search and vector-based semantic search (RAG-based approach) with a smart itinerary planning system.
 
 ---
 
