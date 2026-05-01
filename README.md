@@ -1,74 +1,142 @@
-# Wanderlust – AI-Powered Travel Discovery & Planning Platform
+# 🌍 Wanderlust – AI-Powered Travel Discovery & Planning Platform
 
-**Live Application:** https://wanderlust-aqw0.onrender.com/
+<div align="center">
 
-## About
-Wanderlust is a full-stack travel discovery and planning application that allows users to explore travel listings, create their own listings, and receive intelligent recommendations using a hybrid search system combining MongoDB full-text search and vector-based semantic search (RAG-based approach).
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0D1117,100:1F6FEB&height=160&section=header&text=Wanderlust&fontSize=32&fontColor=ffffff&animation=fadeIn" />
 
----
+### AI-Powered Travel Discovery • Full Stack MERN Inspired • Hybrid Search System
 
-## Features
+<sub><i>"Discover travel through intelligence, not just filters."</i></sub>
 
-- Travel listings with full CRUD functionality
-- Wishlist, reviews, and ratings system
-- Secure authentication using Passport.js
-- Session management with Connect-Mongo
-- Hybrid search (keyword + semantic vector search)
-- Multi-criteria filtering (price, category, mood)
-- Debounced search input for performance optimization
-- Pagination for efficient data loading
-- AI-powered travel assistant using RAG (MongoDB + Vector Search + LLM)
-- Location services using OpenCage API
-- Smart itinerary planner for day-wise travel planning
+</div>
 
 ---
 
-## Tech Stack
+## 01 — About
 
-**Frontend:** HTML, CSS, JavaScript, Bootstrap, EJS  
-**Backend:** Node.js, Express.js  
-**Database:** MongoDB, Mongoose  
-**Authentication:** Passport.js, Connect-Mongo  
-**AI / Search:** Vector Search, MongoDB Full-Text Indexing, Hugging Face Transformers, Kilo AI  
-**Services:** Cloudinary, Multer, OpenCage API
-
----
-
-## How to Run Locally
-
-1. Clone the repository
 ```bash
-git clone <repo-link>
-cd wanderlust
+> project
+Wanderlust
+
+> type
+Full Stack Travel Discovery & Planning Platform
+
+> concept
+AI-powered hybrid search + travel itinerary planning
+
+> goal
+Make travel discovery more intelligent, contextual, and personalized
 ```
 
-2. Install dependencies
-```bash
-npm install
-```
+Wanderlust is a full-stack travel application that enables users to explore listings, create travel posts, and receive intelligent recommendations using a **hybrid search system (MongoDB full-text + vector semantic search + RAG pipeline)**.
 
-3. Create a `.env` file and add required environment variables
-```
-MONGO_URI=your_mongodb_uri
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-OPENCAGE_API_KEY=your_api_key
-SESSION_SECRET=your_secret
-```
+---
 
-4. Start the server
-```bash
-npm start
-```
+## 02 — Key Features
 
-5. Open in browser
-```
-http://localhost:3000
+```txt
+→ Travel Listings (CRUD)
+→ Wishlist, Reviews & Ratings
+→ AI-powered hybrid search (keyword + semantic)
+→ Multi-criteria filtering (price, category, mood)
+→ Debounced search + pagination optimization
+→ RAG-based travel assistant
+→ Smart itinerary planner
+→ Secure authentication system
+→ Location-based enrichment (OpenCage API)
 ```
 
 ---
 
-## Author
-Srishti Verma  
-Full Stack Developer | AI Systems Enthusiast
+## 03 — System Architecture
+
+```txt
+User Query
+   ↓
+Intent Detection
+   ↓
+Routing Layer
+   ├── MongoDB Full-Text Search
+   ├── Vector Semantic Search
+   └── Hybrid Merge Logic
+   ↓
+Retrieval Layer
+   ↓
+LLM (Kilo AI / Transformers)
+   ↓
+Personalized Travel Output
+```
+
+---
+
+## 04 — Tech Stack
+
+### Frontend
+HTML • CSS • JavaScript • Bootstrap • EJS
+
+### Backend
+Node.js • Express.js
+
+### Database
+MongoDB • Mongoose
+
+### AI & Search
+Vector Search • MongoDB Full-Text Indexing • Hugging Face Transformers • Kilo AI
+
+### Services
+Cloudinary • Multer • OpenCage API
+
+---
+
+## 05 — Core Highlights
+
+```txt
+✔ Hybrid Search Architecture (Keyword + Semantic)
+✔ Retrieval-Augmented Generation (RAG)
+✔ Optimized API performance (debounce + pagination)
+✔ Scalable authentication system
+✔ Production-ready backend design
+✔ Real-world AI integration use case
+```
+
+---
+
+## 06 — Impact
+
+Wanderlust demonstrates the ability to design and implement:
+
+→ AI-powered full-stack applications
+→ Intelligent search systems beyond traditional filtering
+→ Scalable backend architectures
+→ Real-world RAG-based workflows
+
+---
+
+## 07 — Future Enhancements
+
+```txt
+→ AI-based dynamic pricing
+→ Real-time booking system
+→ Social travel feed
+→ Mobile app (React Native)
+→ Personalized recommendation engine
+```
+
+---
+
+## 08 — Author
+
+<div align="center">
+
+**Srishti Verma**  
+Full Stack Developer • AI Systems Enthusiast
+
+</div>
+
+---
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1F6FEB,100:0D1117&height=120&section=footer" />
+
+</div>
