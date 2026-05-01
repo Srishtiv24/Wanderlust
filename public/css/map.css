@@ -1,0 +1,9 @@
+
+/* ===== MAP (show page) ===== */
+#map {
+    height: 300px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+  

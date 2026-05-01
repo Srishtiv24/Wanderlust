@@ -31,7 +31,6 @@
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-
 .ai-sidebar-logo {
   width: 30px; height: 30px;
   border-radius: 6px;
@@ -41,7 +40,6 @@
   font-size: 0.75rem;
   flex-shrink: 0;
 }
-
 .ai-sidebar-name {
   font-size: 0.82rem;
   font-weight: 700;
@@ -73,9 +71,7 @@
 }
 
 .ai-preset-nav { padding: 0.5rem 0 1.5rem; flex: 1; }
-
-.ai-category { padding: 0.75rem 0 0.25rem; }
-
+.ai-category   { padding: 0.75rem 0 0.25rem; }
 .ai-category-label {
   font-size: 0.65rem;
   font-weight: 700;
@@ -84,7 +80,6 @@
   color: var(--text-muted);
   padding: 0 1rem 0.4rem;
 }
-
 .ai-preset-item {
   display: block;
   width: 100%;
@@ -118,17 +113,14 @@
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-
 .ai-header-left {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.82rem;
 }
-
 .ai-header-title { font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
 .ai-header-sep   { color: var(--border); }
-
 .ai-header-status {
   display: flex;
   align-items: center;
@@ -177,7 +169,7 @@
   flex-shrink: 0;
 }
 
-/* ── Messages scroll area ── */
+/* ── Messages scroll ── */
 .ai-messages {
   flex: 1;
   overflow-y: auto;
@@ -188,7 +180,7 @@
   scrollbar-color: var(--border) transparent;
 }
 
-/* ── Welcome screen ── */
+/* ── Welcome ── */
 .ai-welcome {
   flex: 1;
   display: flex;
@@ -197,7 +189,6 @@
   padding: 1rem 2rem;
 }
 .ai-welcome-inner { max-width: 540px; width: 100%; text-align: center; }
-
 .ai-welcome-star {
   width: 70px; height: 70px;
   margin: 0 auto 1.2rem;
@@ -208,7 +199,6 @@
   color: white;
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
-
 .ai-welcome-inner h2 {
   font-family: 'Bricolage Grotesque', sans-serif;
   font-size: 1.35rem;
@@ -223,9 +213,7 @@
   line-height: 1.6;
   margin-bottom: 1.75rem;
 }
-
 .ai-suggestions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-
 .ai-suggestion {
   display: flex;
   align-items: center;
@@ -245,7 +233,7 @@
 .ai-suggestion i { font-size: 0.78rem; color: var(--primary); flex-shrink: 0; width: 14px; }
 .ai-suggestion:hover { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
 
-/* ── Chat message rows ── */
+/* ── Message rows ── */
 .ai-msg-row {
   padding: 0.2rem 0;
   animation: msgIn 0.2s ease;
@@ -263,7 +251,6 @@
   gap: 0.85rem;
   align-items: flex-start;
 }
-
 .ai-msg-row.user-row .ai-msg-inner { flex-direction: row-reverse; }
 
 .ai-msg-content {
@@ -295,13 +282,12 @@
 }
 .ai-msg-row.bot-row .ai-msg-text { background: transparent; }
 
-/* Bot message text formatting */
+/* Bot text formatting */
 .ai-msg-text p            { margin-bottom: 0.6rem; }
 .ai-msg-text p:last-child { margin-bottom: 0; }
 .ai-msg-text strong       { font-weight: 700; color: var(--text); }
 .ai-msg-text em           { color: var(--text-muted); font-style: italic; }
-.ai-msg-text ul,
-.ai-msg-text ol           { padding-left: 1.25rem; margin: 0.4rem 0; }
+.ai-msg-text ul, .ai-msg-text ol { padding-left: 1.25rem; margin: 0.4rem 0; }
 .ai-msg-text li           { margin-bottom: 0.25rem; }
 .ai-msg-text h3 {
   font-family: 'Bricolage Grotesque', sans-serif;
@@ -343,6 +329,74 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
+/* ══════════════════════════════════════════
+   ACTION BAR — copy + export PDF buttons
+   Appears below every completed bot reply.
+   ══════════════════════════════════════════ */
+
+.ai-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+  animation: exportFadeIn 0.3s ease both;
+}
+
+@keyframes exportFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ai-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36rem;
+  padding: 0.34rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-size: 0.71rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.ai-action-btn svg {
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.ai-action-btn:hover {
+  border-color: #aaa;
+  color: var(--text);
+  background: #f7f7f7;
+}
+
+.ai-action-btn:active {
+  transform: scale(0.96);
+}
+
+/* Copied! success state */
+.ai-action-btn--success {
+  border-color: #22c55e !important;
+  color: #16a34a !important;
+  background: #f0fdf4 !important;
+}
+
+/* PDF button — accent tinted */
+.ai-action-btn--pdf:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-soft, #fff5f4);
+}
+
+.ai-action-btn--pdf:hover svg {
+  transform: translateY(1px);
+}
+
 /* ── Input area ── */
 .ai-input-area {
   padding: 0 1.5rem 1.25rem;
@@ -373,7 +427,6 @@
   resize: none; line-height: 1.55; max-height: 140px; overflow-y: auto;
 }
 .ai-input-box textarea::placeholder { color: #aaa; }
-
 .ai-send {
   width: 32px; height: 32px; border-radius: 7px;
   background: var(--text); border: none; color: white;
@@ -385,31 +438,25 @@
 .ai-send:disabled { background: var(--border); cursor: not-allowed; }
 
 
-/* ══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════
    LISTING CARDS STRIP
-   Appears below the bot's text reply as a horizontal
-   scroll track of rich photo cards.
-   ══════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════ */
 
 .aic-strip {
   animation: msgIn 0.3s ease;
   padding: 0.55rem 0 0.9rem;
 }
-
 .aic-strip-inner {
   max-width: 680px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
-
-/* Header row */
 .aic-strip-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.7rem;
 }
-
 .aic-strip-label {
   display: flex;
   align-items: center;
@@ -421,32 +468,22 @@
   color: var(--text-muted);
 }
 .aic-strip-label svg { color: var(--primary); flex-shrink: 0; }
+.aic-strip-hint { font-size: 0.64rem; color: #c0c0c0; letter-spacing: 0.02em; }
 
-.aic-strip-hint {
-  font-size: 0.64rem;
-  color: #c0c0c0;
-  letter-spacing: 0.02em;
-}
-
-/* Horizontal scroll track */
 .aic-scroll-track {
   display: flex;
   gap: 0.6rem;
   overflow-x: auto;
-  padding-bottom: 6px;          /* room for scrollbar */
+  padding-bottom: 6px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: #e5e5e5 transparent;
 }
 .aic-scroll-track::-webkit-scrollbar { height: 3px; }
-.aic-scroll-track::-webkit-scrollbar-thumb {
-  background: #e0e0e0; border-radius: 99px;
-}
+.aic-scroll-track::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 99px; }
 
-/* ── Individual card ── */
 .aic {
-  /* fixed width so the strip scrolls */
   flex: 0 0 188px;
   display: flex;
   flex-direction: column;
@@ -458,22 +495,18 @@
   background: #fff;
   scroll-snap-align: start;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-
-  /* staggered entrance */
   animation: cardIn 0.35s ease both;
 }
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(12px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-
 .aic:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
   border-color: var(--primary);
 }
 
-/* ── Photo section ── */
 .aic-photo {
   position: relative;
   height: 130px;
@@ -483,19 +516,14 @@
   flex-shrink: 0;
   overflow: hidden;
 }
-
-/* gradient fallback pattern when no image */
 .aic-photo--fallback {
   background-image:
     radial-gradient(ellipse at 30% 40%, rgba(232,57,42,0.18) 0%, transparent 60%),
     radial-gradient(ellipse at 80% 70%, rgba(255,122,24,0.14) 0%, transparent 55%),
     linear-gradient(145deg, #fef6f5, #fff0ea);
 }
-
-/* dark-to-transparent overlay so text is readable */
 .aic-overlay {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background: linear-gradient(
     to bottom,
     rgba(0,0,0,0.08) 0%,
@@ -503,12 +531,9 @@
     rgba(0,0,0,0.55) 100%
   );
 }
+.aic-photo-top  { position: absolute; top: 9px; left: 9px; }
+.aic-photo-bottom { position: absolute; bottom: 9px; left: 9px; }
 
-/* top-left country badge */
-.aic-photo-top {
-  position: absolute;
-  top: 9px; left: 9px;
-}
 .aic-country-badge {
   display: inline-block;
   font-size: 0.58rem;
@@ -523,12 +548,6 @@
   padding: 0.15rem 0.45rem;
   border: 1px solid rgba(255,255,255,0.18);
 }
-
-/* bottom price tag — sits on the photo */
-.aic-photo-bottom {
-  position: absolute;
-  bottom: 9px; left: 9px;
-}
 .aic-price-tag {
   display: inline-flex;
   align-items: baseline;
@@ -539,13 +558,8 @@
   text-shadow: 0 1px 4px rgba(0,0,0,0.5);
   letter-spacing: -0.02em;
 }
-.aic-per {
-  font-size: 0.6rem;
-  font-weight: 500;
-  opacity: 0.85;
-}
+.aic-per { font-size: 0.6rem; font-weight: 500; opacity: 0.85; }
 
-/* ── Card body ── */
 .aic-body {
   padding: 0.65rem 0.7rem 0.45rem;
   flex: 1;
@@ -553,7 +567,6 @@
   flex-direction: column;
   gap: 0.22rem;
 }
-
 .aic-title {
   font-size: 0.78rem;
   font-weight: 700;
@@ -561,13 +574,11 @@
   line-height: 1.3;
   letter-spacing: -0.01em;
   margin: 0;
-  /* two-line clamp */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
 .aic-loc {
   margin: 0;
   display: flex;
@@ -581,12 +592,10 @@
 }
 .aic-loc svg { flex-shrink: 0; color: var(--primary); }
 
-/* ── Card footer / CTA ── */
 .aic-footer {
   padding: 0.42rem 0.7rem 0.52rem;
   border-top: 1px solid var(--border);
 }
-
 .aic-cta {
   display: inline-flex;
   align-items: center;
@@ -597,20 +606,17 @@
   letter-spacing: 0.01em;
   transition: gap 0.15s ease;
 }
-
-.aic:hover .aic-cta {
-  gap: 0.5rem; /* arrow slides right on hover */
-}
+.aic:hover .aic-cta { gap: 0.5rem; }
 .aic-cta svg { transition: transform 0.15s ease; }
 .aic:hover .aic-cta svg { transform: translateX(2px); }
 
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .ai-sidebar     { display: none; }
-  .ai-suggestions { grid-template-columns: 1fr; }
-  .ai-input-area  { padding: 0 1rem 1rem; }
+  .ai-sidebar      { display: none; }
+  .ai-suggestions  { grid-template-columns: 1fr; }
+  .ai-input-area   { padding: 0 1rem 1rem; }
   .aic-strip-inner { padding: 0 1rem; }
-  .aic            { flex: 0 0 165px; }
-  .aic-photo      { height: 110px; }
+  .aic             { flex: 0 0 165px; }
+  .aic-photo       { height: 110px; }
 }

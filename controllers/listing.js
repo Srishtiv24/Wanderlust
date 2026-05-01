@@ -1,104 +1,87 @@
 const Listing = require("../models/listing.js");
 const opencage = require('opencage-api-client');
+const { vectorSearch } = require("../utils/vectorSearch.js");
+
+// ─────────────────────────────────────────────
+// Mood → natural language query for vector search
+// Much richer than keyword matching
+// ─────────────────────────────────────────────
+const MOOD_QUERIES = {
+  healing:     "peaceful wellness retreat spa nature calm serene yoga meditation quiet scenic",
+  celebration: "luxury party villa resort pool rooftop glamour exclusive premium champagne",
+  solitude:    "secluded remote quiet cabin wilderness off-grid hidden private rustic escape",
+  adventure:   "mountain trek hiking safari jungle ski slope expedition wild rugged outdoor",
+  monsoon:     "lush green rainforest backwater houseboat tropical waterfall misty jungle kerala",
+  sisterhood:  "boutique villa spa rooftop scenic charming wellness pool beach island retreat",
+};
+
+// ─────────────────────────────────────────────
+// Category → natural language query for vector search
+// ─────────────────────────────────────────────
+const CATEGORY_QUERIES = {
+  mountains: "mountain alpine ski chalet peak summit highland snow trek glacier valley lodge",
+  beach:     "beach coastal ocean seaside sand waves surf bay lagoon beachfront island villa",
+  arctic:    "arctic igloo aurora northern lights snow ice tundra polar glacier lapland winter",
+  pools:     "infinity pool private pool swimming rooftop pool resort villa overwater jacuzzi",
+  cities:    "city urban downtown skyline loft apartment penthouse metropolitan vibrant neighborhood",
+  camping:   "camping tent glamping campfire wilderness national park treehouse off-grid stargazing",
+  castles:   "castle palace fort heritage historic royal haveli chateau manor medieval estate",
+  forests:   "forest jungle treehouse canopy rainforest wildlife eco nature lush trail bamboo",
+};
 
 module.exports.index = async (req, res) => {
   const { search, mood, minPrice, maxPrice, category } = req.query;
 
-  let filter = {};
-  let sortOption = {};
-  let projection = {}; // ⚡ important fix
+  const priceFilter = {};
+  if (minPrice) priceFilter.$gte = Number(minPrice);
+  if (maxPrice) priceFilter.$lte = Number(maxPrice);
 
-  // ===== HYBRID SEARCH =====
-  if (search && search.trim()) {
-    const query = search.trim();
+  let allListings;
 
-    if (query.length < 3) {
-      // 🔹 REGEX SEARCH
-      const regex = new RegExp(query, "i");
-      filter.$or = [
-        { title: regex },
-        { description: regex },
-        { location: regex },
-        { country: regex },
-      ];
-    } else {
-      // 🔹 TEXT SEARCH
-      filter.$text = { $search: query };
-      sortOption = { score: { $meta: "textScore" } };
-      projection = { score: { $meta: "textScore" } }; // ⚡ ONLY here
+  const hasQuery = search?.trim();
+  const hasVectorSignals = mood || category;
+
+  // ─────────────────────────────────────────────
+  // Decide search strategy
+  // ─────────────────────────────────────────────
+  const isLongQuery = (text = "") => {
+    const wordCount = text.trim().split(/\s+/).length;
+    return wordCount > 4 || text.length > 30;
+  };
+
+  const useVector =
+    hasVectorSignals ||
+    (hasQuery && isLongQuery(search));
+
+  if (useVector) {
+    // ───────── VECTOR SEARCH PATH ─────────
+    const parts = [];
+
+    if (search?.trim()) parts.push(search.trim());
+    if (mood && MOOD_QUERIES[mood]) parts.push(MOOD_QUERIES[mood]);
+    if (category && CATEGORY_QUERIES[category]) parts.push(CATEGORY_QUERIES[category]);
+
+    const combinedQuery = parts.join(". ");
+
+    allListings = await vectorSearch(combinedQuery, 30, priceFilter);
+
+  } else {
+    // ───────── MONGO FULL-TEXT SEARCH PATH ─────────
+    const filter = {};
+
+    if (search?.trim()) {
+      filter.$text = { $search: search.trim() };
     }
+
+    if (minPrice || maxPrice) {
+      filter.price = priceFilter;
+    }
+
+    allListings = await Listing.find(filter);
   }
 
-  // ===== MOOD FILTER =====
-  const moodKeywords = {
-    healing: ["spa", "wellness", "peaceful", "retreat", "nature", "forest", "lake"],
-    celebration: ["luxury", "party", "villa", "resort", "beach", "pool"],
-    solitude: ["cabin", "remote", "quiet", "countryside"],
-    adventure: ["mountain", "trek", "camp", "hiking"],
-    monsoon: ["kerala", "goa", "coorg", "rainforest"],
-    sisterhood: ["bali", "greece", "villa", "retreat"],
-  };
+  if (req.xhr) return res.json({ allListings });
 
-  if (mood && moodKeywords[mood]) {
-    const regexes = moodKeywords[mood].map((k) => new RegExp(k, "i"));
-
-    const moodFilter = {
-      $or: [
-        { title: { $in: regexes } },
-        { description: { $in: regexes } },
-        { location: { $in: regexes } },
-        { country: { $in: regexes } },
-      ],
-    };
-
-    filter = Object.keys(filter).length
-      ? { $and: [filter, moodFilter] }
-      : moodFilter;
-  }
-
-  // ===== CATEGORY FILTER =====
-  const categoryKeywords = {
-    mountains: ["mountain", "alpine", "ski"],
-    beach: ["beach", "coastal", "ocean"],
-    cities: ["city", "urban", "downtown"],
-    camping: ["camp", "tent", "outdoor"],
-  };
-
-  if (category && categoryKeywords[category]) {
-    const regexes = categoryKeywords[category].map((k) => new RegExp(k, "i"));
-
-    const catFilter = {
-      $or: [
-        { title: { $in: regexes } },
-        { description: { $in: regexes } },
-        { location: { $in: regexes } },
-        { country: { $in: regexes } },
-      ],
-    };
-
-    filter = Object.keys(filter).length
-      ? { $and: [filter, catFilter] }
-      : catFilter;
-  }
-
-  // ===== PRICE FILTER =====
-  if (minPrice || maxPrice) {
-    filter.price = {};
-    if (minPrice) filter.price.$gte = Number(minPrice);
-    if (maxPrice) filter.price.$lte = Number(maxPrice);
-  }
-
-  // ===== FINAL QUERY =====
-  let query = Listing.find(filter, projection);
-
-  if (Object.keys(sortOption).length) {
-    query = query.sort(sortOption);
-  }
-
-  const allListings = await query;
-  if (req.xhr) {
-    return res.json({ allListings });
-  }
   res.render("listings/index.ejs", {
     allListings,
     searchQuery: search || "",
@@ -118,12 +101,10 @@ module.exports.createListing = async (req, res, next) => {
     req.flash("error", 'Image upload is required.');
     return res.redirect("listings/new");
   }
-  let url = req.file.path;
-  let filename = req.file.filename;
   let newListing = new Listing(req.body.listing);
   newListing.owner = req.user._id;
-  newListing.image = { url, filename };
-  await newListing.save();
+  newListing.image = { url: req.file.path, filename: req.file.filename };
+  await newListing.save(); // pre-save hook generates embedding automatically
   req.flash("success", "New Listing Created!");
   res.redirect("/listings");
 };
@@ -166,11 +147,12 @@ module.exports.renderEditForm = async (req, res) => {
 
 module.exports.editListing = async (req, res, next) => {
   const { id } = req.params;
-  let updatedListing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+  let listing = await Listing.findById(id);
+  Object.assign(listing, req.body.listing);
   if (req.file) {
-    updatedListing.image = { url: req.file.path, filename: req.file.filename };
-    await updatedListing.save();
+    listing.image = { url: req.file.path, filename: req.file.filename };
   }
+  await listing.save(); // triggers embedding regeneration if fields changed
   req.flash("success", "Listing Updated!");
   res.redirect(`/listings/${id}`);
 };

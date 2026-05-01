@@ -1,0 +1,165 @@
+<% layout('/layouts/boiler-plate') -%>
+
+<div class="itin-wrap">
+
+  <!-- HERO -->
+  <div class="itin-hero">
+    <div class="itin-hero-inner">
+      <div class="itin-hero-top">
+        <div class="itin-hero-left">
+          <div class="itin-hero-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Trip Planner</div>
+          <h1>Plan your trip.<br><em>Day by day.</em></h1>
+          <p class="itin-hero-sub">Build a visual day-by-day itinerary — drag activities into morning, afternoon &amp; evening slots, add your Wanderlust stay, then let AI complete the rest.</p>
+          <div class="itin-location-pill detecting" id="locationPill" onclick="detectLocation()">
+            <i class="fa-solid fa-location-dot"></i>
+            <span id="locationText">Detecting your location…</span>
+          </div>
+        </div>
+        <div class="itin-hero-steps">
+          <div class="itin-step"><div class="itin-step-num">1</div><div class="itin-step-text"><strong>Set destination</strong>Enter where &amp; when</div></div>
+          <div class="itin-step"><div class="itin-step-num">2</div><div class="itin-step-text"><strong>Build days</strong>Drag activities into slots</div></div>
+          <div class="itin-step"><div class="itin-step-num">3</div><div class="itin-step-text"><strong>Generate</strong>AI fills in the rest</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETUP CARD -->
+  <div class="itin-setup-card">
+    <div class="itin-setup-grid">
+      <div class="itin-field">
+        <label><i class="fa-solid fa-map-pin"></i> Destination *</label>
+        <input type="text" id="setupDest" placeholder="e.g. Jaipur, Rajasthan">
+      </div>
+      <div class="itin-field">
+        <label><i class="fa-regular fa-calendar"></i> Start Date</label>
+        <input type="date" id="setupDate">
+      </div>
+      <div class="itin-field">
+        <label><i class="fa-solid fa-moon"></i> Duration</label>
+        <select id="setupDays">
+          <option value="1">1 Day</option><option value="2">2 Days</option>
+          <option value="3" selected>3 Days</option><option value="4">4 Days</option>
+          <option value="5">5 Days</option><option value="7">7 Days</option>
+          <option value="10">10 Days</option><option value="14">2 Weeks</option>
+        </select>
+      </div>
+      <div class="itin-field">
+        <label><i class="fa-solid fa-person"></i> Travelling as</label>
+        <select id="setupGroup">
+          <option value="solo">Solo</option><option value="couple" selected>Couple</option>
+          <option value="family">Family</option><option value="friends">Friends</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- BUDGET: keyword pills + custom INR input -->
+    <div class="itin-pill-label"><i class="fa-solid fa-gauge"></i> Budget <span style="font-weight:400;color:#bbb;font-size:.68rem;margin-left:.3rem;">— pick a tier or enter your own</span></div>
+    <div class="itin-budget-row" id="budgetPills">
+      <span class="ipill" data-val="budget" onclick="setBudgetPill(this)"><i class="fa-solid fa-coins"></i> Budget</span>
+      <span class="ipill single-sel" data-val="moderate" onclick="setBudgetPill(this)"><i class="fa-solid fa-credit-card"></i> Moderate</span>
+      <span class="ipill" data-val="comfortable" onclick="setBudgetPill(this)"><i class="fa-solid fa-star"></i> Comfortable</span>
+      <span class="ipill" data-val="luxury" onclick="setBudgetPill(this)"><i class="fa-solid fa-crown"></i> Luxury</span>
+      <div class="itin-budget-custom-wrap">
+        <span class="itin-budget-prefix">₹</span>
+        <input class="itin-budget-input" id="budgetCustom" type="number" min="0" placeholder="custom" oninput="onBudgetInput(this)">
+        <span class="itin-budget-unit">/day</span>
+      </div>
+    </div>
+
+    <div class="itin-pill-label"><i class="fa-solid fa-compass"></i> Travel Style <span style="font-weight:400;color:#bbb;font-size:.68rem;margin-left:.25rem;">(pick any)</span></div>
+    <div class="itin-pills-row" id="stylePills">
+      <span class="ipill" data-val="relaxed" onclick="togglePill(this)"><i class="fa-solid fa-mug-hot"></i> Relaxed</span>
+      <span class="ipill" data-val="adventurous" onclick="togglePill(this)"><i class="fa-solid fa-person-hiking"></i> Adventurous</span>
+      <span class="ipill" data-val="cultural" onclick="togglePill(this)"><i class="fa-solid fa-landmark"></i> Cultural</span>
+      <span class="ipill" data-val="offbeat" onclick="togglePill(this)"><i class="fa-solid fa-gem"></i> Offbeat</span>
+      <span class="ipill" data-val="romantic" onclick="togglePill(this)"><i class="fa-solid fa-heart"></i> Romantic</span>
+      <span class="ipill" data-val="spiritual" onclick="togglePill(this)"><i class="fa-solid fa-om"></i> Spiritual</span>
+    </div>
+    <button class="itin-gen-full-btn" style="margin-top:.5rem;" onclick="initBuilder()">
+      <i class="fa-solid fa-layer-group"></i> Build My Itinerary Canvas
+    </button>
+  </div>
+
+  <!-- BUILDER -->
+  <div class="itin-builder" id="itinBuilder">
+
+    <div class="itin-suggestions-panel">
+      <div class="itin-suggestions-title">
+        <i class="fa-solid fa-lightbulb"></i>
+        Suggested activities for <span id="destNameTag" style="color:#fe424d;margin-left:.2rem;"></span>
+        <span style="margin-left:auto;font-size:.7rem;font-weight:500;color:#aaa;">Click to add · Drag into a slot · Scroll for more →</span>
+      </div>
+      <div class="itin-suggestion-chips-wrap">
+        <button class="itin-chips-scroll-btn left" onclick="scrollChipsLeft()" title="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="itin-suggestion-chips" id="suggestionChips"></div>
+        <button class="itin-chips-scroll-btn right" onclick="scrollChipsRight()" title="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <div class="itin-builder-header">
+      <div class="itin-builder-title">
+        <i class="fa-solid fa-calendar-days"></i> Day-by-Day Plan
+        <span id="builderDestLabel"></span>
+      </div>
+      <div class="itin-days-nav" id="dayTabs"></div>
+    </div>
+
+    <div id="dayCanvases"></div>
+
+    <div class="itin-stays-section" id="staysSection" style="display:none;">
+      <div class="itin-stays-title">
+        <i class="fa-solid fa-bed"></i> Wanderlust stays you can book near <span id="staysDestLabel" style="color:#fe424d;margin-left:.2rem;"></span>
+        <span style="font-size:.7rem;font-weight:500;color:#aaa;margin-left:auto;">Drag into any slot to add as accommodation</span>
+      </div>
+      <div class="itin-stays-grid" id="staysGrid"></div>
+    </div>
+
+    <div class="itin-gen-bar">
+      <div class="itin-gen-bar-left">
+        <h3 id="genBarTitle">Ready to generate?</h3>
+        <p id="genBarSub">Add some activities then let AI complete your itinerary.</p>
+      </div>
+      <div class="itin-gen-bar-actions">
+        <button class="itin-gen-btn outline" onclick="resetBuilder()"><i class="fa-solid fa-rotate-left"></i> Start over</button>
+        <button class="itin-gen-btn primary" onclick="generateFromBuilder()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate full itinerary</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="itin-or-row">or skip the builder and use the quick form</div>
+
+  <!-- QUICK FORM -->
+  <div class="itin-form-card">
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:700;color:#1a1a2e;margin-bottom:.25rem;display:flex;align-items:center;gap:.5rem;">
+      <i class="fa-solid fa-route" style="color:#fe424d;"></i> Quick Form
+    </div>
+    <p style="font-size:.82rem;color:#aaa;margin-bottom:1rem;">Just fill this in and the AI plans everything.</p>
+
+    <div class="itin-form-section"><i class="fa-solid fa-location-dot"></i> Where &amp; When</div>
+    <div class="itin-form-grid-2">
+      <div class="itin-field itin-form-full"><label><i class="fa-solid fa-map-pin"></i> Destination *</label><input type="text" id="qDest" placeholder="e.g. Coorg, Karnataka"></div>
+      <div class="itin-field"><label><i class="fa-regular fa-calendar"></i> Start Date</label><input type="date" id="qDate"></div>
+      <div class="itin-field"><label><i class="fa-solid fa-moon"></i> Duration</label>
+        <select id="qDays"><option value="1">1 Day</option><option value="2">2 Days</option><option value="3" selected>3 Days</option><option value="4">4 Days</option><option value="5">5 Days</option><option value="7">7 Days</option><option value="10">10 Days</option><option value="14">2 Weeks</option></select>
+      </div>
+    </div>
+    <div class="itin-form-section"><i class="fa-solid fa-users"></i> Who</div>
+    <div class="itin-form-grid-2">
+      <div class="itin-field"><label><i class="fa-solid fa-person"></i> Travelling as</label><select id="qGroup"><option value="a solo traveller">Solo</option><option value="a couple" selected>Couple</option><option value="a family with kids">Family</option><option value="a group of friends">Friends</option></select></div>
+      <div class="itin-field"><label><i class="fa-solid fa-indian-rupee-sign"></i> Budget / day</label><select id="qBudget"><option value="budget (under ₹1500/day)">Budget</option><option value="moderate (₹1500–4000/day)" selected>Moderate</option><option value="comfortable (₹4000–8000/day)">Comfortable</option><option value="luxury (₹8000+/day)">Luxury</option></select></div>
+      <div class="itin-field"><label><i class="fa-solid fa-car"></i> Transport</label><select id="qTransport"><option value="any">Any/Flexible</option><option value="public transport">Public Transport</option><option value="self-drive">Self-Drive</option><option value="cab/taxi">Cab/Taxi</option><option value="bike/scooter">Bike/Scooter</option></select></div>
+      <div class="itin-field"><label><i class="fa-solid fa-people-group"></i> Group size</label><input type="number" id="qSize" value="2" min="1" max="50"></div>
+    </div>
+    <div class="itin-form-section"><i class="fa-solid fa-sliders"></i> Preferences</div>
+    <div class="itin-form-grid-2">
+      <div class="itin-field itin-form-full"><label><i class="fa-solid fa-compass"></i> Interests</label><input type="text" id="qInterests" placeholder="trekking, local food, photography, temples…"></div>
+      <div class="itin-field itin-form-full"><label><i class="fa-solid fa-utensils"></i> Food preferences</label><input type="text" id="qFood" placeholder="vegetarian, street food, no spice…"></div>
+      <div class="itin-field itin-form-full"><label><i class="fa-solid fa-star"></i> Must-see / special requests</label><input type="text" id="qMustSee" placeholder="waterfall hike, anniversary dinner, sunrise view…"></div>
+    </div>
+    <button class="itin-gen-full-btn" id="qGenBtn" onclick="quickGenerate()">
+      <i class="fa-solid fa-wand-magic-sparkles"></i> Generate My Itinerary
+    </button>
+  </div>
+
+</div>

@@ -12,8 +12,7 @@ const ExpressError = require("./utils/ExpressError.js");
 const listingsRouter = require("./routes/listing.js");
 const reviewsRouter = require("./routes/review.js");
 const usersRouter = require("./routes/user.js");
-const pagesRouter = require("./routes/features.js");
-const aiRouter = require("./routes/ai.js");
+const featuresRouter = require("./routes/features.js");
 const session = require("express-session");
 const MongoStore = require('connect-mongo');
 const flash = require("connect-flash");
@@ -110,8 +109,7 @@ app.get('/', (req, res) => {
 app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", usersRouter);
-app.use("/", aiRouter);  
-app.use("/", pagesRouter);  
+app.use("/", featuresRouter);  
 
 //for all other routes that does not match
 app.use((req, res, next) => {

@@ -562,47 +562,6 @@ body {
 .wl-trust-text strong { font-size: 0.82rem; font-weight: 700; display: block; }
 .wl-trust-text span { font-size: 0.72rem; color: var(--text-muted); }
 
-/* ===== MAP WIDGET ===== */
-
-
-
-
-
-
-
-
-
-
-
-
-/* ===== SAFETY BADGE ===== */
-
-
-
-
-
-/* ===== AI ASSISTANT ===== */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* ===== SHOW PAGE ===== */
 .wl-show-layout {
@@ -687,14 +646,6 @@ body {
 }
 .wl-booking-btn:hover { background: #c62f22; }
 
-/* ===== MAP (show page) ===== */
-#map {
-  height: 300px;
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin-top: 1rem;
-}
-
 /* ===== REVIEW SECTION ===== */
 .wl-review-card {
   background: var(--bg);
@@ -770,88 +721,6 @@ body {
 }
 .wl-submit-btn:hover { background: #c62f22; transform: translateY(-1px); }
 
-/* ===== AUTH PAGES ===== */
-.wl-auth-page {
-  min-height: calc(100vh - var(--navbar-height));
-  display: flex; align-items: center; justify-content: center;
-  padding: 2rem 1rem;
-  background: linear-gradient(135deg, var(--bg) 0%, #fff 100%);
-}
-
-.wl-auth-card {
-  background: white;
-  border-radius: var(--radius);
-  padding: 2.5rem;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 400px;
-}
-
-.wl-auth-logo {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.wl-auth-logo .brand-circle {
-  width: 56px; height: 56px;
-  background: var(--primary);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  color: white; font-size: 1.4rem;
-  margin: 0 auto 0.5rem;
-}
-
-.wl-auth-logo h2 {
-  font-family: 'Bricolage Grotesque', sans-serif;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.wl-auth-logo p { font-size: 0.8rem; color: var(--text-muted); }
-
-/* ===== FOOTER ===== */
-.wl-footer {
-  background: white;
-  border-top: 1px solid var(--border);
-  padding: 1.25rem 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.wl-footer-links { display: flex; gap: 1.25rem; }
-.wl-footer-links a {
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.wl-footer-links a:hover { color: var(--primary); }
-
-.wl-footer-socials { display: flex; gap: 0.75rem; }
-.wl-footer-socials a {
-  color: var(--text-muted);
-  font-size: 1rem;
-  transition: color 0.2s;
-  text-decoration: none;
-}
-.wl-footer-socials a:hover { color: var(--primary); }
-
-/* ===== FLASH ALERTS ===== */
-.wl-alert {
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  display: flex; align-items: center; gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-.wl-alert.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
-.wl-alert.error { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
-
 /* ===== FILTERS (top - index) ===== */
 #filters {
   display: flex;
@@ -902,7 +771,6 @@ body {
 .wl-scroll-btn:hover { border-color: var(--primary); color: var(--primary); }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 1200px) {}
 
 @media (max-width: 900px) {  .wl-show-layout { grid-template-columns: 1fr; }
 }
@@ -1098,6 +966,7 @@ body {
   .wl-main { padding: 1rem; }
 }
 
+
 @media (max-width: 600px) {
   .wl-hero-content { padding: 1.5rem; }
   .wl-mood-panel { display: none; }
@@ -1105,6 +974,7 @@ body {
   .wl-trust-bar { grid-template-columns: 1fr 1fr; }
   .wl-main { padding: 0.75rem; }
   .filter-price-inline { display: none; }
+  .wl-auth-links{display:none}
 }
 
 /* ===== ADD LISTING FAB ===== */
