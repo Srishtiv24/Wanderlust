@@ -38,28 +38,45 @@ module.exports.index = async (req, res) => {
 
   let allListings;
 
-  const hasVectorQuery = search?.trim() || mood || category;
+  const hasQuery = search?.trim();
+  const hasVectorSignals = mood || category;
 
-  if (hasVectorQuery) {
-    // ── Build one combined semantic query from whatever the user set ──
+  // ─────────────────────────────────────────────
+  // Decide search strategy
+  // ─────────────────────────────────────────────
+  const isLongQuery = (text = "") => {
+    const wordCount = text.trim().split(/\s+/).length;
+    return wordCount > 4 || text.length > 30;
+  };
+
+  const useVector =
+    hasVectorSignals ||
+    (hasQuery && isLongQuery(search));
+
+  if (useVector) {
+    // ───────── VECTOR SEARCH PATH ─────────
     const parts = [];
-    if (search?.trim())          parts.push(search.trim());
-    if (mood && MOOD_QUERIES[mood])         parts.push(MOOD_QUERIES[mood]);
+
+    if (search?.trim()) parts.push(search.trim());
+    if (mood && MOOD_QUERIES[mood]) parts.push(MOOD_QUERIES[mood]);
     if (category && CATEGORY_QUERIES[category]) parts.push(CATEGORY_QUERIES[category]);
 
     const combinedQuery = parts.join(". ");
 
-    // Single vector search call — handles search + mood + category together
     allListings = await vectorSearch(combinedQuery, 30, priceFilter);
 
   } else {
-    // No search/mood/category — just price filter or show all
+    // ───────── MONGO FULL-TEXT SEARCH PATH ─────────
     const filter = {};
-    if (minPrice || maxPrice) {
-      filter.price = {};
-      if (minPrice) filter.price.$gte = Number(minPrice);
-      if (maxPrice) filter.price.$lte = Number(maxPrice);
+
+    if (search?.trim()) {
+      filter.$text = { $search: search.trim() };
     }
+
+    if (minPrice || maxPrice) {
+      filter.price = priceFilter;
+    }
+
     allListings = await Listing.find(filter);
   }
 
@@ -67,8 +84,8 @@ module.exports.index = async (req, res) => {
 
   res.render("listings/index.ejs", {
     allListings,
-    searchQuery:    search   || "",
-    activeMood:     mood     || "",
+    searchQuery: search || "",
+    activeMood: mood || "",
     activeCategory: category || "",
     activeMinPrice: minPrice || "",
     activeMaxPrice: maxPrice || "",

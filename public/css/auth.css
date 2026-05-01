@@ -1,0 +1,56 @@
+
+/* ===== AUTH PAGES ===== */
+.wl-auth-page {
+    min-height: calc(100vh - var(--navbar-height));
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, var(--bg) 0%, #fff 100%);
+  }
+  
+  .wl-auth-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .wl-auth-logo {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .wl-auth-logo .brand-circle {
+    width: 56px; height: 56px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 1.4rem;
+    margin: 0 auto 0.5rem;
+  }
+  
+  .wl-auth-logo h2 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  
+  .wl-auth-logo p { font-size: 0.8rem; color: var(--text-muted); }
+
+  /* Hide feedback by default */
+.invalid-feedback {
+    display: none;
+  }
+  
+  /* Show feedback only when input is invalid after validation */
+  .was-validated .wl-form-control:invalid ~ .invalid-feedback {
+    display: block;
+  }
+  
+  /* Optional: show success state */
+  .was-validated .wl-form-control:valid {
+    border-color: var(--primary-light);
+  }
+  

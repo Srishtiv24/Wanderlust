@@ -51,6 +51,15 @@
 .ipill.single-sel { border-color: #fe424d; background: #fe424d; color: white; }
 .ipill.single-sel i { color: white; }
 
+/* BUDGET ROW — hybrid: keyword pills + custom INR input */
+.itin-budget-row { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.itin-budget-custom-wrap { display: flex; align-items: center; gap: 0; border: 1.5px solid #e8e8e8; border-radius: 50px; overflow: hidden; transition: border-color .2s, box-shadow .2s; background: #fff; }
+.itin-budget-custom-wrap:focus-within { border-color: #fe424d; box-shadow: 0 0 0 3px rgba(254,66,77,.08); }
+.itin-budget-prefix { padding: .35rem .6rem .35rem .85rem; font-size: .8rem; font-weight: 700; color: #fe424d; background: transparent; white-space: nowrap; }
+.itin-budget-input { border: none; outline: none; font-size: .8rem; font-family: 'DM Sans', sans-serif; color: #333; width: 90px; padding: .35rem .5rem .35rem 0; background: transparent; }
+.itin-budget-input::placeholder { color: #ccc; }
+.itin-budget-unit { padding: .35rem .85rem .35rem .3rem; font-size: .72rem; color: #aaa; white-space: nowrap; }
+
 /* BUILDER */
 .itin-builder { display: none; }
 .itin-builder.visible { display: block; }
@@ -104,13 +113,21 @@
 .itin-add-btn { width: 28px; height: 28px; border-radius: 7px; border: none; background: #fe424d; color: white; cursor: pointer; font-size: .8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .15s; }
 .itin-add-btn:hover { background: #c62f22; }
 
-/* SUGGESTION CHIPS */
+/* SUGGESTION CHIPS — scrollable single row */
 .itin-suggestions-panel { background: #fff; border-radius: 20px; box-shadow: 0 4px 32px rgba(0,0,0,0.08); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
 .itin-suggestions-title { font-size: .8rem; font-weight: 700; color: #333; margin-bottom: .75rem; display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
 .itin-suggestions-title i { color: #fe424d; }
-.itin-suggestion-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
-.itin-chip { display: inline-flex; align-items: center; gap: .35rem; padding: .32rem .75rem; border-radius: 50px; border: 1.5px solid #e8e8e8; background: white; font-size: .76rem; font-weight: 600; color: #444; cursor: pointer; transition: all .15s; user-select: none; }
+.itin-suggestion-chips-wrap { position: relative; }
+.itin-suggestion-chips-wrap::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 48px; background: linear-gradient(to left, transparent, #fff); border-radius: 8px 0 0 8px; pointer-events: none; z-index: 1; }
+.itin-suggestion-chips-wrap::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 48px; background: linear-gradient(to right, transparent, #fff); border-radius: 0 8px 8px 0; pointer-events: none; z-index: 1; }
+.itin-suggestion-chips { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .35rem; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.itin-suggestion-chips::-webkit-scrollbar { display: none; }
+.itin-chip { display: inline-flex; align-items: center; gap: .35rem; padding: .32rem .75rem; border-radius: 50px; border: 1.5px solid #e8e8e8; background: white; font-size: .76rem; font-weight: 600; color: #444; cursor: pointer; transition: all .15s; user-select: none; white-space: nowrap; flex-shrink: 0; }
 .itin-chip:hover { border-color: #fe424d; color: #fe424d; background: #fff5f5; }
+.itin-chips-scroll-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #e8e8e8; background: white; color: #fe424d; cursor: pointer; font-size: .7rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,.1); z-index: 2; transition: all .15s; }
+.itin-chips-scroll-btn.left { left: 0; }
+.itin-chips-scroll-btn.right { right: 0; }
+.itin-chips-scroll-btn:hover { border-color: #fe424d; background: #fff5f5; }
 
 /* STAYS */
 .itin-stays-section { margin-bottom: 1.25rem; }
@@ -212,13 +229,21 @@
         </select>
       </div>
     </div>
-    <div class="itin-pill-label"><i class="fa-solid fa-gauge"></i> Budget</div>
-    <div class="itin-pills-row" id="budgetPills">
-      <span class="ipill" data-val="budget" onclick="setSingle(this,'budgetPills')"><i class="fa-solid fa-coins"></i> Budget</span>
-      <span class="ipill single-sel" data-val="moderate" onclick="setSingle(this,'budgetPills')"><i class="fa-solid fa-credit-card"></i> Moderate</span>
-      <span class="ipill" data-val="comfortable" onclick="setSingle(this,'budgetPills')"><i class="fa-solid fa-star"></i> Comfortable</span>
-      <span class="ipill" data-val="luxury" onclick="setSingle(this,'budgetPills')"><i class="fa-solid fa-crown"></i> Luxury</span>
+
+    <!-- BUDGET: keyword pills + custom INR input -->
+    <div class="itin-pill-label"><i class="fa-solid fa-gauge"></i> Budget <span style="font-weight:400;color:#bbb;font-size:.68rem;margin-left:.3rem;">— pick a tier or enter your own</span></div>
+    <div class="itin-budget-row" id="budgetPills">
+      <span class="ipill" data-val="budget" onclick="setBudgetPill(this)"><i class="fa-solid fa-coins"></i> Budget</span>
+      <span class="ipill single-sel" data-val="moderate" onclick="setBudgetPill(this)"><i class="fa-solid fa-credit-card"></i> Moderate</span>
+      <span class="ipill" data-val="comfortable" onclick="setBudgetPill(this)"><i class="fa-solid fa-star"></i> Comfortable</span>
+      <span class="ipill" data-val="luxury" onclick="setBudgetPill(this)"><i class="fa-solid fa-crown"></i> Luxury</span>
+      <div class="itin-budget-custom-wrap">
+        <span class="itin-budget-prefix">₹</span>
+        <input class="itin-budget-input" id="budgetCustom" type="number" min="0" placeholder="custom" oninput="onBudgetInput(this)">
+        <span class="itin-budget-unit">/day</span>
+      </div>
     </div>
+
     <div class="itin-pill-label"><i class="fa-solid fa-compass"></i> Travel Style <span style="font-weight:400;color:#bbb;font-size:.68rem;margin-left:.25rem;">(pick any)</span></div>
     <div class="itin-pills-row" id="stylePills">
       <span class="ipill" data-val="relaxed" onclick="togglePill(this)"><i class="fa-solid fa-mug-hot"></i> Relaxed</span>
@@ -240,9 +265,13 @@
       <div class="itin-suggestions-title">
         <i class="fa-solid fa-lightbulb"></i>
         Suggested activities for <span id="destNameTag" style="color:#fe424d;margin-left:.2rem;"></span>
-        <span style="margin-left:auto;font-size:.7rem;font-weight:500;color:#aaa;">Click to add · Drag into a slot</span>
+        <span style="margin-left:auto;font-size:.7rem;font-weight:500;color:#aaa;">Click to add · Drag into a slot · Scroll for more →</span>
       </div>
-      <div class="itin-suggestion-chips" id="suggestionChips"></div>
+      <div class="itin-suggestion-chips-wrap">
+        <button class="itin-chips-scroll-btn left" onclick="scrollChipsLeft()" title="Scroll left"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="itin-suggestion-chips" id="suggestionChips"></div>
+        <button class="itin-chips-scroll-btn right" onclick="scrollChipsRight()" title="Scroll right"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
     </div>
 
     <div class="itin-builder-header">
@@ -346,12 +375,115 @@ function setSingle(el, gid) {
   el.classList.add('single-sel');
 }
 
+/* ── Budget: hybrid pill + custom INR ── */
+function setBudgetPill(el) {
+  document.querySelectorAll('#budgetPills .ipill').forEach(function(p){ p.classList.remove('single-sel'); });
+  el.classList.add('single-sel');
+  document.getElementById('budgetCustom').value = ''; // clear custom when pill chosen
+}
+function onBudgetInput(inp) {
+  if (inp.value) {
+    // deselect all keyword pills when user types a number
+    document.querySelectorAll('#budgetPills .ipill').forEach(function(p){ p.classList.remove('single-sel'); });
+  }
+}
+function getBudgetValue() {
+  var custom = document.getElementById('budgetCustom').value.trim();
+  if (custom) return '₹' + parseInt(custom).toLocaleString('en-IN') + '/day custom budget';
+  var pill = document.querySelector('#budgetPills .single-sel');
+  return pill ? pill.dataset.val : 'moderate';
+}
+
+/* ── Activities master list — expanded ── */
 var ACTS = {
-  default: [{icon:'🏛️',label:'Visit local museum',sub:'Cultural'},{icon:'🍜',label:'Try street food',sub:'Food'},{icon:'🌅',label:'Sunrise viewpoint',sub:'Nature'},{icon:'🛕',label:'Visit temple/shrine',sub:'Spiritual'},{icon:'🛍️',label:'Local market shopping',sub:'Shopping'},{icon:'🚶',label:'Walking heritage tour',sub:'Culture'},{icon:'🍽️',label:'Dinner at local restaurant',sub:'Food'},{icon:'📸',label:'Photography walk',sub:'Leisure'},{icon:'☕',label:'Café & chill',sub:'Relaxation'},{icon:'🚗',label:'Scenic drive',sub:'Transport'},{icon:'🎭',label:'Cultural show/folk art',sub:'Evening'},{icon:'🛶',label:'Boat ride',sub:'Adventure'}],
-  beach: [{icon:'🏖️',label:'Beach walk at sunrise',sub:'Nature'},{icon:'🤿',label:'Snorkelling/diving',sub:'Adventure'},{icon:'🚤',label:'Boat cruise',sub:'Leisure'},{icon:'🍹',label:'Beachside sundowner',sub:'Evening'},{icon:'🏄',label:'Surfing lesson',sub:'Sport'}],
-  mountain: [{icon:'🥾',label:'Morning trek',sub:'Adventure'},{icon:'⛺',label:'Campfire evening',sub:'Evening'},{icon:'🦅',label:'Bird watching',sub:'Nature'},{icon:'🌿',label:'Forest walk',sub:'Nature'},{icon:'🏔️',label:'Summit viewpoint',sub:'Nature'}],
-  city: [{icon:'🏙️',label:'City skyline view',sub:'Sightseeing'},{icon:'🎨',label:'Art gallery visit',sub:'Culture'},{icon:'🍕',label:'Rooftop dinner',sub:'Evening'},{icon:'🎶',label:'Live music venue',sub:'Night'}],
-  heritage: [{icon:'🏰',label:'Fort/palace tour',sub:'Heritage'},{icon:'🖼️',label:'Museum visit',sub:'Cultural'},{icon:'🧵',label:'Handicraft workshop',sub:'Experience'},{icon:'🐘',label:'Wildlife/nature tour',sub:'Wildlife'}]
+  default: [
+    {icon:'🏛️',label:'Visit local museum',sub:'Cultural'},
+    {icon:'🍜',label:'Try street food',sub:'Food'},
+    {icon:'🌅',label:'Sunrise viewpoint',sub:'Nature'},
+    {icon:'🛕',label:'Visit temple/shrine',sub:'Spiritual'},
+    {icon:'🛍️',label:'Local market shopping',sub:'Shopping'},
+    {icon:'🚶',label:'Walking heritage tour',sub:'Culture'},
+    {icon:'🍽️',label:'Dinner at local restaurant',sub:'Food'},
+    {icon:'📸',label:'Photography walk',sub:'Leisure'},
+    {icon:'☕',label:'Café & chill',sub:'Relaxation'},
+    {icon:'🚗',label:'Scenic drive',sub:'Transport'},
+    {icon:'🎭',label:'Cultural show / folk art',sub:'Evening'},
+    {icon:'🛶',label:'Boat ride',sub:'Adventure'},
+    {icon:'🌿',label:'Nature walk / park visit',sub:'Nature'},
+    {icon:'🎨',label:'Art gallery visit',sub:'Culture'},
+    {icon:'🏞️',label:'Waterfall visit',sub:'Nature'},
+    {icon:'🧘',label:'Morning yoga / meditation',sub:'Wellness'},
+    {icon:'🚲',label:'Cycling tour',sub:'Active'},
+    {icon:'🌃',label:'Night market stroll',sub:'Evening'},
+    {icon:'🍦',label:'Local sweets & desserts',sub:'Food'},
+    {icon:'🎪',label:'Local fair / festival',sub:'Culture'},
+    {icon:'🏊',label:'Swimming / lake dip',sub:'Leisure'},
+    {icon:'🛺',label:'Auto-rickshaw city tour',sub:'Transport'},
+    {icon:'🌄',label:'Sunset viewpoint',sub:'Nature'},
+    {icon:'🍳',label:'Cooking class',sub:'Experience'},
+    {icon:'🎵',label:'Live music / open mic',sub:'Night'},
+    {icon:'📖',label:'Visit local library / bookshop',sub:'Leisure'},
+    {icon:'🏋️',label:'Gym / workout session',sub:'Wellness'},
+    {icon:'🧵',label:'Handicraft workshop',sub:'Experience'},
+    {icon:'🌊',label:'Riverside walk',sub:'Nature'},
+    {icon:'🏟️',label:'Stadium / sports venue tour',sub:'Sport'},
+    {icon:'🎡',label:'Amusement / theme park',sub:'Fun'},
+    {icon:'🕌',label:'Mosque / church visit',sub:'Spiritual'},
+    {icon:'🦜',label:'Wildlife / bird sanctuary',sub:'Nature'},
+    {icon:'🚠',label:'Cable car / ropeway ride',sub:'Adventure'},
+    {icon:'🍺',label:'Local brewery / tap room',sub:'Evening'},
+    {icon:'💆',label:'Spa / ayurvedic massage',sub:'Wellness'},
+    {icon:'🗺️',label:'Guided city tour',sub:'Culture'},
+    {icon:'🧗',label:'Rock climbing / bouldering',sub:'Adventure'},
+    {icon:'🏄',label:'Water sports',sub:'Adventure'},
+    {icon:'🎲',label:'Board games café',sub:'Leisure'}
+  ],
+  beach: [
+    {icon:'🏖️',label:'Beach walk at sunrise',sub:'Nature'},
+    {icon:'🤿',label:'Snorkelling / diving',sub:'Adventure'},
+    {icon:'🚤',label:'Boat cruise',sub:'Leisure'},
+    {icon:'🍹',label:'Beachside sundowner',sub:'Evening'},
+    {icon:'🏄',label:'Surfing lesson',sub:'Sport'},
+    {icon:'🦀',label:'Seafood shack dinner',sub:'Food'},
+    {icon:'🌊',label:'Stand-up paddleboarding',sub:'Adventure'},
+    {icon:'🎣',label:'Fishing trip',sub:'Leisure'},
+    {icon:'🏝️',label:'Island hopping',sub:'Adventure'},
+    {icon:'⛱️',label:'Beach bonfire',sub:'Evening'}
+  ],
+  mountain: [
+    {icon:'🥾',label:'Morning trek',sub:'Adventure'},
+    {icon:'⛺',label:'Campfire evening',sub:'Evening'},
+    {icon:'🦅',label:'Bird watching',sub:'Nature'},
+    {icon:'🌿',label:'Forest walk',sub:'Nature'},
+    {icon:'🏔️',label:'Summit viewpoint',sub:'Nature'},
+    {icon:'🍄',label:'Foraging walk',sub:'Experience'},
+    {icon:'🚵',label:'Mountain biking',sub:'Adventure'},
+    {icon:'🛷',label:'Sledding / snow play',sub:'Fun'},
+    {icon:'🌲',label:'Tree-top walk',sub:'Nature'},
+    {icon:'🧭',label:'Orienteering / trail run',sub:'Active'}
+  ],
+  city: [
+    {icon:'🏙️',label:'City skyline view',sub:'Sightseeing'},
+    {icon:'🎨',label:'Art gallery visit',sub:'Culture'},
+    {icon:'🍕',label:'Rooftop dinner',sub:'Evening'},
+    {icon:'🎶',label:'Live music venue',sub:'Night'},
+    {icon:'🏬',label:'Shopping mall / high street',sub:'Shopping'},
+    {icon:'🎬',label:'Cinema / indie film',sub:'Evening'},
+    {icon:'🍻',label:'Craft beer bar',sub:'Evening'},
+    {icon:'🗼',label:'Iconic landmark visit',sub:'Sightseeing'},
+    {icon:'🚇',label:'Metro / public transport ride',sub:'Transport'},
+    {icon:'🌆',label:'Golden hour rooftop',sub:'Evening'}
+  ],
+  heritage: [
+    {icon:'🏰',label:'Fort / palace tour',sub:'Heritage'},
+    {icon:'🖼️',label:'Museum visit',sub:'Cultural'},
+    {icon:'🧵',label:'Handicraft workshop',sub:'Experience'},
+    {icon:'🐘',label:'Wildlife / nature tour',sub:'Wildlife'},
+    {icon:'🏺',label:'Pottery village visit',sub:'Culture'},
+    {icon:'🎪',label:'Puppet show / folk drama',sub:'Culture'},
+    {icon:'📜',label:'Archaeological site walk',sub:'Heritage'},
+    {icon:'🔭',label:'Observatory / stargazing',sub:'Night'}
+  ]
 };
 
 function getSuggestions(dest) {
@@ -373,6 +505,17 @@ function renderSuggestions(dest) {
     return '<div class="itin-chip" draggable="true" ondragstart="chipDragStart(event,'+i+')" onclick="chipClick('+i+')">'+a.icon+' '+a.label+'</div>';
   }).join('');
 }
+
+function scrollChipsLeft() {
+  document.getElementById('suggestionChips').scrollBy({ left: -260, behavior: 'smooth' });
+}
+function scrollChipsRight() {
+  document.getElementById('suggestionChips').scrollBy({ left: 260, behavior: 'smooth' });
+}
+
+
+
+
 
 function initBuilder() {
   var dest = document.getElementById('setupDest').value.trim();
@@ -519,7 +662,7 @@ async function loadStays(dest) {
 
 function generateFromBuilder() {
   var dest=document.getElementById('setupDest').value.trim();
-  var budget=document.querySelector('#budgetPills .single-sel')?document.querySelector('#budgetPills .single-sel').dataset.val:'moderate';
+  var budget=getBudgetValue();
   var styles=[].slice.call(document.querySelectorAll('#stylePills .sel')).map(function(el){return el.dataset.val;});
   var group=document.getElementById('setupGroup').value;
   var date=document.getElementById('setupDate').value;

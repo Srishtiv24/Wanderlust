@@ -10,7 +10,7 @@ module.exports.signup=async (req, res,next) => {
       let newUser = new User({ username, email });//username schema added by passport 
       let registeredUser = await User.register(newUser, password);//passport
       console.log(registeredUser);
-      req.login(registeredUser,((err)=>
+      req.login(registeredUser,((err)=>//passport method
       { if(err){ next(err)}
       req.flash("success", "Welcome to WanderLust !");
       res.redirect("/listings");
@@ -31,15 +31,22 @@ module.exports.login=async (req, res) => { //app.js -serialize & deserilaize use
     res.redirect(redirectUrl);
   }
 
-module.exports.logout=(req, res, next) => {
-    req.logout((err) => { //user detached 
-      if (err) {
-        return next(err);
-      }
-      req.flash("success", "Successfully logged out !");
-      res.redirect("/listings");
+  module.exports.logout = (req, res, next) => {
+    req.logout((err) => { //passposrt method
+      if (err) return next(err);
+  
+      //  Destroy session from MongoDB
+      req.session.destroy((err) => {
+        if (err) return next(err);
+  
+        // Clear cookie from browser
+        res.clearCookie("connect.sid");
+  
+        req.flash("success", "Successfully logged out!");
+        res.redirect("/listings");
+      });
     });
-  }
+  };
 
   /*
 When a user logs in via Passport (passport.authenticate("local")), Passport verifies their credentials.
