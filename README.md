@@ -64,11 +64,10 @@ npm start
 
 5. Open in browser
 ```
-http://localhost:3000
+http://localhost:8080
 ```
 
 ---
 
 ## Author
 Srishti Verma  
-Full Stack Developer | AI Systems Enthusiast
