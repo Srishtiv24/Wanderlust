@@ -1,152 +1,128 @@
-# 🌍 Wanderlust – AI-Powered Travel Discovery & Planning Platform
+import { motion } from "framer-motion";
+import { Compass, MapPin, Sparkles, Rocket, Shield, Search, Globe } from "lucide-react";
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Wanderlust-Travel%20AI%20Platform-1f6feb?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Live-Demo-00C853?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Full%20Stack-MERN%20Inspired-ff6b6b?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/AI-RAG%20System-blue?style=for-the-badge" />
-</p>
+export default function WanderlustPortfolio() {
+  return (
+    <div className="bg-black text-white scroll-smooth">
+      {/* NAV */}
+      <nav className="fixed top-0 w-full bg-black/70 backdrop-blur-md z-50 flex justify-between items-center px-6 py-4 border-b border-white/10">
+        <div className="flex items-center gap-2 font-bold">
+          <Compass /> Wanderlust
+        </div>
+        <div className="hidden md:flex gap-6 text-sm text-gray-300">
+          <a href="#about">About</a>
+          <a href="#features">Features</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#tech">Tech</a>
+        </div>
+      </nav>
 
-<p align="center">
-  <b>🚀 Live Application:</b> <a href="https://wanderlust-aqw0.onrender.com/">wanderlust-aqw0.onrender.com</a>
-</p>
+      {/* HERO */}
+      <section className="h-screen flex flex-col justify-center items-center text-center px-6">
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-5xl md:text-7xl font-bold"
+        >
+          Wanderlust
+        </motion.h1>
 
----
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-gray-400 mt-4 max-w-xl"
+        >
+          AI-Powered Travel Discovery & Planning Platform with Hybrid Search Intelligence
+        </motion.p>
 
-## ✨ The Problem
-Travel discovery platforms are either:
-- Too rigid (only keyword-based search)
-- Or too slow (no intelligent ranking)
+        <motion.a
+          href="#about"
+          whileHover={{ scale: 1.05 }}
+          className="mt-8 px-6 py-3 bg-white text-black rounded-full font-semibold"
+        >
+          Explore Project
+        </motion.a>
+      </section>
 
-Users struggle to express intent like:
-> “a peaceful mountain stay with snow and silence for healing”
+      {/* ABOUT */}
+      <section id="about" className="min-h-screen flex items-center px-10">
+        <div className="max-w-3xl">
+          <h2 className="text-4xl font-bold mb-4">Overview</h2>
+          <p className="text-gray-400 leading-relaxed">
+            Wanderlust is a full-stack travel platform combining traditional listing systems
+            with AI-powered semantic search and retrieval-augmented generation (RAG).
+            It understands both structured filters and natural language travel intent.
+          </p>
+        </div>
+      </section>
 
----
+      {/* FEATURES */}
+      <section id="features" className="min-h-screen px-10 py-20">
+        <h2 className="text-4xl font-bold mb-10">Features</h2>
 
-## 💡 The Solution
-**Wanderlust introduces a Hybrid AI Search System** that understands both:
-- Structured filters (price, category, location)
-- Natural language intent (mood, experience, context)
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { icon: Search, title: "Hybrid Search", desc: "MongoDB + Vector AI semantic retrieval" },
+            { icon: Sparkles, title: "AI Assistant", desc: "RAG-based intelligent recommendations" },
+            { icon: MapPin, title: "Location System", desc: "Geo-based travel discovery via APIs" },
+            { icon: Shield, title: "Auth System", desc: "Secure Passport.js authentication" },
+            { icon: Rocket, title: "Performance", desc: "Debounced + paginated architecture" },
+            { icon: Globe, title: "Scalable Design", desc: "Production-ready system architecture" },
+          ].map((f, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.05 }}
+              className="p-6 bg-white/5 rounded-2xl border border-white/10"
+            >
+              <f.icon className="mb-3" />
+              <h3 className="font-semibold text-lg">{f.title}</h3>
+              <p className="text-gray-400 text-sm mt-2">{f.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
-It intelligently routes queries to the best engine: MongoDB or Vector AI.
+      {/* ARCHITECTURE */}
+      <section id="architecture" className="min-h-screen px-10 py-20">
+        <h2 className="text-4xl font-bold mb-6">System Architecture</h2>
 
----
+        <div className="bg-white/5 p-6 rounded-2xl border border-white/10 font-mono text-sm">
+          User Query → Intent Detection → Routing Layer → MongoDB / Vector DB → LLM → Response
+        </div>
+      </section>
 
-## ⚡ Key Highlights (At a Glance)
+      {/* TECH */}
+      <section id="tech" className="min-h-screen px-10 py-20">
+        <h2 className="text-4xl font-bold mb-10">Tech Stack</h2>
 
-- 🔎 Hybrid Search (Keyword + Semantic + AI Routing)
-- 🧠 Retrieval-Augmented Generation (RAG) Assistant
-- ⚙️ Debounced Search + Pagination Optimization
-- 🔐 Secure Auth with Session Persistence
-- 🗺️ Location-aware Travel Discovery
-- 📦 Production-ready Full Stack Architecture
+        <div className="flex flex-wrap gap-3">
+          {[
+            "React",
+            "Node.js",
+            "Express",
+            "MongoDB",
+            "Vector Search",
+            "Hugging Face",
+            "Cloudinary",
+            "Bootstrap",
+          ].map((t) => (
+            <span
+              key={t}
+              className="px-4 py-2 bg-white/10 rounded-full text-sm"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      </section>
 
----
+      {/* FOOTER */}
+      <footer className="text-center py-10 border-t border-white/10 text-gray-500">
+        Built by Srishti Verma • Full Stack Developer & AI Enthusiast
+      </footer>
+    </div>
+  );
+}
 
-## 🧠 How It Works (System Flow)
-
-```
-User Query
-   ↓
-Intent Detection Layer
-   ↓
-┌──────────────────────────────┐
-│ Keyword → MongoDB Full Text  │
-│ Semantic → Vector Search     │
-│ Hybrid → Combined Results    │
-└──────────────────────────────┘
-   ↓
-Retrieval Layer (MongoDB + Vectors)
-   ↓
-LLM Reasoning (Kilo AI / Transformers)
-   ↓
-Personalized Travel Recommendation
-```
-
----
-
-## 🧩 Core Features
-
-### 🏡 Travel Listings Engine
-- CRUD-based listing management
-- Wishlist, reviews & ratings system
-- Cloud image storage (Cloudinary + Multer)
-- Joi-based validation layer
-
-### 🔐 Authentication System
-- Passport.js authentication
-- Persistent sessions via Connect-Mongo
-- Protected routes & authorization middleware
-
-### 🔎 Intelligent Search Engine
-- MongoDB full-text indexing
-- Vector-based semantic search
-- Dynamic query routing
-- Debounced input handling
-- Multi-filter search (price, mood, category)
-- Pagination for scalability
-
-### 🤖 AI Travel Assistant (RAG)
-- Natural language understanding
-- Context-aware retrieval system
-- LLM-generated travel recommendations
-- Smart itinerary planning
-
-### 🗺️ Location Intelligence
-- OpenCage API integration
-- Geo-based listing enrichment
-- Day-wise itinerary planner
-
----
-
-## 🛠️ Tech Stack
-
-**Frontend:** HTML · CSS · JavaScript · Bootstrap · EJS  
-**Backend:** Node.js · Express.js  
-**Database:** MongoDB · Mongoose  
-**Auth:** Passport.js · Connect-Mongo  
-**AI/Search:** Vector Search · MongoDB Text Index · Hugging Face · Kilo AI  
-**Services:** Cloudinary · OpenCage API · Multer
-
----
-
-## 🚀 Why This Project Stands Out
-
-- Real-world **AI + Full Stack integration**
-- Hybrid **search intelligence architecture**
-- Production-level **performance optimizations**
-- Scalable backend system design
-- Practical implementation of **RAG systems without heavy frameworks**
-
----
-
-## 📈 Impact
-
-This project demonstrates strong expertise in:
-- Full-stack system architecture
-- AI-powered search and recommendation systems
-- Backend optimization (debouncing, pagination, filtering)
-- Real-world product thinking and scalable design
-
----
-
-## 🔮 Future Roadmap
-
-- 💰 AI-based dynamic pricing engine
-- 🎟️ Real-time booking system
-- 🌍 Social travel feed with itineraries
-- 📱 Mobile application (React Native)
-- 🧠 Personalized recommendation engine
-
----
-
-## 👨‍💻 Author
-
-**Srishti Verma**  
-Full Stack Developer | AI Systems Enthusiast
-
----
-
-<p align="center">
-⭐ If you like this project, consider starring it on GitHub ⭐
-</p>
