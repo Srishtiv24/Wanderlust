@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const Listing = require("../models/listing.js");
+const {getAIAssitant , chatAI} =require("../controllers/ai.js")
 
 // ── GET /itinerary ────────────────────────────────────────────────────────────
-router.get("/itinerary", (req, res) => res.render("itinerary.ejs"));
+router.get("/itinerary", (req, res) => res.render("features/itinerary.ejs"));
 
 // ── GET /wishlist ─────────────────────────────────────────────────────────────
-router.get("/wishlist", (req, res) => res.render("wishlist.ejs"));
+router.get("/wishlist", (req, res) => res.render("features/wishlist.ejs"));
 
 // ── GET /api/listings-by-ids ──────────────────────────────────────────────────
 router.get("/api/listings-by-ids", async (req, res) => {
@@ -34,31 +35,31 @@ router.get("/api/listings-by-ids", async (req, res) => {
   }
 });
 
-// ── GET /api/tb-listings ──────────────────────────────────────────────────────
-// Used by the Trip Builder on the itinerary page to populate the listing picker
+router.get("/ai-assistant", getAIAssitant);
 
-router.get("/api/listings-by-ids", async (req, res) => {
+// ── /api/tb-listings — used by itinerary builder to show stays ──
+// Accepts optional ?dest= query param for destination filtering
+router.get("/api/tb-listings", async (req, res) => {
   try {
-    const { ids } = req.query;
-    if (!ids) return res.json({ listings: [] });
+    const dest = (req.query.dest || "").trim();
+    let listings;
 
-    // ✅ Guard — if ids=all, return all listings (used by trip builder)
-    if (ids === "all") {
-      const listings = await Listing.find({}).select(
-        "title location country price image description"
-      );
-      return res.json({ listings });
+    if (dest) {
+      const destListings = await vectorSearch(dest, 6, {});
+      listings = destListings.length > 0
+        ? destListings
+        : await Listing.find({}, LISTING_FIELDS).limit(8).lean();
+    } else {
+      listings = await Listing.find({}, LISTING_FIELDS).lean();
     }
 
-    const idArr = ids
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (!idArr.length) return res.json({ listings: [] });
+    res.json({ listings });
   } catch (err) {
-    console.error("tb-listings error:", err.message);
-    res.status(500).json({ error: "Failed to fetch listings." });
+    console.error("[tb-listings error]", err);
+    res.status(500).json({ listings: [] });
   }
 });
+
+router.post("/api/ai-chat", chatAI);
 
 module.exports = router;

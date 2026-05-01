@@ -1,0 +1,32 @@
+
+/* ===== FOOTER ===== */
+.wl-footer {
+    background: white;
+    border-top: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  .wl-footer-links { display: flex; gap: 1.25rem; }
+  .wl-footer-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .wl-footer-links a:hover { color: var(--primary); }
+  
+  .wl-footer-socials { display: flex; gap: 0.75rem; }
+  .wl-footer-socials a {
+    color: var(--text-muted);
+    font-size: 1rem;
+    transition: color 0.2s;
+    text-decoration: none;
+  }
+  .wl-footer-socials a:hover { color: var(--primary); }
+  

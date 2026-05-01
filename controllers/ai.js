@@ -1,5 +1,3 @@
-const express  = require("express");
-const router   = express.Router();
 const Listing  = require("../models/listing.js");
 
 // ─────────────────────────────────────────────
@@ -299,123 +297,95 @@ STRICT RULES:
 - If the user seems to want an itinerary, tell them to use the Itinerary Planner at /itinerary for a better experience`;
 }
 
-// ─────────────────────────────────────────────
-// ROUTES
-// ─────────────────────────────────────────────
-router.get("/ai-assistant", (req, res) => {
-  const autoPrompt      = req.query.prompt      ? req.query.prompt.trim()      : "";
-  const autoDestination = req.query.destination ? req.query.destination.trim() : "";
-  res.render("ai.ejs", { autoPrompt, autoDestination });
-});
+module.exports.getAIAssitant=(req, res) => {
+    const autoPrompt      = req.query.prompt      ? req.query.prompt.trim()      : "";
+    const autoDestination = req.query.destination ? req.query.destination.trim() : "";
+    res.render("features/ai.ejs", { autoPrompt, autoDestination });
+}
 
-// ── /api/tb-listings — used by itinerary builder to show stays ──
-// Accepts optional ?dest= query param for destination filtering
-router.get("/api/tb-listings", async (req, res) => {
-  try {
-    const dest = (req.query.dest || "").trim();
-    let listings;
-
-    if (dest) {
-      const destListings = await vectorSearch(dest, 6, {});
-      listings = destListings.length > 0
-        ? destListings
-        : await Listing.find({}, LISTING_FIELDS).limit(8).lean();
-    } else {
-      listings = await Listing.find({}, LISTING_FIELDS).lean();
+module.exports.chatAI=async (req, res) => {
+    try {
+      const { messages } = req.body;
+      if (!messages || !messages.length) {
+        return res.status(400).json({ error: "No messages" });
+      }
+  
+      const lastUserMsg = [...messages].reverse().find(m => m.role === "user")?.content || "";
+  
+      // explicitDestination — sent by itinerary page or ai-chat.js intent classifier
+      // When present, skips regex extraction and searches location/country directly
+      const explicitDestination = (req.body.destination || req.body.locations?.[0] || "").trim().toLowerCase() || null;
+  
+      const [{ listings, filters, searchMode }, allListings] = await Promise.all([
+        fetchRelevantListings(lastUserMsg, explicitDestination),
+        Listing.find({}, "price country").lean(),
+      ]);
+  
+      const allPrices = allListings.map(l => l.price);
+      const allStats  = {
+        total:    allListings.length,
+        minPrice: Math.min(...allPrices),
+        maxPrice: Math.max(...allPrices),
+        countries: [...new Set(allListings.map(l => l.country))],
+      };
+  
+      const systemPrompt = buildSystemPrompt(listings, allStats, filters);
+  
+      // ── Card display logic ──
+      // Show cards for every searchMode except "all" and "no_dest_match"
+      const toCard = (l) => ({
+        _id: l._id, title: l.title, description: l.description,
+        price: l.price, location: l.location, country: l.country, image: l.image ?? null,
+      });
+  
+      let cardListings = [];
+  
+      if (searchMode === "exact") {
+        cardListings = listings.slice(0, 1).map(toCard);
+      } else if (searchMode === "destination") {
+        cardListings = listings.slice(0, 3).map(toCard);
+      } else if (searchMode === "vector" || searchMode === "price") {
+        // vector covers: solo stays, beach vibes, romantic, mood — anything semantic
+        cardListings = listings.slice(0, 6).map(toCard);
+      }
+      // searchMode === "all" or "no_dest_match" → cardListings stays []
+  
+      // Call Kilo AI
+      const response = await fetch("https://api.kilo.ai/api/gateway/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.KILO_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "kilo-auto/free",
+          stream: false,
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...messages,
+          ],
+        }),
+      });
+  
+      const data  = await response.json();
+      const reply = data.choices?.[0]?.message?.content || "Something went wrong.";
+  
+      console.log(
+        `[AI] mode=${searchMode} | dest=${explicitDestination || (filters.destinations||[]).join(",") || "none"}` +
+        ` | destMatched=${!!filters._destMatched}` +
+        ` | listings=${listings.length}/${allStats.total}` +
+        ` | cards=${cardListings.length}` +
+        ` | "${lastUserMsg.slice(0, 60)}"`
+      );
+  
+      res.json({
+        reply,
+        listings: cardListings,
+        isItinerary: !!(filters.isItinerary || filters.isExactMatch),
+      });
+  
+    } catch (err) {
+      console.error("[AI route error]", err);
+      res.status(500).json({ reply: "Server error — please try again.", listings: [] });
     }
-
-    res.json({ listings });
-  } catch (err) {
-    console.error("[tb-listings error]", err);
-    res.status(500).json({ listings: [] });
   }
-});
-
-router.post("/api/ai-chat", async (req, res) => {
-  try {
-    const { messages } = req.body;
-    if (!messages || !messages.length) {
-      return res.status(400).json({ error: "No messages" });
-    }
-
-    const lastUserMsg = [...messages].reverse().find(m => m.role === "user")?.content || "";
-
-    // explicitDestination — sent by itinerary page or ai-chat.js intent classifier
-    // When present, skips regex extraction and searches location/country directly
-    const explicitDestination = (req.body.destination || req.body.locations?.[0] || "").trim().toLowerCase() || null;
-
-    const [{ listings, filters, searchMode }, allListings] = await Promise.all([
-      fetchRelevantListings(lastUserMsg, explicitDestination),
-      Listing.find({}, "price country").lean(),
-    ]);
-
-    const allPrices = allListings.map(l => l.price);
-    const allStats  = {
-      total:    allListings.length,
-      minPrice: Math.min(...allPrices),
-      maxPrice: Math.max(...allPrices),
-      countries: [...new Set(allListings.map(l => l.country))],
-    };
-
-    const systemPrompt = buildSystemPrompt(listings, allStats, filters);
-
-    // ── Card display logic ──
-    // Show cards for every searchMode except "all" and "no_dest_match"
-    const toCard = (l) => ({
-      _id: l._id, title: l.title, description: l.description,
-      price: l.price, location: l.location, country: l.country, image: l.image ?? null,
-    });
-
-    let cardListings = [];
-
-    if (searchMode === "exact") {
-      cardListings = listings.slice(0, 1).map(toCard);
-    } else if (searchMode === "destination") {
-      cardListings = listings.slice(0, 3).map(toCard);
-    } else if (searchMode === "vector" || searchMode === "price") {
-      // vector covers: solo stays, beach vibes, romantic, mood — anything semantic
-      cardListings = listings.slice(0, 6).map(toCard);
-    }
-    // searchMode === "all" or "no_dest_match" → cardListings stays []
-
-    // Call Kilo AI
-    const response = await fetch("https://api.kilo.ai/api/gateway/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.KILO_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "kilo-auto/free",
-        stream: false,
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages,
-        ],
-      }),
-    });
-
-    const data  = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "Something went wrong.";
-
-    console.log(
-      `[AI] mode=${searchMode} | dest=${explicitDestination || (filters.destinations||[]).join(",") || "none"}` +
-      ` | destMatched=${!!filters._destMatched}` +
-      ` | listings=${listings.length}/${allStats.total}` +
-      ` | cards=${cardListings.length}` +
-      ` | "${lastUserMsg.slice(0, 60)}"`
-    );
-
-    res.json({
-      reply,
-      listings: cardListings,
-      isItinerary: !!(filters.isItinerary || filters.isExactMatch),
-    });
-
-  } catch (err) {
-    console.error("[AI route error]", err);
-    res.status(500).json({ reply: "Server error — please try again.", listings: [] });
-  }
-});
-
-module.exports = router;

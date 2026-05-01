@@ -6,7 +6,7 @@ let isThinking = false;
 // ─────────────────────────────────────────────
 function typeWriterEffect(element, text, speed = 16, onDone) {
   let i = 0;
-  const msgs = document.getElementById('aiMessages');
+  const msgs = document.getElementById("aiMessages");
   function type() {
     if (i <= text.length) {
       element.innerHTML = formatMarkdown(text.slice(0, i));
@@ -14,7 +14,7 @@ function typeWriterEffect(element, text, speed = 16, onDone) {
       msgs.scrollTop = msgs.scrollHeight;
       setTimeout(type, speed);
     } else {
-      if (typeof onDone === 'function') onDone();
+      if (typeof onDone === "function") onDone();
     }
   }
   type();
@@ -25,16 +25,19 @@ function typeWriterEffect(element, text, speed = 16, onDone) {
 // ─────────────────────────────────────────────
 function exportItinerary(rawText) {
   const formatted = formatMarkdownForPrint(rawText);
-  const now       = new Date();
-  const dateStr   = now.toLocaleDateString('en-IN', {
-    day: 'numeric', month: 'long', year: 'numeric'
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   });
 
   // Detect a trip title from the first line, fall back gracefully
-  const firstLine = rawText.split('\n')[0].replace(/\*\*/g, '').trim();
-  const title     = firstLine.length > 4 && firstLine.length < 80
-    ? firstLine
-    : 'Your Travel Itinerary';
+  const firstLine = rawText.split("\n")[0].replace(/\*\*/g, "").trim();
+  const title =
+    firstLine.length > 4 && firstLine.length < 80
+      ? firstLine
+      : "Your Travel Itinerary";
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -227,9 +230,9 @@ function exportItinerary(rawText) {
 </body>
 </html>`;
 
-  const win = window.open('', '_blank');
+  const win = window.open("", "_blank");
   if (!win) {
-    alert('Please allow pop-ups to export the itinerary.');
+    alert("Please allow pop-ups to export the itinerary.");
     return;
   }
   win.document.write(html);
@@ -238,27 +241,31 @@ function exportItinerary(rawText) {
 
 // Convert markdown to clean HTML suitable for the print page
 function formatMarkdownForPrint(text) {
-  const lines  = text.split('\n');
+  const lines = text.split("\n");
   const output = [];
-  let inList   = false;
+  let inList = false;
 
   for (let raw of lines) {
     let line = raw.trim();
 
     // Close open list before non-list lines
-    if (inList && !line.startsWith('- ') && !line.startsWith('• ')) {
-      output.push('</ul>');
+    if (inList && !line.startsWith("- ") && !line.startsWith("• ")) {
+      output.push("</ul>");
       inList = false;
     }
 
     if (!line) {
-      output.push('<br>');
+      output.push("<br>");
       continue;
     }
 
     // Day headers → styled day-block open
-    if (/^(day\s*\d+|day\s*[one|two|three|four|five|six|seven])/i.test(line.replace(/\*\*/g, ''))) {
-      const clean = line.replace(/\*\*/g, '');
+    if (
+      /^(day\s*\d+|day\s*[one|two|three|four|five|six|seven])/i.test(
+        line.replace(/\*\*/g, "")
+      )
+    ) {
+      const clean = line.replace(/\*\*/g, "");
       output.push(`<div class="day-block"><h3>${escapeHtml(clean)}</h3>`);
       // Close day block at next blank or at end — simpler: wrap whole text, close at </div> below
       output.push(`</div>`); // self-contained; content will inline-flow
@@ -266,59 +273,66 @@ function formatMarkdownForPrint(text) {
     }
 
     // ### heading
-    if (line.startsWith('### ')) {
-      output.push(`<h3>${escapeHtml(line.slice(4)).replace(/\*\*/g, '')}</h3>`);
+    if (line.startsWith("### ")) {
+      output.push(`<h3>${escapeHtml(line.slice(4)).replace(/\*\*/g, "")}</h3>`);
       continue;
     }
 
     // ## heading
-    if (line.startsWith('## ')) {
-      output.push(`<h3>${escapeHtml(line.slice(3)).replace(/\*\*/g, '')}</h3>`);
+    if (line.startsWith("## ")) {
+      output.push(`<h3>${escapeHtml(line.slice(3)).replace(/\*\*/g, "")}</h3>`);
       continue;
     }
 
     // # heading
-    if (line.startsWith('# ')) {
-      output.push(`<h3>${escapeHtml(line.slice(2)).replace(/\*\*/g, '')}</h3>`);
+    if (line.startsWith("# ")) {
+      output.push(`<h3>${escapeHtml(line.slice(2)).replace(/\*\*/g, "")}</h3>`);
       continue;
     }
 
     // Bullet list
-    if (line.startsWith('- ') || line.startsWith('• ')) {
-      if (!inList) { output.push('<ul>'); inList = true; }
-      const item = line.slice(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    if (line.startsWith("- ") || line.startsWith("• ")) {
+      if (!inList) {
+        output.push("<ul>");
+        inList = true;
+      }
+      const item = line
+        .slice(2)
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
       output.push(`<li>${item}</li>`);
       continue;
     }
 
     // Normal paragraph
     const para = line
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>');
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g, "<em>$1</em>");
     output.push(`<p>${para}</p>`);
   }
 
-  if (inList) output.push('</ul>');
-  return output.join('\n');
+  if (inList) output.push("</ul>");
+  return output.join("\n");
 }
 
 // ─────────────────────────────────────────────
 // Build listing card HTML string
 // ─────────────────────────────────────────────
 function buildCardHTML(l, index) {
-  const price    = Number(l.price).toLocaleString('en-IN');
-  const title    = escapeHtml(l.title);
+  const price = Number(l.price).toLocaleString("en-IN");
+  const title = escapeHtml(l.title);
   const location = escapeHtml(l.location);
-  const country  = escapeHtml(l.country);
-  const imgUrl   = l.image
-    ? escapeHtml(typeof l.image === 'object' ? (l.image.url || '') : l.image)
-    : '';
-  const imgStyle = imgUrl ? `background-image:url('${imgUrl}');` : '';
+  const country = escapeHtml(l.country);
+  const imgUrl = l.image
+    ? escapeHtml(typeof l.image === "object" ? l.image.url || "" : l.image)
+    : "";
+  const imgStyle = imgUrl ? `background-image:url('${imgUrl}');` : "";
 
   return `
     <a class="aic" href="/listings/${l._id}" target="_blank"
        style="animation-delay:${index * 70}ms">
-      <div class="aic-photo ${imgUrl ? '' : 'aic-photo--fallback'}" style="${imgStyle}">
+      <div class="aic-photo ${
+        imgUrl ? "" : "aic-photo--fallback"
+      }" style="${imgStyle}">
         <div class="aic-overlay"></div>
         <div class="aic-photo-top">
           <span class="aic-country-badge">${country}</span>
@@ -353,9 +367,9 @@ function buildCardHTML(l, index) {
 function appendListingCards(listings, afterEl) {
   if (!listings || listings.length === 0) return;
 
-  const msgs  = document.getElementById('aiMessages');
-  const strip = document.createElement('div');
-  strip.className = 'aic-strip';
+  const msgs = document.getElementById("aiMessages");
+  const strip = document.createElement("div");
+  strip.className = "aic-strip";
 
   strip.innerHTML = `
     <div class="aic-strip-inner">
@@ -367,12 +381,12 @@ function appendListingCards(listings, afterEl) {
             <rect x=".5" y="6.5" width="4" height="4" rx="1" fill="currentColor"/>
             <rect x="6.5" y="6.5" width="4" height="4" rx="1" fill="currentColor"/>
           </svg>
-          ${listings.length} matching listing${listings.length !== 1 ? 's' : ''}
+          ${listings.length} matching listing${listings.length !== 1 ? "s" : ""}
         </span>
         <span class="aic-strip-hint">swipe to explore</span>
       </div>
       <div class="aic-scroll-track">
-        ${listings.map((l, i) => buildCardHTML(l, i)).join('')}
+        ${listings.map((l, i) => buildCardHTML(l, i)).join("")}
       </div>
     </div>`;
 
@@ -388,9 +402,9 @@ function appendListingCards(listings, afterEl) {
 // Preset buttons
 // ─────────────────────────────────────────────
 function sendPreset(btn) {
-  const span = btn.querySelector('span');
+  const span = btn.querySelector("span");
   const text = span ? span.textContent.trim() : btn.textContent.trim();
-  document.getElementById('aiInput').value = text;
+  document.getElementById("aiInput").value = text;
   sendMessage();
 }
 
@@ -399,7 +413,7 @@ function sendPreset(btn) {
 // ─────────────────────────────────────────────
 function newChat() {
   chatHistory = [];
-  document.getElementById('aiMessages').innerHTML = `
+  document.getElementById("aiMessages").innerHTML = `
     <div class="ai-welcome" id="aiWelcome">
       <div class="ai-welcome-inner">
         <div class="ai-welcome-star">✦</div>
@@ -414,45 +428,49 @@ function newChat() {
 // Keyboard + textarea
 // ─────────────────────────────────────────────
 function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
+  if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     sendMessage();
   }
 }
 function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+  el.style.height = "auto";
+  el.style.height = Math.min(el.scrollHeight, 140) + "px";
 }
 
 // ─────────────────────────────────────────────
 // Status indicators
 // ─────────────────────────────────────────────
 function setReady() {
-  document.getElementById('aiDot').className = 'ai-dot';
-  document.getElementById('aiStatusText').textContent = 'Ready';
+  document.getElementById("aiDot").className = "ai-dot";
+  document.getElementById("aiStatusText").textContent = "Ready";
 }
 function setBusy() {
-  document.getElementById('aiDot').className = 'ai-dot busy';
-  document.getElementById('aiStatusText').textContent = 'Thinking…';
+  document.getElementById("aiDot").className = "ai-dot busy";
+  document.getElementById("aiStatusText").textContent = "Thinking…";
 }
 
 // ─────────────────────────────────────────────
 // Append a chat bubble — now with export button on bot replies
 // ─────────────────────────────────────────────
-function appendMsg(text, role, isTemp = false, rawText = '') {
-  const welcome = document.getElementById('aiWelcome');
+function appendMsg(text, role, isTemp = false, rawText = "") {
+  const welcome = document.getElementById("aiWelcome");
   if (welcome) welcome.remove();
 
-  const row = document.createElement('div');
-  row.className = `ai-msg-row ${role === 'bot' ? 'bot-row' : 'user-row'}${isTemp ? ' ai-thinking-row' : ''}`;
+  const row = document.createElement("div");
+  row.className = `ai-msg-row ${role === "bot" ? "bot-row" : "user-row"}${
+    isTemp ? " ai-thinking-row" : ""
+  }`;
 
-  const avatar = role === 'bot'
-    ? `<div class="ai-orb-avatar">✦</div>`
-    : `<div class="ai-user-avatar"><i class="fa-solid fa-user"></i></div>`;
+  const avatar =
+    role === "bot"
+      ? `<div class="ai-orb-avatar">✦</div>`
+      : `<div class="ai-user-avatar"><i class="fa-solid fa-user"></i></div>`;
 
   // Export button — only on completed bot messages, not on the thinking placeholder
-  const exportBtn = (role === 'bot' && !isTemp)
-    ? `<button class="ai-export-btn" title="Export as PDF"
+  const exportBtn =
+    role === "bot" && !isTemp
+      ? `<button class="ai-export-btn" title="Export as PDF"
          onclick="exportItinerary(this.closest('.ai-msg-row').dataset.raw)">
          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
            <path d="M2 9v2.5A.5.5 0 0 0 2.5 12h8a.5.5 0 0 0 .5-.5V9M6.5 1v7M4 6l2.5 2.5L9 6"
@@ -460,21 +478,23 @@ function appendMsg(text, role, isTemp = false, rawText = '') {
          </svg>
          Export PDF
        </button>`
-    : '';
+      : "";
 
   const body = isTemp
     ? `<div class="ai-msg-text ai-thinking">
          <div class="ai-dots"><span></span><span></span><span></span></div>
          Thinking...
        </div>`
-    : `<div class="ai-msg-text">${role === 'bot' ? formatMarkdown(text) : escapeHtml(text)}</div>
+    : `<div class="ai-msg-text">${
+        role === "bot" ? formatMarkdown(text) : escapeHtml(text)
+      }</div>
        ${exportBtn}`;
 
   row.innerHTML = `
     <div class="ai-msg-inner">
       <div class="ai-msg-avatar">${avatar}</div>
       <div class="ai-msg-content">
-        <div class="ai-msg-label">${role === 'bot' ? 'Assistant' : 'You'}</div>
+        <div class="ai-msg-label">${role === "bot" ? "Assistant" : "You"}</div>
         ${body}
       </div>
     </div>`;
@@ -482,8 +502,8 @@ function appendMsg(text, role, isTemp = false, rawText = '') {
   // Store raw text on the row so the export button can read it
   if (rawText) row.dataset.raw = rawText;
 
-  document.getElementById('aiMessages').appendChild(row);
-  document.getElementById('aiMessages').scrollTop = 99999;
+  document.getElementById("aiMessages").appendChild(row);
+  document.getElementById("aiMessages").scrollTop = 99999;
   return row;
 }
 
@@ -492,30 +512,30 @@ function appendMsg(text, role, isTemp = false, rawText = '') {
 // ─────────────────────────────────────────────
 function formatMarkdown(text) {
   return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n- (.+)/g, '<br>• $1')
-    .replace(/\n/g, '<br>');
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\n- (.+)/g, "<br>• $1")
+    .replace(/\n/g, "<br>");
 }
 
 function escapeHtml(s) {
-  return String(s || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  return String(s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 // ─────────────────────────────────────────────
 // Action buttons — copy (all) + export PDF (itinerary only)
 // ─────────────────────────────────────────────
 function appendActionButtons(msgContent, rawText, isItinerary) {
-  const bar = document.createElement('div');
-  bar.className = 'ai-action-bar';
+  const bar = document.createElement("div");
+  bar.className = "ai-action-bar";
 
   // ── Copy button (always shown) ──
-  const copyBtn = document.createElement('button');
-  copyBtn.className = 'ai-action-btn';
-  copyBtn.title     = 'Copy response';
+  const copyBtn = document.createElement("button");
+  copyBtn.className = "ai-action-btn";
+  copyBtn.title = "Copy response";
   copyBtn.innerHTML = `
     <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
       <rect x="4.5" y="4.5" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.3"/>
@@ -524,7 +544,7 @@ function appendActionButtons(msgContent, rawText, isItinerary) {
     </svg>
     Copy`;
 
-  copyBtn.addEventListener('click', () => {
+  copyBtn.addEventListener("click", () => {
     navigator.clipboard.writeText(rawText).then(() => {
       copyBtn.innerHTML = `
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
@@ -532,7 +552,7 @@ function appendActionButtons(msgContent, rawText, isItinerary) {
             stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         Copied!`;
-      copyBtn.classList.add('ai-action-btn--success');
+      copyBtn.classList.add("ai-action-btn--success");
       setTimeout(() => {
         copyBtn.innerHTML = `
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
@@ -541,7 +561,7 @@ function appendActionButtons(msgContent, rawText, isItinerary) {
               stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
           </svg>
           Copy`;
-        copyBtn.classList.remove('ai-action-btn--success');
+        copyBtn.classList.remove("ai-action-btn--success");
       }, 2000);
     });
   });
@@ -550,16 +570,16 @@ function appendActionButtons(msgContent, rawText, isItinerary) {
 
   // ── Export PDF button (itinerary only) ──
   if (isItinerary) {
-    const exportBtn = document.createElement('button');
-    exportBtn.className = 'ai-action-btn ai-action-btn--pdf';
-    exportBtn.title     = 'Export as PDF';
+    const exportBtn = document.createElement("button");
+    exportBtn.className = "ai-action-btn ai-action-btn--pdf";
+    exportBtn.title = "Export as PDF";
     exportBtn.innerHTML = `
       <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
         <path d="M2 9v2.5A.5.5 0 0 0 2.5 12h8a.5.5 0 0 0 .5-.5V9M6.5 1v7M4 6l2.5 2.5L9 6"
           stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       Export PDF`;
-    exportBtn.addEventListener('click', () => exportItinerary(rawText));
+    exportBtn.addEventListener("click", () => exportItinerary(rawText));
     bar.appendChild(exportBtn);
   }
 
@@ -571,17 +591,58 @@ function appendActionButtons(msgContent, rawText, isItinerary) {
 // the backend gets ready-made search params
 // ─────────────────────────────────────────────
 const CATEGORY_KEYWORDS = {
-  beach:    ['beach', 'coastal', 'seaside', 'ocean', 'shore', 'surf', 'bay', 'island'],
-  mountain: ['mountain', 'hill', 'alpine', 'highland', 'peak', 'valley', 'trek'],
-  heritage: ['heritage', 'haveli', 'historic', 'palace', 'fort', 'colonial', 'ancient', 'old city'],
-  luxury:   ['luxury', 'villa', 'resort', 'suite', 'premium', 'penthouse', 'mansion'],
-  budget:   ['budget', 'hostel', 'backpacker', 'affordable', 'cheap', 'guesthouse'],
-  forest:   ['forest', 'jungle', 'wildlife', 'nature', 'eco', 'treehouse'],
-  desert:   ['desert', 'dune', 'arid', 'sahara', 'thar', 'sand'],
-  urban:    ['apartment', 'city', 'downtown', 'metro', 'urban', 'studio', 'loft'],
-  romantic: ['romantic', 'honeymoon', 'couple', 'intimate', 'cozy', 'charming'],
-  artdeco:  ['art deco', 'art-deco', 'vintage', 'retro', '1920', 'glamour'],
-  pool:     ['pool', 'swimming', 'infinity pool'],
+  beach: [
+    "beach",
+    "coastal",
+    "seaside",
+    "ocean",
+    "shore",
+    "surf",
+    "bay",
+    "island",
+  ],
+  mountain: [
+    "mountain",
+    "hill",
+    "alpine",
+    "highland",
+    "peak",
+    "valley",
+    "trek",
+  ],
+  heritage: [
+    "heritage",
+    "haveli",
+    "historic",
+    "palace",
+    "fort",
+    "colonial",
+    "ancient",
+    "old city",
+  ],
+  luxury: [
+    "luxury",
+    "villa",
+    "resort",
+    "suite",
+    "premium",
+    "penthouse",
+    "mansion",
+  ],
+  budget: [
+    "budget",
+    "hostel",
+    "backpacker",
+    "affordable",
+    "cheap",
+    "guesthouse",
+  ],
+  forest: ["forest", "jungle", "wildlife", "nature", "eco", "treehouse"],
+  desert: ["desert", "dune", "arid", "sahara", "thar", "sand"],
+  urban: ["apartment", "city", "downtown", "metro", "urban", "studio", "loft"],
+  romantic: ["romantic", "honeymoon", "couple", "intimate", "cozy", "charming"],
+  artdeco: ["art deco", "art-deco", "vintage", "retro", "1920", "glamour"],
+  pool: ["pool", "swimming", "infinity pool"],
 };
 
 function extractLocations(text) {
@@ -604,19 +665,30 @@ function extractLocations(text) {
 function classifyIntent(messages) {
   // Combine last 3 user turns for context
   const recentText = messages
-    .filter(m => m.role === 'user')
+    .filter((m) => m.role === "user")
     .slice(-3)
-    .map(m => m.content)
-    .join(' ');
+    .map((m) => m.content)
+    .join(" ");
 
   const lower = recentText.toLowerCase();
 
   // Itinerary intent
   const isItineraryQuery = [
-    'itinerary', 'plan', 'trip to', 'travel to', 'visit', 'going to',
-    'days in', 'week in', 'weekend in', 'holiday in', 'vacation in',
-    'tour of', 'places to see', 'what to do in',
-  ].some(t => lower.includes(t));
+    "itinerary",
+    "plan",
+    "trip to",
+    "travel to",
+    "visit",
+    "going to",
+    "days in",
+    "week in",
+    "weekend in",
+    "holiday in",
+    "vacation in",
+    "tour of",
+    "places to see",
+    "what to do in",
+  ].some((t) => lower.includes(t));
 
   // Listing title hint — quoted or "find X listing/stay/property"
   const titleMatch =
@@ -629,7 +701,7 @@ function classifyIntent(messages) {
 
   // Categories
   const categories = Object.entries(CATEGORY_KEYWORDS)
-    .filter(([, kws]) => kws.some(kw => lower.includes(kw)))
+    .filter(([, kws]) => kws.some((kw) => lower.includes(kw)))
     .map(([cat]) => cat);
 
   return {
@@ -646,46 +718,46 @@ function classifyIntent(messages) {
 async function sendMessage() {
   if (isThinking) return;
 
-  const input = document.getElementById('aiInput');
-  const text  = input.value.trim();
+  const input = document.getElementById("aiInput");
+  const text = input.value.trim();
   if (!text) return;
 
-  input.value = '';
-  input.style.height = 'auto';
+  input.value = "";
+  input.style.height = "auto";
 
   // 1 — user bubble
-  appendMsg(text, 'user');
-  chatHistory.push({ role: 'user', content: text });
+  appendMsg(text, "user");
+  chatHistory.push({ role: "user", content: text });
 
   isThinking = true;
   setBusy();
-  document.getElementById('aiSendBtn').disabled = true;
+  document.getElementById("aiSendBtn").disabled = true;
 
   // 2 — thinking placeholder (no export btn yet)
-  const botMsgEl = appendMsg('', 'bot', true);
+  const botMsgEl = appendMsg("", "bot", true);
 
   try {
-    const res = await fetch('/api/ai-chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("/api/ai-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        messages:    chatHistory,
+        messages: chatHistory,
         // Destination set by ai.ejs from the ?destination= URL param
         // sent by itinerary page — reliable, no regex extraction needed
         destination: window._autoDestination || null,
       }),
     });
 
-    if (!res.ok) throw new Error('API failed');
+    if (!res.ok) throw new Error("API failed");
 
-    const data  = await res.json();
-    const reply = data.reply || 'No response.';
+    const data = await res.json();
+    const reply = data.reply || "No response.";
 
     // 3 — swap thinking for typewriter
-    botMsgEl.classList.remove('ai-thinking-row');
-    const msgContent = botMsgEl.querySelector('.ai-msg-content');
-    const target     = botMsgEl.querySelector('.ai-msg-text');
-    target.innerHTML = '';
+    botMsgEl.classList.remove("ai-thinking-row");
+    const msgContent = botMsgEl.querySelector(".ai-msg-content");
+    const target = botMsgEl.querySelector(".ai-msg-text");
+    target.innerHTML = "";
 
     // 4 — after typewriter done: add action buttons + listing cards
     typeWriterEffect(target, reply, 16, () => {
@@ -696,24 +768,23 @@ async function sendMessage() {
       }
     });
 
-    chatHistory.push({ role: 'assistant', content: reply });
-
+    chatHistory.push({ role: "assistant", content: reply });
   } catch (err) {
-    botMsgEl.classList.remove('ai-thinking-row');
-    botMsgEl.querySelector('.ai-msg-text').innerHTML =
-      '⚠️ Connection error. Please try again.';
-    console.error('[AI error]', err);
+    botMsgEl.classList.remove("ai-thinking-row");
+    botMsgEl.querySelector(".ai-msg-text").innerHTML =
+      "⚠️ Connection error. Please try again.";
+    console.error("[AI error]", err);
   }
 
   isThinking = false;
   setReady();
-  document.getElementById('aiSendBtn').disabled = false;
+  document.getElementById("aiSendBtn").disabled = false;
   input.focus();
 }
 
 // ─────────────────────────────────────────────
 // Autofocus
 // ─────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('aiInput').focus();
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("aiInput").focus();
 });
