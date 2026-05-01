@@ -1,104 +1,152 @@
-# Wanderlust – AI-Powered Travel Listing & Planning Platform
+# 🌍 Wanderlust – AI-Powered Travel Discovery & Planning Platform
 
-**Live Application:** https://wanderlust-aqw0.onrender.com/
+<p align="center">
+  <img src="https://img.shields.io/badge/Wanderlust-Travel%20AI%20Platform-1f6feb?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Live-Demo-00C853?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Full%20Stack-MERN%20Inspired-ff6b6b?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/AI-RAG%20System-blue?style=for-the-badge" />
+</p>
 
-Wanderlust is a full-stack travel discovery and planning platform that combines traditional listing-based functionality with AI-powered semantic search and retrieval-augmented generation (RAG). The system is designed to support both structured database queries and natural language-based search through a hybrid search architecture.
-
----
-
-## Overview
-
-Wanderlust enables users to explore, create, and manage travel listings while receiving intelligent recommendations based on mood, context, and natural language queries. The platform integrates lexical search (MongoDB full-text indexing) with semantic vector search to improve relevance and user experience.
-
----
-
-## Key Features
-
-### Travel Listings System
-- Full CRUD functionality for travel listings
-- Wishlist, reviews, and ratings support
-- Image upload and management using Cloudinary and Multer
-- Server-side validation using Joi
-
-### Authentication System
-- Secure authentication using Passport.js
-- Session management with Connect-Mongo
-- Protected routes and authorization middleware
-
-### Hybrid Search System
-- MongoDB full-text search for keyword-based queries
-- Vector-based semantic search for natural language queries
-- Dynamic routing between keyword and semantic search
-- Debounced input handling to reduce unnecessary API requests
-- Multi-criteria filtering (price, category, mood)
-- Pagination for efficient data rendering
-
-### AI-Powered Travel Assistant (RAG)
-- Natural language query interpretation using NLP
-- Retrieval-augmented generation pipeline combining:
-  - MongoDB filtered retrieval
-  - Vector similarity search
-  - LLM-based response generation
-- Context-aware travel recommendations and itinerary planning
-
-### Location and Planning Features
-- Geolocation services using OpenCage API
-- Structured day-wise itinerary planner
-- Location enrichment for listings
+<p align="center">
+  <b>🚀 Live Application:</b> <a href="https://wanderlust-aqw0.onrender.com/">wanderlust-aqw0.onrender.com</a>
+</p>
 
 ---
 
-## System Architecture
+## ✨ The Problem
+Travel discovery platforms are either:
+- Too rigid (only keyword-based search)
+- Or too slow (no intelligent ranking)
 
-The system follows a hybrid architecture:
-
-User Query → Intent Detection → Routing Layer → Retrieval Layer → Response Generation
-
-- Keyword queries are processed via MongoDB full-text search
-- Semantic queries are processed via vector embeddings
-- Hybrid queries combine both approaches
-- Final output is enhanced using LLM-based reasoning
+Users struggle to express intent like:
+> “a peaceful mountain stay with snow and silence for healing”
 
 ---
 
-## Tech Stack
+## 💡 The Solution
+**Wanderlust introduces a Hybrid AI Search System** that understands both:
+- Structured filters (price, category, location)
+- Natural language intent (mood, experience, context)
 
-**Frontend:** HTML, CSS, JavaScript, Bootstrap, EJS  
-**Backend:** Node.js, Express.js  
-**Database:** MongoDB, Mongoose  
-**Authentication:** Passport.js, Connect-Mongo  
-**AI & Search:** Vector Search, MongoDB Full-Text Indexing, Hugging Face Transformers, Kilo AI  
-**Services:** Cloudinary, Multer, OpenCage API
+It intelligently routes queries to the best engine: MongoDB or Vector AI.
 
 ---
 
-## System Highlights
+## ⚡ Key Highlights (At a Glance)
 
-- Hybrid keyword and semantic search architecture
-- Retrieval-augmented generation (RAG) based recommendation system
-- Optimized backend performance using debouncing and pagination
-- Scalable authentication and session management
-- Production-ready full-stack architecture with real-world use case
-
----
-
-## Impact
-
-This project demonstrates strong capabilities in full-stack system design, AI integration in web applications, and search system optimization. It highlights the ability to combine structured database querying with semantic AI-based retrieval to solve real-world discovery and recommendation problems.
+- 🔎 Hybrid Search (Keyword + Semantic + AI Routing)
+- 🧠 Retrieval-Augmented Generation (RAG) Assistant
+- ⚙️ Debounced Search + Pagination Optimization
+- 🔐 Secure Auth with Session Persistence
+- 🗺️ Location-aware Travel Discovery
+- 📦 Production-ready Full Stack Architecture
 
 ---
 
-## Future Enhancements
+## 🧠 How It Works (System Flow)
 
-- AI-based dynamic pricing engine
-- Real-time booking and reservation system
-- Social travel feed with user-generated itineraries
-- Mobile application (React Native / Flutter)
-- Personalized recommendation system based on user behavior
+```
+User Query
+   ↓
+Intent Detection Layer
+   ↓
+┌──────────────────────────────┐
+│ Keyword → MongoDB Full Text  │
+│ Semantic → Vector Search     │
+│ Hybrid → Combined Results    │
+└──────────────────────────────┘
+   ↓
+Retrieval Layer (MongoDB + Vectors)
+   ↓
+LLM Reasoning (Kilo AI / Transformers)
+   ↓
+Personalized Travel Recommendation
+```
 
 ---
 
-## Author
+## 🧩 Core Features
 
-Srishti Verma  
+### 🏡 Travel Listings Engine
+- CRUD-based listing management
+- Wishlist, reviews & ratings system
+- Cloud image storage (Cloudinary + Multer)
+- Joi-based validation layer
+
+### 🔐 Authentication System
+- Passport.js authentication
+- Persistent sessions via Connect-Mongo
+- Protected routes & authorization middleware
+
+### 🔎 Intelligent Search Engine
+- MongoDB full-text indexing
+- Vector-based semantic search
+- Dynamic query routing
+- Debounced input handling
+- Multi-filter search (price, mood, category)
+- Pagination for scalability
+
+### 🤖 AI Travel Assistant (RAG)
+- Natural language understanding
+- Context-aware retrieval system
+- LLM-generated travel recommendations
+- Smart itinerary planning
+
+### 🗺️ Location Intelligence
+- OpenCage API integration
+- Geo-based listing enrichment
+- Day-wise itinerary planner
+
+---
+
+## 🛠️ Tech Stack
+
+**Frontend:** HTML · CSS · JavaScript · Bootstrap · EJS  
+**Backend:** Node.js · Express.js  
+**Database:** MongoDB · Mongoose  
+**Auth:** Passport.js · Connect-Mongo  
+**AI/Search:** Vector Search · MongoDB Text Index · Hugging Face · Kilo AI  
+**Services:** Cloudinary · OpenCage API · Multer
+
+---
+
+## 🚀 Why This Project Stands Out
+
+- Real-world **AI + Full Stack integration**
+- Hybrid **search intelligence architecture**
+- Production-level **performance optimizations**
+- Scalable backend system design
+- Practical implementation of **RAG systems without heavy frameworks**
+
+---
+
+## 📈 Impact
+
+This project demonstrates strong expertise in:
+- Full-stack system architecture
+- AI-powered search and recommendation systems
+- Backend optimization (debouncing, pagination, filtering)
+- Real-world product thinking and scalable design
+
+---
+
+## 🔮 Future Roadmap
+
+- 💰 AI-based dynamic pricing engine
+- 🎟️ Real-time booking system
+- 🌍 Social travel feed with itineraries
+- 📱 Mobile application (React Native)
+- 🧠 Personalized recommendation engine
+
+---
+
+## 👨‍💻 Author
+
+**Srishti Verma**  
 Full Stack Developer | AI Systems Enthusiast
+
+---
+
+<p align="center">
+⭐ If you like this project, consider starring it on GitHub ⭐
+</p>
