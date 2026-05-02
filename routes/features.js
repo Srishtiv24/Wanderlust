@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Listing = require("../models/listing.js");
-const {getAIAssitant , chatAI} =require("../controllers/ai.js")
+const { getAIAssitant, chatAI } = require("../controllers/ai.js");
 
 // ── GET /itinerary ────────────────────────────────────────────────────────────
 router.get("/itinerary", (req, res) => res.render("features/itinerary.ejs"));
@@ -37,29 +37,48 @@ router.get("/api/listings-by-ids", async (req, res) => {
 
 router.get("/ai-assistant", getAIAssitant);
 
+router.post("/api/ai-chat", chatAI);
+
 // ── /api/tb-listings — used by itinerary builder to show stays ──
 // Accepts optional ?dest= query param for destination filtering
 router.get("/api/tb-listings", async (req, res) => {
   try {
-    const dest = (req.query.dest || "").trim();
-    let listings;
+    const dest = (req.query.dest || "").trim().toLowerCase();
+    let listings = [];
 
     if (dest) {
-      const destListings = await vectorSearch(dest, 6, {});
-      listings = destListings.length > 0
-        ? destListings
-        : await Listing.find({}, LISTING_FIELDS).limit(8).lean();
-    } else {
-      listings = await Listing.find({}, LISTING_FIELDS).lean();
-    }
+      // 1. TEXT SEARCH (fast + indexed)
+      const textResults = await Listing.find(
+        { $text: { $search: dest } },
+        {
+          score: { $meta: "textScore" },
+          title: 1,
+          location: 1,
+          country: 1,
+          price: 1,
+          image: 1,
+        }
+      )
+        .sort({ score: { $meta: "textScore" } })
+        .limit(20)
+        .lean();
 
+      if (textResults.length > 0) {
+        listings = textResults;
+      } else {
+        // 2. VECTOR SEARCH (semantic fallback)
+        const vectorResults = await vectorSearch(dest, 20, {});
+        listings = vectorResults || [];
+      }
+    } else {
+      //No destination → return empty (your design choice)
+      listings = [];
+    }
     res.json({ listings });
   } catch (err) {
     console.error("[tb-listings error]", err);
     res.status(500).json({ listings: [] });
   }
 });
-
-router.post("/api/ai-chat", chatAI);
 
 module.exports = router;

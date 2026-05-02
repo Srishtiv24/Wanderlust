@@ -556,64 +556,75 @@ function updateGenBar() {
         (dest || "your destination") +
         ".";
 }
-
 async function loadStays(dest) {
-  var section = document.getElementById("staysSection"),
-    grid = document.getElementById("staysGrid");
-  document.getElementById("staysDestLabel").textContent = dest;
-  try {
-    var res = await fetch("/api/tb-listings");
-    var data = await res.json();
-    var all = data.listings || [];
-    var dLow = dest.toLowerCase();
-    var matches = all.filter(function (l) {
-      return (
-        l.location.toLowerCase().includes(dLow) ||
-        l.country.toLowerCase().includes(dLow) ||
-        l.title.toLowerCase().includes(dLow)
-      );
-    });
-    if (!matches.length) matches = all.slice(0, 4);
-    matches = matches.slice(0, 6);
-    if (!matches.length) {
+    const section = document.getElementById("staysSection");
+    const grid = document.getElementById("staysGrid");
+    const label = document.getElementById("staysDestLabel");
+  
+    // show destination in UI
+    label.textContent = dest || "";
+  
+    // guard: no destination
+    if (!dest) {
       section.style.display = "none";
       return;
     }
-    grid.innerHTML = matches
-      .map(function (l) {
-        return (
-          '<div class="itin-stay-card" draggable="true" ondragstart="stayDragStart(event,\'' +
-          l.title.replace(/'/g, "") +
-          "','" +
-          l.location +
-          "','" +
-          l.country +
-          "'," +
-          (l.price || 0) +
-          ')" title="Drag to add as stay">' +
-          (l.image && l.image.url
-            ? '<img src="' +
-              l.image.url +
-              '" alt="" onerror="this.style.display=\'none\'">'
-            : "") +
-          '<div class="itin-stay-card-body"><div class="itin-stay-card-name">' +
-          l.title +
-          '</div><div class="itin-stay-card-loc"><i class="fa-solid fa-location-dot" style="color:#fe424d;font-size:.58rem;margin-right:2px;"></i>' +
-          l.location +
-          ", " +
-          l.country +
-          '</div><div class="itin-stay-card-price">₹' +
-          (l.price || 0).toLocaleString("en-IN") +
-          "/night</div></div>" +
-          "</div>"
-        );
-      })
-      .join("");
-    section.style.display = "block";
-  } catch (e) {
-    section.style.display = "none";
+  
+    try {
+      // IMPORTANT: send dest to backend
+      const res = await fetch("/api/tb-listings?dest=" + encodeURIComponent(dest));
+  
+      if (!res.ok) throw new Error("Failed to fetch stays");
+  
+      const data = await res.json();
+      const listings = (data.listings || []).slice(0, 6); // limit UI
+  
+      // empty state
+      if (!listings.length) {
+        section.style.display = "none";
+        return;
+      }
+  
+      // render cards
+      grid.innerHTML = listings.map((l) => {
+        const title = (l.title || "").replace(/'/g, "");
+        const location = l.location || "";
+        const country = l.country || "";
+        const price = l.price || 0;
+  
+        return `
+          <div class="itin-stay-card"
+               draggable="true"
+               ondragstart="stayDragStart(event,'${title}','${location}','${country}',${price})"
+               title="Drag to add as stay">
+  
+            ${l.image && l.image.url
+              ? `<img src="${l.image.url}" alt="${title}" onerror="this.style.display='none'">`
+              : ""}
+  
+            <div class="itin-stay-card-body">
+              <div class="itin-stay-card-name">${title}</div>
+  
+              <div class="itin-stay-card-loc">
+                <i class="fa-solid fa-location-dot" style="color:#fe424d;font-size:.58rem;margin-right:2px;"></i>
+                ${location}, ${country}
+              </div>
+  
+              <div class="itin-stay-card-price">
+                ₹${price.toLocaleString("en-IN")}/night
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+  
+      section.style.display = "block";
+  
+    } catch (err) {
+      console.error("loadStays error:", err);
+      section.style.display = "none";
+    }
   }
-}
 
 function generateFromBuilder() {
   var dest = document.getElementById("setupDest").value.trim();

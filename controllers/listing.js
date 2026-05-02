@@ -122,20 +122,44 @@ module.exports.showListing = async (req, res, next) => {
   res.render("listings/show.ejs", { listing, lat, lng });
 };
 
+
+// ─────────────────────────────────────────────
+// Geocode using Nominatim (OpenStreetMap) — free, no API key needed
+// ─────────────────────────────────────────────
 async function getCoordinates(location, country) {
   try {
-    const data = await opencage.geocode({ q: `${location}, ${country}`, key: process.env.OPENCAGE_API_KEY });
-    if (data.status.code === 200 && data.results.length > 0) {
-      return data.results[0].geometry;
+    const query = encodeURIComponent(`${location}, ${country}`);
+    const url   = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`;
+
+    const res  = await fetch(url, {
+      headers: {
+        // Nominatim requires a descriptive User-Agent
+        "User-Agent": "WanderlustApp/1.0 (srishtiiv24@gmail.com)",
+      },
+    });
+
+    if (!res.ok) throw new Error(`Nominatim HTTP ${res.status}`);
+
+    const data = await res.json();
+
+    if (data && data.length > 0) {
+      const { lat, lon } = data[0];
+      console.log(`[Geocode] ${location}, ${country} → ${lat}, ${lon}`);
+      return { lat: parseFloat(lat), lng: parseFloat(lon) };
     }
-    return { lat: 28.644800, lng: 77.216721 };
-  } catch (error) {
-    return { lat: 28.644800, lng: 77.216721 };
+
+    console.warn(`[Geocode] No results for: ${location}, ${country}`);
+    return { lat: 28.6448, lng: 77.2167 }; // Delhi fallback
+
+  } catch (err) {
+    console.error("[Geocode] Nominatim failed:", err.message);
+    return { lat: 28.6448, lng: 77.2167 };
   }
 }
 
 module.exports.renderEditForm = async (req, res) => {
   const { id } = req.params;
+  console.log("Edit route hit:", req.params.id);
   let listing = await Listing.findById(id);
   if (!listing) {
     req.flash("error", "Listing you requested for doesn't exist!");
