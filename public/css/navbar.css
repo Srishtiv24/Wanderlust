@@ -1,0 +1,487 @@
+/* ── Responsive Navbar ── */
+
+/* ===== NAVBAR ===== */
+.wl-navbar {
+    height: var(--navbar-height);
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+  }
+  
+  .wl-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  
+  .wl-brand-icon {
+    width: 36px; height: 36px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 1rem;
+  }
+  
+  .wl-brand-text { line-height: 1.1; }
+  .wl-brand-text .name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary);
+  }
+  .wl-brand-text .tagline {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    display: block;
+  }
+  
+  .wl-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    flex-shrink: 0;
+  }
+  
+  .wl-nav-links a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  
+  .wl-nav-links a:hover, .wl-nav-links a.active {
+    color: var(--primary);
+    background: var(--primary-soft);
+  }
+  
+  .wl-nav-links a.active {
+    border-bottom: 2px solid var(--primary);
+    border-radius: 8px 8px 0 0;
+  }
+  
+  .wl-search-bar {
+    flex: 1;
+    max-width: 420px;
+    position: relative;
+    margin: 0 auto;
+  }
+  
+  .wl-search-bar input {
+    width: 100%;
+    padding: 0.55rem 1rem 0.55rem 2.5rem;
+    border: 1.5px solid var(--border);
+    border-radius: 25px;
+    font-size: 0.875rem;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    transition: all 0.2s;
+    color: var(--text);
+  }
+  
+  .wl-search-bar input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(232,57,42,0.1);
+  }
+  
+  .wl-search-bar .search-icon {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  
+  .wl-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-shrink: 0;
+  }
+  
+  .wl-user-pill {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.3rem 0.7rem 0.3rem 0.4rem;
+    border: 1.5px solid var(--border);
+    border-radius: 25px;
+    cursor: pointer; background: white;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .wl-user-pill:hover { box-shadow: var(--card-shadow); }
+  .wl-user-pill .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%; object-fit: cover;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 0.7rem; font-weight: 600;
+  }
+  .wl-user-pill .user-info { line-height: 1.1; }
+  .wl-user-pill .user-name { font-size: 0.78rem; font-weight: 600; color: var(--text); }
+  .wl-user-pill .user-role { font-size: 0.65rem; color: var(--text-muted); }
+  
+  .wl-auth-links { display: flex; gap: 0.5rem; }
+  .wl-auth-links a {
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .wl-auth-links a.signup {
+    border: 1.5px solid var(--border);
+    color: var(--text);
+  }
+  .wl-auth-links a.signup:hover { border-color: var(--primary); color: var(--primary); }
+  .wl-auth-links a.login {
+    background: var(--primary);
+    color: white;
+  }
+  .wl-auth-links a.login:hover { background: #c62f22; }
+  
+  /* Hamburger — hidden on desktop */
+  .wl-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    margin-left: auto;
+    z-index: 1001;
+  }
+
+  .wl-hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #222;
+    border-radius: 2px;
+    transition: transform 0.28s ease, opacity 0.2s ease;
+    transform-origin: center;
+  }
+
+  /* Animate to X when open */
+  .wl-hamburger.open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .wl-hamburger.open span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .wl-hamburger.open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* Logout button style */
+  .wl-logout-btn {
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1.5px solid #e8e8e8;
+    color: #222;
+    background: white;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  /* AI star */
+  .wl-ai-star {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  /* ── Mobile Drawer ── */
+  .wl-mobile-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(320px, 85vw);
+    height: 100vh;
+    background: white;
+    z-index: 1050;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
+    overflow-y: auto;
+  }
+
+  .wl-mobile-drawer.open {
+    transform: translateX(0);
+  }
+
+  .wl-drawer-inner {
+    padding: 5rem 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .wl-drawer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wl-drawer-links li a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #222;
+    text-decoration: none;
+    border-bottom: 1px solid #f0f0f0;
+    transition: color 0.15s;
+  }
+
+  .wl-drawer-links li a:hover {
+    color: #fe424d;
+  }
+
+  .wl-drawer-links li a i,
+  .wl-drawer-links li a .wl-ai-star {
+    color: #fe424d;
+    width: 18px;
+    text-align: center;
+  }
+
+  .wl-drawer-divider {
+    height: 1px;
+    background: #f0f0f0;
+    margin: 1rem 0;
+  }
+
+  .wl-drawer-search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 25px;
+    padding: 0.55rem 1rem;
+  }
+
+  .wl-drawer-search i {
+    color: #aaa;
+    font-size: 0.85rem;
+  }
+
+  .wl-drawer-search input {
+    border: none;
+    outline: none;
+    font-size: 0.875rem;
+    flex: 1;
+    background: transparent;
+    color: #222;
+  }
+
+  .wl-drawer-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .wl-drawer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fe424d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .wl-drawer-username {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #222;
+  }
+
+  .wl-drawer-role {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .wl-drawer-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #fe424d;
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    transition: opacity 0.15s;
+  }
+
+  .wl-drawer-cta:hover {
+    opacity: 0.88;
+    color: white;
+  }
+
+  .wl-drawer-logout {
+    display: block;
+    text-align: center;
+    padding: 0.65rem;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 10px;
+    color: #444;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .wl-drawer-logout:hover {
+    border-color: #fe424d;
+    color: #fe424d;
+  }
+
+  .wl-drawer-auth {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .wl-drawer-signup,
+  .wl-drawer-login {
+    flex: 1;
+    text-align: center;
+    padding: 0.7rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+
+  .wl-drawer-signup {
+    background: #fe424d;
+    color: white;
+  }
+
+  .wl-drawer-signup:hover {
+    opacity: 0.88;
+    color: white;
+  }
+
+  .wl-drawer-login {
+    border: 1.5px solid #e8e8e8;
+    color: #222;
+  }
+
+  .wl-drawer-login:hover {
+    border-color: #fe424d;
+    color: #fe424d;
+  }
+
+  /* Overlay */
+  .wl-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1040;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .wl-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .wl-nav-links a.active {
+    color: #fe424d;
+    font-weight: 600;
+  }
+
+  .wl-nav-links a.active i,
+  .wl-nav-links a.active .wl-ai-star {
+    color: #fe424d;
+  }
+
+  /* ── Breakpoints ── */
+
+  /* Tablet — hide search bar and some text */
+  @media (max-width: 1024px) {
+    .wl-search-bar {
+      display: none;
+    }
+
+    .wl-brand-text .tagline {
+      display: none;
+    }
+
+    .wl-user-pill .user-info {
+      display: none;
+    }
+  }
+
+  /* Mobile — show hamburger, hide nav links and right side */
+  @media (max-width: 768px) {
+    .wl-nav-links {
+      display: none;
+    }
+
+    .wl-nav-right {
+      display: none;
+    }
+
+    .wl-globe-btn {
+      display: none;
+    }
+
+    .wl-hamburger {
+      display: flex;
+    }
+
+    /* Keep brand visible */
+    .wl-navbar {
+      padding: 0 1rem;
+      justify-content: space-between;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .wl-brand-text .name {
+      font-size: 1rem;
+    }
+  }

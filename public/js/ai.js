@@ -26,191 +26,341 @@ function typeWriterEffect(element, text, speed = 16, onDone) {
 function exportItinerary(rawText) {
   const formatted = formatMarkdownForPrint(rawText);
   const now = new Date();
-  const dateStr = now.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const dateStr = now.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
 
-  // Detect a trip title from the first line, fall back gracefully
-  const firstLine = rawText.split("\n")[0].replace(/\*\*/g, "").trim();
-  const title =
-    firstLine.length > 4 && firstLine.length < 80
-      ? firstLine
-      : "Your Travel Itinerary";
+  const destination = (window.autoDestination || "Your Destination")
+    .split(" ")
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>${escapeHtml(title)}</title>
+  <title>${escapeHtml(destination)} Itinerary · Wanderlust</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap');
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'DM Sans', sans-serif;
-      color: #1a1a1a;
+      font-family: 'Inter', sans-serif;
       background: #fff;
-      padding: 0;
+      color: #1a1a1a;
     }
 
-    /* ── Cover strip ── */
+    /* ── COVER ── */
     .cover {
-      background: linear-gradient(135deg, #e8392a 0%, #ff7a18 100%);
-      color: #fff;
-      padding: 2.8rem 3rem 2.4rem;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #e8392a 95%, #ff6b5b 5%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 5rem 4.5rem;
       position: relative;
       overflow: hidden;
+      page-break-after: always;
     }
+
     .cover::after {
       content: '✦';
       position: absolute;
-      right: 2.5rem; top: 50%;
-      transform: translateY(-50%);
-      font-size: 6rem;
-      opacity: 0.12;
+      bottom: 3rem; right: 4rem;
+      font-size: 14rem;
+      color: rgba(255,255,255,0.08);
       line-height: 1;
     }
-    .cover-eyebrow {
-      font-size: 0.62rem;
+
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      font-size: 0.6rem;
       font-weight: 700;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      opacity: 0.75;
-      margin-bottom: 0.55rem;
+      padding: 0.45rem 1.1rem;
+      border-radius: 50px;
+      margin-bottom: 2.5rem;
     }
+
+    .cover-for {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+    }
+
     .cover-title {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.9rem;
-      font-weight: 800;
-      line-height: 1.2;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 9vw, 5.5rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.05;
       letter-spacing: -0.02em;
-      max-width: 72%;
-    }
-    .cover-meta {
-      margin-top: 1.2rem;
-      font-size: 0.72rem;
-      opacity: 0.7;
-      display: flex;
-      gap: 1.5rem;
-    }
-    .cover-meta span { display: flex; align-items: center; gap: 0.3rem; }
-
-    /* ── Content area ── */
-    .content {
-      padding: 2.6rem 3rem;
-      max-width: 780px;
-    }
-
-    /* Typography */
-    .content h3 {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin: 1.6rem 0 0.55rem;
-      padding-bottom: 0.35rem;
-      border-bottom: 2px solid #f0f0f0;
-      letter-spacing: -0.01em;
-    }
-    .content h3:first-child { margin-top: 0; }
-
-    .content h4 {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #e8392a;
-      margin: 1rem 0 0.3rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-size: 0.72rem;
-    }
-
-    .content p {
-      font-size: 0.875rem;
-      line-height: 1.75;
-      color: #333;
       margin-bottom: 0.6rem;
     }
 
-    .content ul, .content ol {
-      padding-left: 1.25rem;
-      margin: 0.4rem 0 0.8rem;
-    }
-    .content li {
-      font-size: 0.875rem;
-      line-height: 1.7;
-      color: #333;
-      margin-bottom: 0.3rem;
+    .cover-tagline {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 2.5rem;
     }
 
-    .content strong { font-weight: 700; color: #1a1a1a; }
-    .content em     { color: #666; font-style: italic; }
-
-    /* Day blocks — each bold "Day X" becomes a card */
-    .day-block {
-      border: 1px solid #f0f0f0;
-      border-radius: 10px;
-      padding: 1.1rem 1.2rem;
-      margin-bottom: 0.9rem;
-      break-inside: avoid;
+    .cover-divider {
+      width: 60px;
+      height: 3px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 2px;
+      margin-bottom: 2rem;
     }
-    .day-block h3 {
-      border-bottom: none;
-      margin-top: 0;
-      font-size: 0.96rem;
+
+    .cover-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .cover-meta-item {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.65rem;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.7);
     }
-    .day-block h3::before {
-      content: '';
-      display: inline-block;
-      width: 8px; height: 8px;
+
+    .cover-meta-item .dot {
+      width: 6px; height: 6px;
       border-radius: 50%;
-      background: #e8392a;
+      background: #fff;
       flex-shrink: 0;
     }
 
-    /* ── Footer ── */
+    .cover-bottom {
+      position: absolute;
+      bottom: 3rem; left: 4.5rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      padding: 3.5rem 4.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .content h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 2.5rem 0 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .content h3::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 1.1em;
+      background: linear-gradient(180deg, #e8392a, #ff6b5b);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .content h3:first-child { margin-top: 0; }
+
+    .content p {
+      font-size: 0.88rem;
+      line-height: 1.85;
+      color: #444;
+      margin-bottom: 0.75rem;
+    }
+
+    .content ul {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .content li {
+      font-size: 0.86rem;
+      line-height: 1.75;
+      color: #444;
+      padding: 0.3rem 0 0.3rem 1.5rem;
+      position: relative;
+    }
+
+    .content li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: #e8392a;
+      font-weight: 700;
+    }
+
+    .content strong { color: #1a1a1a; font-weight: 600; }
+    .content em     { color: #888; font-style: italic; }
+
+    /* ── TIME SLOTS ── */
+    .time-slot {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1.1rem 0 0.4rem;
+      padding: 0.5rem 0.8rem;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid rgba(232,57,42,0.15);
+    }
+
+    .time-icon { font-size: 1rem; }
+
+    .time-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #e8392a;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── DAY CARDS ── */
+    .day-block {
+      background: #fff;
+      border: 1px solid rgba(232,57,42,0.12);
+      border-radius: 14px;
+      padding: 0;
+      margin: 1.5rem 0;
+      break-inside: avoid;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(232,57,42,0.06);
+    }
+
+    .day-block-header {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      background: linear-gradient(135deg, #e8392a, #ff6b5b);
+      padding: 1rem 1.5rem;
+    }
+
+    .day-number-badge {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .day-block-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+    }
+
+    .day-block-header h3::before { display: none; }
+
+    .day-block-body {
+      padding: 1.2rem 1.5rem 1.4rem;
+    }
+
+    .day-block-body p   { margin-bottom: 0.5rem; }
+    .day-block-body ul  { margin-top: 0.3rem; }
+    .day-block-body li  { font-size: 0.84rem; }
+
+    /* ── SECTION HEADINGS ── */
+    .section-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: #1a1a1a;
+      margin: 2rem 0 0.6rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid rgba(232,57,42,0.15);
+    }
+
+    /* ── SUB HEADINGS ── */
+    .sub-heading {
+      font-weight: 700;
+      color: #e8392a;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin: 1rem 0 0.3rem;
+    }
+
+    /* ── FOOTER ── */
     .footer {
-      margin-top: 2rem;
-      padding: 1rem 3rem 1.4rem;
-      border-top: 1px solid #f0f0f0;
+      margin-top: 3rem;
+      padding: 1.4rem 4.5rem;
+      background: linear-gradient(135deg, #e8392a 0%, #ff6b5b 100%);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     .footer-brand {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 0.78rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
       font-weight: 700;
-      color: #e8392a;
-      display: flex; align-items: center; gap: 0.35rem;
-    }
-    .footer-note {
-      font-size: 0.65rem;
-      color: #aaa;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
-    /* Print */
+    .footer-note {
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
     @media print {
-      @page { margin: 0; size: A4; }
-      body   { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      @page    { margin: 0; size: A4; }
+      body         { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .cover        { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .footer       { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .day-block    { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .day-block-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .time-slot    { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
 <body>
 
   <div class="cover">
-    <div class="cover-eyebrow">✦ Wanderlust · Travel Itinerary</div>
-    <div class="cover-title">${escapeHtml(title)}</div>
+    <div class="cover-badge">✦ &nbsp; Wanderlust AI Travel Planner</div>
+    <div class="cover-for">Your personalized itinerary for</div>
+    <div class="cover-title">${escapeHtml(destination)}</div>
+    <div class="cover-tagline">Smart Itinerary, Planned by AI ✦</div>
+    <div class="cover-divider"></div>
     <div class="cover-meta">
-      <span>📅 Generated on ${dateStr}</span>
-      <span>✈ Planned by AI Travel Assistant</span>
+      <div class="cover-meta-item"><div class="dot"></div>Generated on ${dateStr}</div>
+      <div class="cover-meta-item"><div class="dot"></div>Crafted by Wanderlust AI Assistant</div>
     </div>
+    <div class="cover-bottom">W A N D E R L U S T</div>
   </div>
 
   <div class="content">
@@ -219,22 +369,17 @@ function exportItinerary(rawText) {
 
   <div class="footer">
     <div class="footer-brand">✦ Wanderlust</div>
-    <div class="footer-note">Generated by Wanderlust AI Assistant · wanderlust.com</div>
+    <div class="footer-note">Generated by Wanderlust AI · wanderlust.com</div>
   </div>
 
   <script>
-    window.addEventListener('load', () => {
-      setTimeout(() => window.print(), 400);
-    });
+    window.addEventListener('load', () => setTimeout(() => window.print(), 500));
   <\/script>
 </body>
 </html>`;
 
   const win = window.open("", "_blank");
-  if (!win) {
-    alert("Please allow pop-ups to export the itinerary.");
-    return;
-  }
+  if (!win) { alert("Please allow pop-ups to export the itinerary."); return; }
   win.document.write(html);
   win.document.close();
 }
@@ -244,66 +389,85 @@ function formatMarkdownForPrint(text) {
   const lines = text.split("\n");
   const output = [];
   let inList = false;
+  let inDayBlock = false;
 
   for (let raw of lines) {
     let line = raw.trim();
 
-    // Close open list before non-list lines
     if (inList && !line.startsWith("- ") && !line.startsWith("• ")) {
       output.push("</ul>");
       inList = false;
     }
 
     if (!line) {
-      output.push("<br>");
+      output.push("<div style='height:0.5rem'></div>");
       continue;
     }
 
-    // Day headers → styled day-block open
-    if (
-      /^(day\s*\d+|day\s*[one|two|three|four|five|six|seven])/i.test(
-        line.replace(/\*\*/g, "")
-      )
-    ) {
+    // ── Day headers ──
+    if (/^(\*\*)?day\s*\d+/i.test(line)) {
+      if (inDayBlock) output.push("</div></div>");
+      const clean = line.replace(/\*\*/g, "").replace(/^#+\s*/, "");
+      output.push(`
+        <div class="day-block">
+          <div class="day-block-header">
+            <div class="day-number-badge">${clean.match(/\d+/)?.[0] || "·"}</div>
+            <h3>${escapeHtml(clean)}</h3>
+          </div>
+          <div class="day-block-body">`);
+      inDayBlock = true;
+      continue;
+    }
+
+    // ── Morning / Afternoon / Evening ──
+    if (/^(\*\*)?(morning|afternoon|evening|night)(\*\*)?[:\s]/i.test(line)) {
       const clean = line.replace(/\*\*/g, "");
-      output.push(`<div class="day-block"><h3>${escapeHtml(clean)}</h3>`);
-      // Close day block at next blank or at end — simpler: wrap whole text, close at </div> below
-      output.push(`</div>`); // self-contained; content will inline-flow
+      const icon = /morning/i.test(clean) ? "🌅" : /afternoon/i.test(clean) ? "☀️" : "🌙";
+      output.push(`<div class="time-slot"><span class="time-icon">${icon}</span><span class="time-label">${escapeHtml(clean)}</span></div>`);
       continue;
     }
 
-    // ### heading
+    // ── ### heading ──
     if (line.startsWith("### ")) {
-      output.push(`<h3>${escapeHtml(line.slice(4)).replace(/\*\*/g, "")}</h3>`);
+      const clean = line.slice(4).replace(/\*\*/g, "");
+      output.push(`<h4 class="section-heading">${escapeHtml(clean)}</h4>`);
       continue;
     }
 
-    // ## heading
+    // ── ## heading ──
     if (line.startsWith("## ")) {
-      output.push(`<h3>${escapeHtml(line.slice(3)).replace(/\*\*/g, "")}</h3>`);
+      if (inDayBlock) { output.push("</div></div>"); inDayBlock = false; }
+      const clean = line.slice(3).replace(/\*\*/g, "");
+      output.push(`<h3 class="section-heading">${escapeHtml(clean)}</h3>`);
       continue;
     }
 
-    // # heading
+    // ── # heading ──
     if (line.startsWith("# ")) {
-      output.push(`<h3>${escapeHtml(line.slice(2)).replace(/\*\*/g, "")}</h3>`);
+      if (inDayBlock) { output.push("</div></div>"); inDayBlock = false; }
+      const clean = line.slice(2).replace(/\*\*/g, "");
+      output.push(`<h3 class="section-heading">${escapeHtml(clean)}</h3>`);
       continue;
     }
 
-    // Bullet list
+    // ── Bullet list ──
     if (line.startsWith("- ") || line.startsWith("• ")) {
-      if (!inList) {
-        output.push("<ul>");
-        inList = true;
-      }
-      const item = line
-        .slice(2)
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      if (!inList) { output.push("<ul>"); inList = true; }
+      const item = line.slice(2)
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.*?)\*/g, "<em>$1</em>");
       output.push(`<li>${item}</li>`);
       continue;
     }
 
-    // Normal paragraph
+    // ── Bold-only line → sub heading ──
+    if (/^\*\*[^*]+\*\*[:\s]*$/.test(line)) {
+      const clean = line.replace(/\*\*/g, "").replace(/:$/, "");
+      output.push(`<p class="sub-heading">${escapeHtml(clean)}</p>`);
+      continue;
+    }
+
+    // ── Normal paragraph ──
     const para = line
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.*?)\*/g, "<em>$1</em>");
@@ -311,9 +475,10 @@ function formatMarkdownForPrint(text) {
   }
 
   if (inList) output.push("</ul>");
+  if (inDayBlock) output.push("</div></div>");
+
   return output.join("\n");
 }
-
 // ─────────────────────────────────────────────
 // Build listing card HTML string
 // ─────────────────────────────────────────────
@@ -467,19 +632,6 @@ function appendMsg(text, role, isTemp = false, rawText = "") {
       ? `<div class="ai-orb-avatar">✦</div>`
       : `<div class="ai-user-avatar"><i class="fa-solid fa-user"></i></div>`;
 
-  // Export button — only on completed bot messages, not on the thinking placeholder
-  const exportBtn =
-    role === "bot" && !isTemp
-      ? `<button class="ai-export-btn" title="Export as PDF"
-         onclick="exportItinerary(this.closest('.ai-msg-row').dataset.raw)">
-         <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-           <path d="M2 9v2.5A.5.5 0 0 0 2.5 12h8a.5.5 0 0 0 .5-.5V9M6.5 1v7M4 6l2.5 2.5L9 6"
-             stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
-         </svg>
-         Export PDF
-       </button>`
-      : "";
-
   const body = isTemp
     ? `<div class="ai-msg-text ai-thinking">
          <div class="ai-dots"><span></span><span></span><span></span></div>
@@ -487,8 +639,7 @@ function appendMsg(text, role, isTemp = false, rawText = "") {
        </div>`
     : `<div class="ai-msg-text">${
         role === "bot" ? formatMarkdown(text) : escapeHtml(text)
-      }</div>
-       ${exportBtn}`;
+      }</div>`;
 
   row.innerHTML = `
     <div class="ai-msg-inner">
@@ -499,7 +650,6 @@ function appendMsg(text, role, isTemp = false, rawText = "") {
       </div>
     </div>`;
 
-  // Store raw text on the row so the export button can read it
   if (rawText) row.dataset.raw = rawText;
 
   document.getElementById("aiMessages").appendChild(row);
@@ -716,70 +866,58 @@ function classifyIntent(messages) {
 // MAIN — send message
 // ─────────────────────────────────────────────
 async function sendMessage() {
-  if (isThinking) return;
+  const input = document.getElementById('aiInput');
+  const message = input.value.trim();
+  if (!message || isThinking) return;
 
-  const input = document.getElementById("aiInput");
-  const text = input.value.trim();
-  if (!text) return;
+  chatHistory.push({ role: 'user', content: message });
+  input.value = '';
+  autoResize(input);
 
-  input.value = "";
-  input.style.height = "auto";
-
-  // 1 — user bubble
-  appendMsg(text, "user");
-  chatHistory.push({ role: "user", content: text });
-
-  isThinking = true;
+  appendMsg(message, 'user');
+  const thinkingRow = appendMsg('', 'bot', true);
   setBusy();
-  document.getElementById("aiSendBtn").disabled = true;
-
-  // 2 — thinking placeholder (no export btn yet)
-  const botMsgEl = appendMsg("", "bot", true);
+  isThinking = true;
 
   try {
-    const res = await fetch("/api/ai-chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const res = await fetch('/api/ai-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: chatHistory,
-        // Destination set by ai.ejs from the ?destination= URL param
-        // sent by itinerary page — reliable, no regex extraction needed
-        destination: window._autoDestination || null,
+        messages: chatHistory,                   
+        destination: window.autoDestination || '', 
       }),
     });
 
-    if (!res.ok) throw new Error("API failed");
-
     const data = await res.json();
-    const reply = data.reply || "No response.";
+    const reply = data.reply || 'Something went wrong.';
 
-    // 3 — swap thinking for typewriter
-    botMsgEl.classList.remove("ai-thinking-row");
-    const msgContent = botMsgEl.querySelector(".ai-msg-content");
-    const target = botMsgEl.querySelector(".ai-msg-text");
-    target.innerHTML = "";
+    // Add assistant reply to history
+    chatHistory.push({ role: 'assistant', content: reply });  // ✅
 
-    // 4 — after typewriter done: add action buttons + listing cards
-    typeWriterEffect(target, reply, 16, () => {
-      appendActionButtons(msgContent, reply, data.isItinerary);
+    thinkingRow.remove();
 
-      if (data.listings && data.listings.length > 0) {
-        appendListingCards(data.listings, botMsgEl);
-      }
+    // Append empty bot bubble
+    const botRow = appendMsg('', 'bot', false, reply);
+    const textEl = botRow.querySelector('.ai-msg-text');
+    
+    // Type the reply, then show cards + buttons when done
+    typeWriterEffect(textEl, reply, 16, () => {
+      appendListingCards(data.listings, botRow);
+      appendActionButtons(
+        botRow.querySelector('.ai-msg-content'),
+        reply,
+        data.isItinerary
+      );
     });
-
-    chatHistory.push({ role: "assistant", content: reply });
   } catch (err) {
-    botMsgEl.classList.remove("ai-thinking-row");
-    botMsgEl.querySelector(".ai-msg-text").innerHTML =
-      "⚠️ Connection error. Please try again.";
-    console.error("[AI error]", err);
+    console.error(err);
+    thinkingRow.remove();
+    appendMsg('Server error — please try again.', 'bot');
+  } finally {
+    isThinking = false;
+    setReady();
   }
-
-  isThinking = false;
-  setReady();
-  document.getElementById("aiSendBtn").disabled = false;
-  input.focus();
 }
 
 // ─────────────────────────────────────────────
