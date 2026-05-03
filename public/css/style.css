@@ -31,6 +31,28 @@ body {
   flex-direction: column;
 }
 
+  .wl-page-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 36px; padding: 0 0.5rem;
+    border-radius: 50%; border: 1.5px solid var(--border);
+    background: white; color: var(--text-muted);
+    font-size: 0.8rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    text-decoration: none; transition: all 0.18s; cursor: pointer;
+  }
+  .wl-page-btn:hover:not(.disabled):not(.wl-page-active) {
+    border-color: var(--primary); color: var(--primary);
+  }
+  .wl-page-active {
+    background: var(--primary); border-color: var(--primary);
+    color: white !important; cursor: default;
+  }
+  .wl-page-nav { border-radius: 10px; padding: 0 0.65rem; }
+  .wl-page-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+  .wl-page-dots { color: var(--text-muted); font-size: 0.85rem; padding: 0 0.15rem; line-height: 36px; }
+
+  #wl-dynamic-content.wl-loading { opacity: 0.45; pointer-events: none; transition: opacity 0.15s; }
+  #wl-dynamic-content { transition: opacity 0.2s; }
+
 /* ===== PAGE LAYOUT ===== */
 .wl-page-layout {
   flex: 1;

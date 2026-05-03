@@ -48,11 +48,18 @@
   .wl-nav-links {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     list-style: none;
     flex-shrink: 0;
   }
   
+
+  .wl-nav-links i{
+    display: flex;
+    align-items: center;
+    padding-top:0.15rem;
+  }
   .wl-nav-links a {
     display: flex;
     align-items: center;

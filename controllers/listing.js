@@ -61,22 +61,27 @@ module.exports.index = async (req, res) => {
   }
 
   // ── Explore-All pagination (only when no filters active) ──
-  const PAGE_SIZE      = 12;
-  const exploreOpen    = !!allPage;
-  const currentAllPage = Math.max(1, parseInt(allPage) || 1);
+ // ── Explore-All pagination (only when no filters active) ──
+const PAGE_SIZE      = 12;
+const exploreOpen    = !!allPage;
+const currentAllPage = Math.max(1, parseInt(allPage) || 1);
 
-  let exploreListings      = [];
-  let exploreTotalPages    = 1;
-  let exploreTotalListings = 0;
+let exploreListings      = [];
+let exploreTotalPages    = 1;
+let exploreTotalListings = 0;
 
-  if (exploreOpen) {
-    const allUnfiltered  = await Listing.find({});
-    exploreTotalListings = allUnfiltered.length;
-    exploreTotalPages    = Math.ceil(exploreTotalListings / PAGE_SIZE);
-    const safePage       = Math.min(currentAllPage, exploreTotalPages);
-    exploreListings      = allUnfiltered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-  }
+if (exploreOpen) {
+  exploreTotalListings = await Listing.countDocuments({});
+  exploreTotalPages    = Math.ceil(exploreTotalListings / PAGE_SIZE);
 
+  const safePage  = Math.min(currentAllPage, exploreTotalPages);
+  const skipCount = (safePage - 1) * PAGE_SIZE;
+
+  exploreListings = await Listing.find({})
+    .skip(skipCount)
+    .limit(PAGE_SIZE)
+    .lean(); 
+}
   // ── AJAX / XHR response — return everything the client needs ──
   const isXhr = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest';
   if (isXhr) {
