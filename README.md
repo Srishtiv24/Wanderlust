@@ -10,7 +10,6 @@ It combines a modern travel marketplace with a smart itinerary planner, allowing
 The platform features a hybrid search system that blends traditional keyword search with semantic vector search, enabling more relevant and intent-aware results. An integrated AI travel assistant understands natural language queries (like budget, location, or travel style) and provides context-aware recommendations grounded in real listings.
 
 Wanderlust also includes rich media support (images/videos), wishlist management, reviews & ratings, interactive maps, and exportable itineraries—creating a complete end-to-end travel planning experience.
-
 The project follows a scalable MVC architecture with secure authentication, robust validation, and optimized performance.
 ---
 
