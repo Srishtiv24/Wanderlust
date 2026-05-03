@@ -41,10 +41,7 @@ Built using the MERN stack, the project follows a scalable MVC architecture with
 
 ---
 
-# Environment Setup & Running the Project
-
-## Create Environment Variables
-
+# Run the Project
 
 ```env
 # Getting Started
