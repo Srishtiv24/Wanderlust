@@ -161,17 +161,19 @@
 </div>
 
 <% if (typeof autoPrompt !== 'undefined' && autoPrompt) { %>
-<script>
-// Auto-send the prompt passed via ?prompt= query string (e.g. from itinerary or wishlist page)
-window.addEventListener('DOMContentLoaded', function() {
-  const prompt = `<%- autoPrompt.replace(/`/g, "'") %>`;
-  if (prompt && typeof sendMessage === 'function') {
-    const input = document.getElementById('aiInput');
-    if (input) {
-      input.value = prompt;
-      setTimeout(() => sendMessage(), 250);
-    }
-  }
-});
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      // Expose to all JS in this page — including sendMessage
+      window.autoDestination = `<%- (autoDestination || '').replace(/`/g, "'") %>`;
+    
+      const prompt = `<%- autoPrompt.replace(/`/g, "'") %>`;
+      if (prompt && typeof sendMessage === 'function') {
+        const input = document.getElementById('aiInput');
+        if (input) {
+          input.value = prompt;
+          setTimeout(() => sendMessage(), 250);
+        }
+      }
+    });
 </script>
 <% } %>

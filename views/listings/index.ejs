@@ -8,7 +8,6 @@
       <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&auto=format&fit=crop&q=80"
            alt="Hero background" class="wl-hero-img">
       <div class="wl-hero-bg"></div>
-
       <div class="wl-hero-content">
         <div class="wl-hero-eyebrow">✦ Where Every Stay Tells a Story</div>
         <h1>Find places that<br><span>feel like you</span></h1>
@@ -17,85 +16,88 @@
           <a href="/itinerary" class="wl-btn-primary">
             <i class="fa-solid fa-map-location-dot"></i> Plan a Trip
           </a>
-          <a href="#" class="wl-btn-secondary" onclick="event.preventDefault(); document.querySelector('.wl-search-bar input').focus();">
+          <a href="#" class="wl-btn-secondary"
+            onclick="event.preventDefault(); document.querySelector('.wl-search-bar input').focus();">
             <i class="fa-solid fa-magnifying-glass"></i> Search Destinations
           </a>
         </div>
       </div>
-
-      <!-- Mood chips float inside hero -->
       <div class="wl-mood-panel">
         <h4>How do you feel today?</h4>
         <div class="wl-mood-grid">
-          <a href="#" class="wl-mood-tag wl-filter-link healing <%= activeMood==='healing' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="healing"><i class="fa-solid fa-leaf"></i> Healing</a>
-          <a href="#" class="wl-mood-tag wl-filter-link celebration <%= activeMood==='celebration' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="celebration"><i class="fa-solid fa-champagne-glasses"></i> Celebration</a>
-          <a href="#" class="wl-mood-tag wl-filter-link solitude <%= activeMood==='solitude' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="solitude"><i class="fa-solid fa-moon"></i> Solitude</a>
-          <a href="#" class="wl-mood-tag wl-filter-link sisterhood <%= activeMood==='sisterhood' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="sisterhood"><i class="fa-solid fa-heart"></i> Sisterhood</a>
-          <a href="#" class="wl-mood-tag wl-filter-link adventure <%= activeMood==='adventure' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="adventure"><i class="fa-solid fa-person-hiking"></i> Adventure</a>
-          <a href="#" class="wl-mood-tag wl-filter-link monsoon <%= activeMood==='monsoon' ? 'active' : '' %>" data-filter-key="mood" data-filter-val="monsoon"><i class="fa-solid fa-cloud-rain"></i> Monsoon Magic</a>
+          <a href="#" class="wl-mood-tag wl-filter-link healing      <%= activeMood==='healing'      ? 'active':'' %>" data-filter-key="mood" data-filter-val="healing"><i class="fa-solid fa-leaf"></i> Healing</a>
+          <a href="#" class="wl-mood-tag wl-filter-link celebration  <%= activeMood==='celebration'  ? 'active':'' %>" data-filter-key="mood" data-filter-val="celebration"><i class="fa-solid fa-champagne-glasses"></i> Celebration</a>
+          <a href="#" class="wl-mood-tag wl-filter-link solitude     <%= activeMood==='solitude'     ? 'active':'' %>" data-filter-key="mood" data-filter-val="solitude"><i class="fa-solid fa-moon"></i> Solitude</a>
+          <a href="#" class="wl-mood-tag wl-filter-link sisterhood   <%= activeMood==='sisterhood'   ? 'active':'' %>" data-filter-key="mood" data-filter-val="sisterhood"><i class="fa-solid fa-heart"></i> Sisterhood</a>
+          <a href="#" class="wl-mood-tag wl-filter-link adventure    <%= activeMood==='adventure'    ? 'active':'' %>" data-filter-key="mood" data-filter-val="adventure"><i class="fa-solid fa-person-hiking"></i> Adventure</a>
+          <a href="#" class="wl-mood-tag wl-filter-link monsoon      <%= activeMood==='monsoon'      ? 'active':'' %>" data-filter-key="mood" data-filter-val="monsoon"><i class="fa-solid fa-cloud-rain"></i> Monsoon Magic</a>
         </div>
       </div>
     </div>
 
     <!-- ===== ACTIVE FILTERS BANNER ===== -->
-    <% if (activeMood || activeCategory || searchQuery || activeMinPrice || activeMaxPrice) { %>
-    <div class="wl-active-filters">
-      <span><i class="fa-solid fa-filter"></i> Showing filtered results:</span>
-      <% if (searchQuery) { %><span class="wl-filter-chip">Search: "<%= searchQuery %>"</span><% } %>
-      <% if (activeMood) { %><span class="wl-filter-chip mood">Mood: <%= activeMood %></span><% } %>
-      <% if (activeCategory) { %><span class="wl-filter-chip">Category: <%= activeCategory %></span><% } %>
-      <% if (activeMinPrice || activeMaxPrice) { %><span class="wl-filter-chip">₹<%= activeMinPrice||'0' %> – ₹<%= activeMaxPrice||'∞' %></span><% } %>
-      <a href="/listings" class="wl-filter-clear"><i class="fa-solid fa-xmark"></i> Clear all</a>
+    <div id="wl-active-filters-banner">
+      <% if (activeMood || activeCategory || searchQuery || activeMinPrice || activeMaxPrice) { %>
+      <div class="wl-active-filters">
+        <span><i class="fa-solid fa-filter"></i> Showing filtered results:</span>
+        <% if (searchQuery)    { %><span class="wl-filter-chip">Search: "<%= searchQuery %>"</span><% } %>
+        <% if (activeMood)     { %><span class="wl-filter-chip mood">Mood: <%= activeMood %></span><% } %>
+        <% if (activeCategory) { %><span class="wl-filter-chip">Category: <%= activeCategory %></span><% } %>
+        <% if (activeMinPrice || activeMaxPrice) { %><span class="wl-filter-chip">&#8377;<%= activeMinPrice||'0' %> &#8211; &#8377;<%= activeMaxPrice||'&#8734;' %></span><% } %>
+        <a href="#" class="wl-filter-clear" onclick="clearAllFilters(); return false;">
+          <i class="fa-solid fa-xmark"></i> Clear all
+        </a>
+      </div>
+      <% } %>
     </div>
-    <% } %>
 
     <!-- ===== CATEGORY FILTER BAR ===== -->
     <div id="filters">
-      <a href="/listings" class="filter wl-filter-link <%= !activeCategory && !activeMood && !searchQuery ? 'active' : '' %>" data-filter-clear="true">
+      <a href="/listings" class="filter wl-filter-link <%= !activeCategory && !activeMood && !searchQuery ? 'active':'' %>" data-filter-clear="true">
         <div><i class="fa-solid fa-fire"></i></div><p>Trending</p>
       </a>
-      <a href="#" class="filter wl-filter-link <%= activeCategory==='mountains' ? 'active' : '' %>" data-filter-key="category" data-filter-val="mountains">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='mountains' ? 'active':'' %>" data-filter-key="category" data-filter-val="mountains">
         <div><i class="fa-solid fa-mountain-sun"></i></div><p>Mountains</p>
       </a>
-      <a href="#" class="filter wl-filter-link <%= activeCategory==='beach' ? 'active' : '' %>" data-filter-key="category" data-filter-val="beach">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='beach' ? 'active':'' %>" data-filter-key="category" data-filter-val="beach">
         <div><i class="fa-solid fa-umbrella-beach"></i></div><p>Beach</p>
       </a>
-      <a href="#" class="filter wl-filter-link <%= activeCategory==='arctic' ? 'active' : '' %>" data-filter-key="category" data-filter-val="arctic">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='arctic' ? 'active':'' %>" data-filter-key="category" data-filter-val="arctic">
         <div><i class="fa-solid fa-snowflake"></i></div><p>Arctic</p>
       </a>
-      <a href="#" class="filter wl-filter-link <%= activeCategory==='pools' ? 'active' : '' %>" data-filter-key="category" data-filter-val="pools">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='pools' ? 'active':'' %>" data-filter-key="category" data-filter-val="pools">
         <div><i class="fa-solid fa-person-swimming"></i></div><p>Pools</p>
       </a>
-      <a href="#" class="filter wl-filter-link <%= activeCategory==='cities' ? 'active' : '' %>" data-filter-key="category" data-filter-val="cities">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='cities' ? 'active':'' %>" data-filter-key="category" data-filter-val="cities">
         <div><i class="fa-solid fa-city"></i></div><p>Cities</p>
       </a>
-      <a href="#" class="filter wl-filter-link <%= activeCategory==='camping' ? 'active' : '' %>" data-filter-key="category" data-filter-val="camping">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='camping' ? 'active':'' %>" data-filter-key="category" data-filter-val="camping">
         <div><i class="fa-solid fa-campground"></i></div><p>Camping</p>
       </a>
-      <a href="#" class="filter wl-filter-link <%= activeCategory==='castles' ? 'active' : '' %>" data-filter-key="category" data-filter-val="castles">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='castles' ? 'active':'' %>" data-filter-key="category" data-filter-val="castles">
         <div><i class="fa-solid fa-chess-rook"></i></div><p>Castles</p>
       </a>
-      <a href="#" class="filter wl-filter-link <%= activeCategory==='forests' ? 'active' : '' %>" data-filter-key="category" data-filter-val="forests">
+      <a href="#" class="filter wl-filter-link <%= activeCategory==='forests' ? 'active':'' %>" data-filter-key="category" data-filter-val="forests">
         <div><i class="fa-solid fa-tree-city"></i></div><p>Forests</p>
       </a>
 
-      <!-- Price filter inline -->
       <div class="filter-price-inline">
-        <form action="/listings" method="GET" id="priceFilterForm">
-          <% if (searchQuery) { %><input type="hidden" name="search" value="<%= searchQuery %>"><% } %>
-          <% if (activeCategory) { %><input type="hidden" name="category" value="<%= activeCategory %>"><% } %>
-          <% if (activeMood) { %><input type="hidden" name="mood" value="<%= activeMood %>"><% } %>
-          <label>₹</label>
-          <input type="number" name="minPrice" placeholder="Min" value="<%= activeMinPrice %>" min="0">
-          <span>–</span>
-          <input type="number" name="maxPrice" placeholder="Max" value="<%= activeMaxPrice %>" min="0">
-          <button type="submit"><i class="fa-solid fa-arrow-right"></i></button>
+        <form id="priceFilterForm" onsubmit="return false;">
+          <label>&#8377;</label>
+          <input type="number" id="minPriceInput" placeholder="Min" value="<%= activeMinPrice %>" min="0">
+          <span>&#8211;</span>
+          <input type="number" id="maxPriceInput" placeholder="Max" value="<%= activeMaxPrice %>" min="0">
+          <button type="button" id="priceFilterBtn"><i class="fa-solid fa-arrow-right"></i></button>
         </form>
       </div>
 
-      <!-- ===== EXPLORE ALL LISTINGS BUTTON ===== -->
-      <button class="wl-btn-primary" onclick="toggleAllListings()" id="exploreAllBtn" style="padding: 0.4rem 1rem; font-size: 0.78rem; border-radius: 20px; margin-left: 0.25rem;">
-        <i class="fa-solid fa-grid-2"></i> Explore All
+      <button id="exploreAllBtn" class="wl-btn-primary"
+        style="padding:0.4rem 1rem;font-size:0.78rem;border-radius:20px;margin-left:0.25rem;border:none;cursor:pointer;">
+        <% if (exploreOpen) { %>
+          <i class="fa-solid fa-xmark"></i> Close
+        <% } else { %>
+          <i class="fa-solid fa-grid-2"></i> Explore All
+        <% } %>
       </button>
 
       <div class="tax-toggle">
@@ -104,112 +106,221 @@
       </div>
     </div>
 
-    <div style="margin: 1.25rem 0 0.5rem;">
-      <% if (allListings.length === 0) { %>
-      <div class="wl-empty-state">
-        <span style="font-size:3rem;">🗺️</span>
-        <h3>No listings found</h3>
-        <p>Try a different search, mood, or category.</p>
-        <a href="/listings" class="wl-btn-primary" style="display:inline-flex; margin-top:0.5rem;">Clear filters</a>
-      </div>
-      <% } %>
-    </div>
+    <!-- ===== DYNAMIC CONTENT — JS re-renders this on every filter change ===== -->
+    <div id="wl-dynamic-content">
 
-    <!-- ===== ALL LISTINGS WITH PAGINATION ===== -->
-    <div id="allListingsSection" style="display:none;">
-      <div class="wl-section-header">
-        <h2 class="wl-section-title">All Listings</h2>
-        <span id="paginationInfo" style="font-size:0.82rem; color:var(--text-muted);"></span>
-      </div>
-      <div class="wl-stays-grid" id="allListingsGrid"></div>
-      <div id="paginationControls" style="display:flex; justify-content:center; align-items:center; gap:0.5rem; margin:1.25rem 0;"></div>
-    </div>
-
-    <!-- ===== POPULAR DESTINATIONS ===== -->
-    <% if (allListings.length > 0) { %>
-    <div id="popular-section">
-      <div class="wl-section-header">
-        <h2 class="wl-section-title">
-          <% if (activeMood) { %>Stays for <%= activeMood.charAt(0).toUpperCase()+activeMood.slice(1) %> Mood
-          <% } else if (activeCategory) { %><%= activeCategory.charAt(0).toUpperCase()+activeCategory.slice(1) %> Stays
-          <% } else if (searchQuery) { %>Results for "<%= searchQuery %>"
-          <% } else { %>Popular Destinations<% } %>
-        </h2>
-        <span style="font-size:0.82rem; color:var(--text-muted);"><%= allListings.length %> listing<%= allListings.length!==1?'s':'' %></span>
-      </div>
-
-      <div class="wl-cards-scroll">
-        <% for(let i = 0; i < Math.min(allListings.length, 12); i++) {
-           const listing = allListings[i];
-           const rating = (4.3 + ((listing.price % 7) * 0.08)).toFixed(1);
-           const reviews = 150 + (listing.price % 300);
-        %>
-        <a href="/listings/<%= listing._id %>" class="wl-dest-card">
-          <button class="wl-dest-card-fav"
-            data-fav-id="<%= listing._id %>"
-            data-fav-title="<%= listing.title %>"
-            data-fav-img="<%= listing.image.url %>"
-            data-fav-location="<%= listing.location %>"
-            data-fav-price="<%= listing.price %>"
-            onclick="event.preventDefault(); handleFavClick(this)">
-            <i class="fa-regular fa-heart"></i>
-          </button>
-          <img src="<%= listing.image.url %>" alt="<%= listing.title %>" class="wl-dest-card-img">
-          <div class="wl-dest-card-body">
-            <div class="wl-dest-card-name"><%= listing.title %></div>
-            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.25rem;">
-              <i class="fa-solid fa-location-dot" style="color:var(--primary); font-size:0.65rem;"></i>
-              <%= listing.location %>, <%= listing.country %>
-            </div>
-            <div class="wl-dest-card-meta">
-              <div class="wl-rating">
-                <i class="fa-solid fa-star"></i> <%= rating %>
-                <span>(<%= reviews %>)</span>
-              </div>
-            </div>
-            <div class="wl-dest-price">
-              ₹<%= listing.price.toLocaleString('en-IN') %>/night
-              <i class="tax-info" style="font-size:0.68rem; color:var(--text-muted); font-style:normal;"> +18% GST</i>
-            </div>
-          </div>
-        </a>
+      <div style="margin:1.25rem 0 0.5rem;">
+        <% if (allListings.length === 0 && !exploreOpen) { %>
+        <div class="wl-empty-state">
+          <span style="font-size:3rem;">&#128506;&#65039;</span>
+          <h3>No listings found</h3>
+          <p>Try a different search, mood, or category.</p>
+          <a href="/listings" class="wl-btn-primary" style="display:inline-flex;margin-top:0.5rem;">Clear filters</a>
+        </div>
         <% } %>
       </div>
-    </div>
 
-    <!-- ===== TOP STAYS ===== -->
-    <% if (allListings.length > 3 && !searchQuery && !activeMood && !activeCategory) { %>
-    <div id="stays-section">
-      <div class="wl-section-header">
-        <h2 class="wl-section-title">Top Stays for You</h2>
+      <!-- ===== EXPLORE ALL SECTION ===== -->
+      <% if (exploreOpen) { %>
+      <div id="allListingsSection">
+        <div class="wl-section-header">
+          <h2 class="wl-section-title">All Listings</h2>
+          <span style="font-size:0.82rem;color:var(--text-muted);">
+            Showing <%= ((currentAllPage-1)*12)+1 %>&#8211;<%= Math.min(currentAllPage*12, exploreTotalListings) %>
+            of <%= exploreTotalListings %> listing<%= exploreTotalListings!==1?'s':'' %>
+          </span>
+        </div>
+        <div class="wl-stays-grid">
+          <% exploreListings.forEach(function(s) {
+             const rating  = (4.3 + ((s.price % 7) * 0.08)).toFixed(1);
+             const reviews = 50 + (s.price % 250);
+          %>
+          <div class="wl-stay-card">
+            <button class="wl-stay-card-fav"
+              data-fav-id="<%= s._id %>" data-fav-title="<%= s.title %>"
+              data-fav-img="<%= s.image.url %>" data-fav-location="<%= s.location %>"
+              data-fav-price="<%= s.price %>" onclick="handleFavClick(this)">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+            <a href="/listings/<%= s._id %>">
+              <img src="<%= s.image.url %>" alt="<%= s.title %>" class="wl-stay-card-img" loading="lazy">
+            </a>
+            <div class="wl-stay-card-body">
+              <div class="wl-stay-name"><%= s.title %></div>
+              <div class="wl-stay-location">
+                <i class="fa-solid fa-location-dot" style="font-size:0.65rem;"></i>
+                <%= s.location %>, <%= s.country %>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem;">
+                <div class="wl-stay-price">&#8377;<%= s.price.toLocaleString('en-IN') %><small>/night</small></div>
+                <div class="wl-rating" style="font-size:0.72rem;">
+                  <i class="fa-solid fa-star"></i> <%= rating %> <span>(<%= reviews %>)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+
+        <% if (exploreTotalPages > 1) { %>
+        <nav style="display:flex;justify-content:center;align-items:center;gap:0.4rem;margin:2rem 0 1rem;flex-wrap:wrap;">
+          <% if (currentAllPage > 1) { %>
+          <a href="#" class="wl-page-btn wl-page-nav" data-page="<%= currentAllPage - 1 %>" aria-label="Previous">
+            <i class="fa-solid fa-chevron-left"></i>
+          </a>
+          <% } else { %>
+          <span class="wl-page-btn wl-page-nav disabled"><i class="fa-solid fa-chevron-left"></i></span>
+          <% } %>
+
+          <% for (let p = 1; p <= exploreTotalPages; p++) {
+               const show      = p===1 || p===exploreTotalPages || (p>=currentAllPage-2 && p<=currentAllPage+2);
+               const dotBefore = p === currentAllPage - 3 && currentAllPage > 4;
+               const dotAfter  = p === currentAllPage + 3 && currentAllPage < exploreTotalPages - 3;
+          %>
+            <% if (dotBefore || dotAfter) { %><span class="wl-page-dots">&#8230;</span><% } %>
+            <% if (show) { %>
+              <% if (p === currentAllPage) { %>
+              <span class="wl-page-btn wl-page-active"><%= p %></span>
+              <% } else { %>
+              <a href="#" class="wl-page-btn" data-page="<%= p %>"><%= p %></a>
+              <% } %>
+            <% } %>
+          <% } %>
+
+          <% if (currentAllPage < exploreTotalPages) { %>
+          <a href="#" class="wl-page-btn wl-page-nav" data-page="<%= currentAllPage + 1 %>" aria-label="Next">
+            <i class="fa-solid fa-chevron-right"></i>
+          </a>
+          <% } else { %>
+          <span class="wl-page-btn wl-page-nav disabled"><i class="fa-solid fa-chevron-right"></i></span>
+          <% } %>
+        </nav>
+        <p style="text-align:center;font-size:0.76rem;color:var(--text-muted);margin-bottom:1.5rem;">
+          Page <%= currentAllPage %> of <%= exploreTotalPages %>
+        </p>
+        <% } %>
+      </div>
+      <% } %>
+
+      <!-- ===== POPULAR DESTINATIONS ===== -->
+      <% if (allListings.length > 0) { %>
+      <div id="popular-section">
+        <div class="wl-section-header">
+          <h2 class="wl-section-title">
+            <% if (activeMood) { %>Stays for <%= activeMood.charAt(0).toUpperCase()+activeMood.slice(1) %> Mood
+            <% } else if (activeCategory) { %><%= activeCategory.charAt(0).toUpperCase()+activeCategory.slice(1) %> Stays
+            <% } else if (searchQuery) { %>Results for "<%= searchQuery %>"
+            <% } else { %>Popular Destinations<% } %>
+          </h2>
+          <span style="font-size:0.82rem;color:var(--text-muted);">
+            <%= allListings.length %> listing<%= allListings.length!==1?'s':'' %>
+          </span>
+        </div>
+        <div class="wl-cards-scroll">
+          <% for(let i = 0; i < Math.min(allListings.length, 12); i++) {
+             const listing = allListings[i];
+             const rating  = (4.3 + ((listing.price % 7) * 0.08)).toFixed(1);
+             const reviews = 150 + (listing.price % 300);
+          %>
+          <a href="/listings/<%= listing._id %>" class="wl-dest-card">
+            <button class="wl-dest-card-fav"
+              data-fav-id="<%= listing._id %>" data-fav-title="<%= listing.title %>"
+              data-fav-img="<%= listing.image.url %>" data-fav-location="<%= listing.location %>"
+              data-fav-price="<%= listing.price %>"
+              onclick="event.preventDefault(); handleFavClick(this)">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+            <img src="<%= listing.image.url %>" alt="<%= listing.title %>" class="wl-dest-card-img">
+            <div class="wl-dest-card-body">
+              <div class="wl-dest-card-name"><%= listing.title %></div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.25rem;">
+                <i class="fa-solid fa-location-dot" style="color:var(--primary);font-size:0.65rem;"></i>
+                <%= listing.location %>, <%= listing.country %>
+              </div>
+              <div class="wl-dest-card-meta">
+                <div class="wl-rating"><i class="fa-solid fa-star"></i> <%= rating %> <span>(<%= reviews %>)</span></div>
+              </div>
+              <div class="wl-dest-price">
+                &#8377;<%= listing.price.toLocaleString('en-IN') %>/night
+                <i class="tax-info" style="font-size:0.68rem;color:var(--text-muted);font-style:normal;"> +18% GST</i>
+              </div>
+            </div>
+          </a>
+          <% } %>
+        </div>
       </div>
 
+      <!-- ===== TOP STAYS ===== -->
+      <% if (allListings.length > 3 && !searchQuery && !activeMood && !activeCategory) { %>
+      <div id="stays-section">
+        <div class="wl-section-header">
+          <h2 class="wl-section-title">Top Stays for You</h2>
+        </div>
+        <div class="wl-stays-grid">
+          <%
+            const badges      = ['best-seller','eco','guest-fav','','best-seller','eco'];
+            const badgeLabels = {'best-seller':'Best Seller','eco':'Eco Stay','guest-fav':'Guest Favorite'};
+            const stayTagSets = [
+              ['Beachfront','Private Pool'],['Forest View','Eco-friendly'],
+              ['Mountain View','Bonfire'],['City View','WiFi'],
+              ['Heritage','Guided Tours'],['Lakefront','Kayaking']
+            ];
+            const startIdx = Math.floor(allListings.length / 2);
+            for(let i = 0; i < Math.min(6, allListings.length); i++) {
+              const s     = allListings[startIdx + i] || allListings[i];
+              const badge = badges[i];
+              const tags  = stayTagSets[i];
+              const rating  = (4.3 + ((s.price % 7) * 0.08)).toFixed(1);
+              const reviews = 50 + (s.price % 250);
+          %>
+          <div class="wl-stay-card">
+            <% if(badge) { %><span class="wl-stay-badge <%= badge %>"><%= badgeLabels[badge] %></span><% } %>
+            <button class="wl-stay-card-fav"
+              data-fav-id="<%= s._id %>" data-fav-title="<%= s.title %>"
+              data-fav-img="<%= s.image.url %>" data-fav-location="<%= s.location %>"
+              data-fav-price="<%= s.price %>" onclick="handleFavClick(this)">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+            <a href="/listings/<%= s._id %>">
+              <img src="<%= s.image.url %>" alt="<%= s.title %>" class="wl-stay-card-img">
+            </a>
+            <div class="wl-stay-card-body">
+              <div class="wl-stay-name"><%= s.title %></div>
+              <div class="wl-stay-location">
+                <i class="fa-solid fa-location-dot" style="font-size:0.65rem;"></i>
+                <%= s.location %>, <%= s.country %>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem;">
+                <div class="wl-stay-price">&#8377;<%= s.price.toLocaleString('en-IN') %><small>/night</small></div>
+                <div class="wl-rating" style="font-size:0.72rem;">
+                  <i class="fa-solid fa-star"></i> <%= rating %> <span>(<%= reviews %>)</span>
+                </div>
+              </div>
+              <div class="wl-stay-tags">
+                <% for(const tag of tags) { %><span class="wl-tag"><%= tag %></span><% } %>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- ===== MORE RESULTS ===== -->
+      <% if ((searchQuery || activeMood || activeCategory) && allListings.length > 12) { %>
+      <div class="wl-section-header" style="margin-top:1.5rem;">
+        <h2 class="wl-section-title">More Results</h2>
+      </div>
       <div class="wl-stays-grid">
-        <%
-          const badges = ['best-seller','eco','guest-fav','','best-seller','eco'];
-          const badgeLabels = {'best-seller':'Best Seller','eco':'Eco Stay','guest-fav':'Guest Favorite'};
-          const stayTagSets = [
-            ['Beachfront','Private Pool'],['Forest View','Eco-friendly'],
-            ['Mountain View','Bonfire'],['City View','WiFi'],
-            ['Heritage','Guided Tours'],['Lakefront','Kayaking']
-          ];
-          const startIdx = Math.floor(allListings.length / 2);
-          for(let i = 0; i < Math.min(6, allListings.length); i++) {
-            const s = allListings[startIdx + i] || allListings[i];
-            const badge = badges[i];
-            const tags = stayTagSets[i];
-            const rating = (4.3 + ((s.price % 7) * 0.08)).toFixed(1);
-            const reviews = 50 + (s.price % 250);
+        <% for(let i = 12; i < allListings.length; i++) {
+           const s = allListings[i];
+           const rating = (4.3 + ((s.price % 7) * 0.08)).toFixed(1);
         %>
         <div class="wl-stay-card">
-          <% if(badge) { %><span class="wl-stay-badge <%= badge %>"><%= badgeLabels[badge] %></span><% } %>
           <button class="wl-stay-card-fav"
-            data-fav-id="<%= s._id %>"
-            data-fav-title="<%= s.title %>"
-            data-fav-img="<%= s.image.url %>"
-            data-fav-location="<%= s.location %>"
-            data-fav-price="<%= s.price %>"
-            onclick="handleFavClick(this)">
+            data-fav-id="<%= s._id %>" data-fav-title="<%= s.title %>"
+            data-fav-img="<%= s.image.url %>" data-fav-location="<%= s.location %>"
+            data-fav-price="<%= s.price %>" onclick="handleFavClick(this)">
             <i class="fa-regular fa-heart"></i>
           </button>
           <a href="/listings/<%= s._id %>">
@@ -217,59 +328,19 @@
           </a>
           <div class="wl-stay-card-body">
             <div class="wl-stay-name"><%= s.title %></div>
-            <div class="wl-stay-location">
-              <i class="fa-solid fa-location-dot" style="font-size:0.65rem;"></i>
-              <%= s.location %>, <%= s.country %>
-            </div>
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.35rem;">
-              <div class="wl-stay-price">₹<%= s.price.toLocaleString('en-IN') %><small>/night</small></div>
-              <div class="wl-rating" style="font-size:0.72rem;">
-                <i class="fa-solid fa-star"></i> <%= rating %> <span>(<%= reviews %>)</span>
-              </div>
-            </div>
-            <div class="wl-stay-tags">
-              <% for(const tag of tags) { %><span class="wl-tag"><%= tag %></span><% } %>
-            </div>
+            <div class="wl-stay-location"><%= s.location %>, <%= s.country %></div>
+            <div class="wl-stay-price">&#8377;<%= s.price.toLocaleString('en-IN') %><small>/night</small></div>
           </div>
         </div>
         <% } %>
       </div>
-    </div>
-    <% } %>
-
-    <!-- Show remaining listings if filtered -->
-    <% if ((searchQuery || activeMood || activeCategory) && allListings.length > 8) { %>
-    <div class="wl-section-header" style="margin-top:1.5rem;">
-      <h2 class="wl-section-title">More Results</h2>
-    </div>
-    <div class="wl-stays-grid">
-      <% for(let i = 12; i < allListings.length; i++) {
-         const s = allListings[i];
-         const rating = (4.3 + ((s.price % 7) * 0.08)).toFixed(1);
-      %>
-      <div class="wl-stay-card">
-        <button class="wl-stay-card-fav"
-          data-fav-id="<%= s._id %>" data-fav-title="<%= s.title %>"
-          data-fav-img="<%= s.image.url %>" data-fav-location="<%= s.location %>"
-          data-fav-price="<%= s.price %>" onclick="handleFavClick(this)">
-          <i class="fa-regular fa-heart"></i>
-        </button>
-        <a href="/listings/<%= s._id %>">
-          <img src="<%= s.image.url %>" alt="<%= s.title %>" class="wl-stay-card-img">
-        </a>
-        <div class="wl-stay-card-body">
-          <div class="wl-stay-name"><%= s.title %></div>
-          <div class="wl-stay-location"><%= s.location %>, <%= s.country %></div>
-          <div class="wl-stay-price">₹<%= s.price.toLocaleString('en-IN') %><small>/night</small></div>
-        </div>
-      </div>
       <% } %>
-    </div>
-    <% } %>
-    <% } %>
+      <% } %>
+
+    </div><!-- /#wl-dynamic-content -->
 
     <!-- ===== TRUST BAR ===== -->
-    <div class="wl-trust-bar" style="margin-top: 2rem;">
+    <div class="wl-trust-bar" style="margin-top:2rem;">
       <div class="wl-trust-item">
         <div class="wl-trust-icon yellow"><i class="fa-regular fa-star"></i></div>
         <div class="wl-trust-text"><strong>Honest Reviews</strong><span>Real reviews from real travelers.</span></div>
@@ -283,7 +354,7 @@
         <div class="wl-trust-text"><strong>Mood-Based Search</strong><span>Find places that match how you feel.</span></div>
       </div>
       <div class="wl-trust-item">
-        <div class="wl-trust-icon purple"><span class="wl-ai-star">✦</span></div>
+        <div class="wl-trust-icon purple"><span class="wl-ai-star">&#10022;</span></div>
         <div class="wl-trust-text"><strong>AI-Powered Help</strong><span>Get itinerary ideas instantly.</span></div>
       </div>
       <div class="wl-trust-item">
@@ -291,92 +362,362 @@
         <div class="wl-trust-text"><strong>Save & Plan</strong><span>Save favourites and plan your trip.</span></div>
       </div>
     </div>
-
     <br>
-
   </main>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
+<style>
+  .wl-page-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 36px; padding: 0 0.5rem;
+    border-radius: 50%; border: 1.5px solid var(--border);
+    background: white; color: var(--text-muted);
+    font-size: 0.8rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    text-decoration: none; transition: all 0.18s; cursor: pointer;
+  }
+  .wl-page-btn:hover:not(.disabled):not(.wl-page-active) {
+    border-color: var(--primary); color: var(--primary);
+  }
+  .wl-page-active {
+    background: var(--primary); border-color: var(--primary);
+    color: white !important; cursor: default;
+  }
+  .wl-page-nav { border-radius: 10px; padding: 0 0.65rem; }
+  .wl-page-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+  .wl-page-dots { color: var(--text-muted); font-size: 0.85rem; padding: 0 0.15rem; line-height: 36px; }
 
-  // ── Tax toggle ────────────────────────────────────────────
-  const taxSwitch = document.getElementById('switchCheckDefault');
-  if (taxSwitch) {
-    taxSwitch.addEventListener('change', () => {
-      document.querySelectorAll('.tax-info').forEach(el => {
-        el.style.display = taxSwitch.checked ? 'inline' : 'none';
-      });
+  #wl-dynamic-content.wl-loading { opacity: 0.45; pointer-events: none; transition: opacity 0.15s; }
+  #wl-dynamic-content { transition: opacity 0.2s; }
+</style>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  Core fetch — XHR to /listings, patches dynamic zones only
+// ─────────────────────────────────────────────────────────────
+let _fetchCtrl = null;
+
+async function applyFilters(params, { pushHistory = true, scrollToExplore = false } = {}) {
+  if (_fetchCtrl) _fetchCtrl.abort();
+  _fetchCtrl = new AbortController();
+
+  const qs  = params.toString();
+  const url = qs ? `/listings?${qs}` : '/listings';
+
+  if (pushHistory) history.pushState({}, '', url);
+
+  const dynEl = document.getElementById('wl-dynamic-content');
+  dynEl.classList.add('wl-loading');
+
+  try {
+    const res = await fetch(url, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      signal: _fetchCtrl.signal,
     });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    dynEl.innerHTML = buildListingsHTML(data);
+    document.getElementById('wl-active-filters-banner').innerHTML = buildFiltersBannerHTML(data);
+    syncFilterBarUI(data);
+
+    if (typeof refreshFavButtons === 'function') refreshFavButtons();
+
+    if (scrollToExplore || data.exploreOpen) {
+      const sec = document.getElementById('allListingsSection');
+      if (sec) setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    }
+  } catch (err) {
+    if (err.name !== 'AbortError') console.error('[WL] fetch error:', err);
+  } finally {
+    dynEl.classList.remove('wl-loading');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  HTML builders (client-side mirror of the EJS above)
+// ─────────────────────────────────────────────────────────────
+function buildListingsHTML(d) {
+  const { allListings, searchQuery, activeMood, activeCategory,
+          exploreOpen, exploreListings, exploreTotalListings, exploreTotalPages, currentAllPage } = d;
+
+  if (allListings.length === 0 && !exploreOpen) {
+    return `<div style="margin:1.25rem 0 0.5rem;">
+      <div class="wl-empty-state">
+        <span style="font-size:3rem;">🗺️</span>
+        <h3>No listings found</h3>
+        <p>Try a different search, mood, or category.</p>
+        <button class="wl-btn-primary" onclick="clearAllFilters()" style="display:inline-flex;margin-top:0.5rem;">Clear filters</button>
+      </div></div>`;
   }
 
-  // ── Multi-filter navigation ───────────────────────────────
-  document.querySelectorAll('.wl-filter-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
+  let html = '';
 
-      if (this.dataset.filterClear) {
-        window.location.href = '/listings';
-        return;
-      }
+  if (exploreOpen) {
+    const start = (currentAllPage - 1) * 12 + 1;
+    const end   = Math.min(currentAllPage * 12, exploreTotalListings);
+    html += `<div id="allListingsSection">
+      <div class="wl-section-header">
+        <h2 class="wl-section-title">All Listings</h2>
+        <span style="font-size:0.82rem;color:var(--text-muted);">Showing ${start}&ndash;${end} of ${exploreTotalListings} listing${exploreTotalListings !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="wl-stays-grid">${exploreListings.map(s => buildStayCard(s)).join('')}</div>
+      ${buildPaginationHTML(exploreTotalPages, currentAllPage)}
+    </div>`;
+  }
 
-      const key = this.dataset.filterKey;
-      const val = this.dataset.filterVal;
+  if (allListings.length > 0) {
+    const title = activeMood ? `Stays for ${cap(activeMood)} Mood`
+      : activeCategory      ? `${cap(activeCategory)} Stays`
+      : searchQuery         ? `Results for &ldquo;${escHtml(searchQuery)}&rdquo;`
+      : 'Popular Destinations';
 
-      const params = new URLSearchParams(window.location.search);
+    html += `<div id="popular-section">
+      <div class="wl-section-header">
+        <h2 class="wl-section-title">${title}</h2>
+        <span style="font-size:0.82rem;color:var(--text-muted);">${allListings.length} listing${allListings.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="wl-cards-scroll">${allListings.slice(0, 12).map(l => buildDestCard(l)).join('')}</div>
+    </div>`;
 
-      if (params.get(key) === val) {
-        params.delete(key);
-      } else {
-        params.set(key, val);
-      }
+    if (allListings.length > 3 && !searchQuery && !activeMood && !activeCategory) {
+      const badges      = ['best-seller','eco','guest-fav','','best-seller','eco'];
+      const badgeLabels = {'best-seller':'Best Seller','eco':'Eco Stay','guest-fav':'Guest Favorite'};
+      const stayTagSets = [
+        ['Beachfront','Private Pool'],['Forest View','Eco-friendly'],
+        ['Mountain View','Bonfire'],['City View','WiFi'],
+        ['Heritage','Guided Tours'],['Lakefront','Kayaking']
+      ];
+      const si = Math.floor(allListings.length / 2);
+      const cards = Array.from({ length: Math.min(6, allListings.length) }, (_, i) =>
+        buildStayCard(allListings[si + i] || allListings[i], badges[i], badgeLabels[badges[i]], stayTagSets[i])
+      ).join('');
+      html += `<div id="stays-section">
+        <div class="wl-section-header"><h2 class="wl-section-title">Top Stays for You</h2></div>
+        <div class="wl-stays-grid">${cards}</div>
+      </div>`;
+    }
 
-      const qs = params.toString();
-      window.location.href = qs ? `/listings?${qs}` : '/listings';
+    if ((searchQuery || activeMood || activeCategory) && allListings.length > 12) {
+      html += `<div class="wl-section-header" style="margin-top:1.5rem;">
+        <h2 class="wl-section-title">More Results</h2>
+      </div>
+      <div class="wl-stays-grid">${allListings.slice(12).map(s => buildStayCard(s)).join('')}</div>`;
+    }
+  }
+
+  return html;
+}
+
+function buildStayCard(s, badge, badgeLabel, tags) {
+  const rating  = (4.3 + ((s.price % 7) * 0.08)).toFixed(1);
+  const reviews = 50 + (s.price % 250);
+  const fav = `data-fav-id="${s._id}" data-fav-title="${escAttr(s.title)}" data-fav-img="${escAttr(s.image.url)}" data-fav-location="${escAttr(s.location)}" data-fav-price="${s.price}"`;
+  return `<div class="wl-stay-card">
+    ${badge ? `<span class="wl-stay-badge ${badge}">${escHtml(badgeLabel)}</span>` : ''}
+    <button class="wl-stay-card-fav" ${fav} onclick="handleFavClick(this)"><i class="fa-regular fa-heart"></i></button>
+    <a href="/listings/${s._id}">
+      <img src="${escAttr(s.image.url)}" alt="${escAttr(s.title)}" class="wl-stay-card-img" loading="lazy">
+    </a>
+    <div class="wl-stay-card-body">
+      <div class="wl-stay-name">${escHtml(s.title)}</div>
+      <div class="wl-stay-location"><i class="fa-solid fa-location-dot" style="font-size:0.65rem;"></i> ${escHtml(s.location)}, ${escHtml(s.country)}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem;">
+        <div class="wl-stay-price">&#8377;${s.price.toLocaleString('en-IN')}<small>/night</small></div>
+        <div class="wl-rating" style="font-size:0.72rem;"><i class="fa-solid fa-star"></i> ${rating} <span>(${reviews})</span></div>
+      </div>
+      ${tags ? `<div class="wl-stay-tags">${tags.map(t => `<span class="wl-tag">${escHtml(t)}</span>`).join('')}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function buildDestCard(l) {
+  const rating  = (4.3 + ((l.price % 7) * 0.08)).toFixed(1);
+  const reviews = 150 + (l.price % 300);
+  const fav = `data-fav-id="${l._id}" data-fav-title="${escAttr(l.title)}" data-fav-img="${escAttr(l.image.url)}" data-fav-location="${escAttr(l.location)}" data-fav-price="${l.price}"`;
+  return `<a href="/listings/${l._id}" class="wl-dest-card">
+    <button class="wl-dest-card-fav" ${fav} onclick="event.preventDefault(); handleFavClick(this)"><i class="fa-regular fa-heart"></i></button>
+    <img src="${escAttr(l.image.url)}" alt="${escAttr(l.title)}" class="wl-dest-card-img">
+    <div class="wl-dest-card-body">
+      <div class="wl-dest-card-name">${escHtml(l.title)}</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.25rem;">
+        <i class="fa-solid fa-location-dot" style="color:var(--primary);font-size:0.65rem;"></i>
+        ${escHtml(l.location)}, ${escHtml(l.country)}
+      </div>
+      <div class="wl-dest-card-meta">
+        <div class="wl-rating"><i class="fa-solid fa-star"></i> ${rating} <span>(${reviews})</span></div>
+      </div>
+      <div class="wl-dest-price">&#8377;${l.price.toLocaleString('en-IN')}/night
+        <i class="tax-info" style="font-size:0.68rem;color:var(--text-muted);font-style:normal;"> +18% GST</i>
+      </div>
+    </div>
+  </a>`;
+}
+
+function buildPaginationHTML(totalPages, current) {
+  if (totalPages <= 1) return '';
+  let btns = current > 1
+    ? `<a href="#" class="wl-page-btn wl-page-nav" data-page="${current - 1}"><i class="fa-solid fa-chevron-left"></i></a>`
+    : `<span class="wl-page-btn wl-page-nav disabled"><i class="fa-solid fa-chevron-left"></i></span>`;
+
+  for (let p = 1; p <= totalPages; p++) {
+    const show = p === 1 || p === totalPages || (p >= current - 2 && p <= current + 2);
+    if (p === current - 3 && current > 4)               btns += `<span class="wl-page-dots">&hellip;</span>`;
+    if (p === current + 3 && current < totalPages - 3)  btns += `<span class="wl-page-dots">&hellip;</span>`;
+    if (show) btns += p === current
+      ? `<span class="wl-page-btn wl-page-active">${p}</span>`
+      : `<a href="#" class="wl-page-btn" data-page="${p}">${p}</a>`;
+  }
+
+  btns += current < totalPages
+    ? `<a href="#" class="wl-page-btn wl-page-nav" data-page="${current + 1}"><i class="fa-solid fa-chevron-right"></i></a>`
+    : `<span class="wl-page-btn wl-page-nav disabled"><i class="fa-solid fa-chevron-right"></i></span>`;
+
+  return `<nav style="display:flex;justify-content:center;align-items:center;gap:0.4rem;margin:2rem 0 1rem;flex-wrap:wrap;">${btns}</nav>
+    <p style="text-align:center;font-size:0.76rem;color:var(--text-muted);margin-bottom:1.5rem;">Page ${current} of ${totalPages}</p>`;
+}
+
+function buildFiltersBannerHTML({ searchQuery, activeMood, activeCategory, activeMinPrice, activeMaxPrice }) {
+  if (!activeMood && !activeCategory && !searchQuery && !activeMinPrice && !activeMaxPrice) return '';
+  let chips = '';
+  if (searchQuery)                      chips += `<span class="wl-filter-chip">Search: &ldquo;${escHtml(searchQuery)}&rdquo;</span>`;
+  if (activeMood)                       chips += `<span class="wl-filter-chip mood">Mood: ${escHtml(activeMood)}</span>`;
+  if (activeCategory)                   chips += `<span class="wl-filter-chip">Category: ${escHtml(activeCategory)}</span>`;
+  if (activeMinPrice || activeMaxPrice) chips += `<span class="wl-filter-chip">&#8377;${activeMinPrice||'0'} &ndash; &#8377;${activeMaxPrice||'&infin;'}</span>`;
+  return `<div class="wl-active-filters">
+    <span><i class="fa-solid fa-filter"></i> Showing filtered results:</span>
+    ${chips}
+    <a href="#" class="wl-filter-clear" onclick="clearAllFilters(); return false;"><i class="fa-solid fa-xmark"></i> Clear all</a>
+  </div>`;
+}
+
+function syncFilterBarUI({ activeMood, activeCategory, searchQuery, exploreOpen }) {
+  document.querySelectorAll('.wl-filter-link[data-filter-key="category"]').forEach(el =>
+    el.classList.toggle('active', el.dataset.filterVal === activeCategory));
+  document.querySelectorAll('.wl-filter-link[data-filter-key="mood"]').forEach(el =>
+    el.classList.toggle('active', el.dataset.filterVal === activeMood));
+  const trending = document.querySelector('.wl-filter-link[data-filter-clear]');
+  if (trending) trending.classList.toggle('active', !activeCategory && !activeMood && !searchQuery);
+
+  const btn = document.getElementById('exploreAllBtn');
+  if (btn) btn.innerHTML = exploreOpen
+    ? '<i class="fa-solid fa-xmark"></i> Close'
+    : '<i class="fa-solid fa-grid-2"></i> Explore All';
+
+  const navInput = document.querySelector('.wl-search-bar input[name="search"]');
+  if (navInput && navInput !== document.activeElement) navInput.value = searchQuery || '';
+}
+
+// ─────────────────────────────────────────────────────────────
+//  Helpers
+// ─────────────────────────────────────────────────────────────
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) { return escHtml(s); }
+function getParams() { return new URLSearchParams(window.location.search); }
+
+function setFilter(key, val) {
+  const p = getParams();
+  p.delete('allPage');
+  if (!val) { p.delete(key); }
+  else if (p.get(key) === String(val)) { p.delete(key); }
+  else { p.set(key, val); }
+  applyFilters(p);
+}
+
+function clearAllFilters() { applyFilters(new URLSearchParams()); }
+
+// ─────────────────────────────────────────────────────────────
+//  Event wiring
+// ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+
+  // Tax toggle
+  document.getElementById('switchCheckDefault')?.addEventListener('change', function () {
+    document.querySelectorAll('.tax-info').forEach(el => {
+      el.style.display = this.checked ? 'inline' : 'none';
     });
   });
 
-  // ── Debounced navbar search ───────────────────────────────
-  const navbarForm = document.querySelector('.wl-search-bar form');
-  const navbarInput = navbarForm ? navbarForm.querySelector('input[name="search"]') : null;
+  // Category / mood / trending (delegated — works for SSR and JS-rendered cards)
+  document.addEventListener('click', function (e) {
+    const link = e.target.closest('.wl-filter-link');
+    if (!link) return;
+    e.preventDefault();
+    if (link.dataset.filterClear) { clearAllFilters(); return; }
+    const { filterKey: key, filterVal: val } = link.dataset;
+    if (key && val) setFilter(key, val);
+  });
+
+  // Price filter
+  document.getElementById('priceFilterBtn')?.addEventListener('click', () => {
+    const min = document.getElementById('minPriceInput').value.trim();
+    const max = document.getElementById('maxPriceInput').value.trim();
+    const p   = getParams();
+    p.delete('allPage');
+    if (min) p.set('minPrice', min); else p.delete('minPrice');
+    if (max) p.set('maxPrice', max); else p.delete('maxPrice');
+    applyFilters(p);
+  });
+  ['minPriceInput','maxPriceInput'].forEach(id =>
+    document.getElementById(id)?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('priceFilterBtn').click();
+    })
+  );
+
+  // Explore All
+  document.getElementById('exploreAllBtn')?.addEventListener('click', () => {
+    const p = getParams();
+    if (p.has('allPage')) { p.delete('allPage'); } else { p.set('allPage', 1); }
+    applyFilters(p, { scrollToExplore: true });
+  });
+
+  // Pagination (delegated on dynamic zone)
+  document.getElementById('wl-dynamic-content').addEventListener('click', function (e) {
+    const pg = e.target.closest('[data-page]');
+    if (!pg) return;
+    e.preventDefault();
+    const p = getParams();
+    p.set('allPage', pg.dataset.page);
+    applyFilters(p, { scrollToExplore: true });
+  });
+
+  // Debounced navbar search — NO page reload
+  const navbarInput = document.querySelector('.wl-search-bar input[name="search"]');
   if (navbarInput) {
     let navTimer;
-    navbarInput.addEventListener('input', function() {
+    navbarInput.addEventListener('input', function () {
       clearTimeout(navTimer);
       const val = this.value.trim();
       navTimer = setTimeout(() => {
-        const params = new URLSearchParams(window.location.search);
-        if (val.length >= 2) {
-          params.set('search', val);
-        } else if (val.length === 0) {
-          params.delete('search');
-        } else {
-          return;
-        }
-        const qs = params.toString();
-        window.location.href = qs ? `/listings?${qs}` : '/listings';
+        const p = getParams();
+        p.delete('allPage');
+        if (val.length >= 2)       { p.set('search', val); }
+        else if (val.length === 0) { p.delete('search'); }
+        else                       { return; }
+        applyFilters(p);
       }, 400);
     });
-
-    navbarForm.addEventListener('submit', function(e) {
+    navbarInput.closest('form')?.addEventListener('submit', function (e) {
       e.preventDefault();
       const val = navbarInput.value.trim();
-      const params = new URLSearchParams(window.location.search);
-      if (val) {
-        params.set('search', val);
-      } else {
-        params.delete('search');
-      }
-      const qs = params.toString();
-      window.location.href = qs ? `/listings?${qs}` : '/listings';
+      const p   = getParams();
+      p.delete('allPage');
+      if (val) { p.set('search', val); } else { p.delete('search'); }
+      applyFilters(p);
     });
   }
 
-  // ── Fav button states on load ─────────────────────────────
+  // Browser back / forward
+  window.addEventListener('popstate', () =>
+    applyFilters(new URLSearchParams(window.location.search), { pushHistory: false })
+  );
+
   if (typeof refreshFavButtons === 'function') refreshFavButtons();
 });
 
-// ── Fav click handler ─────────────────────────────────────
+// Favourites
 function handleFavClick(btn) {
   const { favId, favTitle, favImg, favLocation, favPrice } = btn.dataset;
   const added = toggleFav(favId, favTitle, favImg, favLocation, favPrice);
@@ -385,108 +726,4 @@ function handleFavClick(btn) {
     ? '<i class="fa-solid fa-heart" style="color:var(--primary)"></i>'
     : '<i class="fa-regular fa-heart"></i>';
 }
-
-// ===== EXPLORE ALL LISTINGS WITH PAGINATION =====
-const ALL_LISTINGS = <%- JSON.stringify(allListings) %>;
-const PAGE_SIZE = 12;
-let currentPage = 1;
-let allSectionOpen = false;
-
-function toggleAllListings() {
-  const section = document.getElementById('allListingsSection');
-  const btn = document.getElementById('exploreAllBtn');
-  allSectionOpen = !allSectionOpen;
-  section.style.display = allSectionOpen ? 'block' : 'none';
-  btn.innerHTML = allSectionOpen
-    ? '<i class="fa-solid fa-xmark"></i> Close'
-    : '<i class="fa-solid fa-grid-2"></i> Explore All';
-  if (allSectionOpen) {
-    currentPage = 1;
-    renderPage(currentPage);
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-
-function renderPage(page) {
-  const total = ALL_LISTINGS.length;
-  const totalPages = Math.ceil(total / PAGE_SIZE);
-  const start = (page - 1) * PAGE_SIZE;
-  const end = Math.min(start + PAGE_SIZE, total);
-  const slice = ALL_LISTINGS.slice(start, end);
-
-  document.getElementById('paginationInfo').textContent =
-    `Showing ${start + 1}–${end} of ${total} listing${total !== 1 ? 's' : ''}`;
-
-  const grid = document.getElementById('allListingsGrid');
-  grid.innerHTML = slice.map(s => {
-    const rating = (4.3 + ((s.price % 7) * 0.08)).toFixed(1);
-    const reviews = 50 + (s.price % 250);
-    return `
-      <div class="wl-stay-card">
-        <button class="wl-stay-card-fav"
-          data-fav-id="${s._id}" data-fav-title="${s.title}"
-          data-fav-img="${s.image.url}" data-fav-location="${s.location}"
-          data-fav-price="${s.price}" onclick="handleFavClick(this)">
-          <i class="fa-regular fa-heart"></i>
-        </button>
-        <a href="/listings/${s._id}">
-          <img src="${s.image.url}" alt="${s.title}" class="wl-stay-card-img" loading="lazy">
-        </a>
-        <div class="wl-stay-card-body">
-          <div class="wl-stay-name">${s.title}</div>
-          <div class="wl-stay-location">
-            <i class="fa-solid fa-location-dot" style="font-size:0.65rem;"></i>
-            ${s.location}, ${s.country}
-          </div>
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.35rem;">
-            <div class="wl-stay-price">₹${s.price.toLocaleString('en-IN')}<small>/night</small></div>
-            <div class="wl-rating" style="font-size:0.72rem;">
-              <i class="fa-solid fa-star"></i> ${rating} <span>(${reviews})</span>
-            </div>
-          </div>
-        </div>
-      </div>`;
-  }).join('');
-
-  if (typeof refreshFavButtons === 'function') refreshFavButtons();
-
-  // Pagination controls
-  const controls = document.getElementById('paginationControls');
-  let html = '';
-
-  html += `<button class="wl-scroll-btn" onclick="goToPage(${page - 1})" ${page === 1 ? 'disabled style="opacity:0.35;cursor:not-allowed;"' : ''}>
-    <i class="fa-solid fa-chevron-left"></i>
-  </button>`;
-
-  for (let p = 1; p <= totalPages; p++) {
-    if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) {
-      html += `<button onclick="goToPage(${p})" style="
-        width:32px; height:32px; border-radius:50%;
-        border:1.5px solid ${p === page ? 'var(--primary)' : 'var(--border)'};
-        background:${p === page ? 'var(--primary)' : 'white'};
-        color:${p === page ? 'white' : 'var(--text-muted)'};
-        font-size:0.75rem; font-weight:600; cursor:pointer;
-        font-family:'DM Sans',sans-serif;
-        display:inline-flex; align-items:center; justify-content:center;
-        transition:all 0.2s;">${p}</button>`;
-    } else if (p === page - 2 || p === page + 2) {
-      html += `<span style="color:var(--text-muted); font-size:0.8rem;">…</span>`;
-    }
-  }
-
-  html += `<button class="wl-scroll-btn" onclick="goToPage(${page + 1})" ${page === totalPages ? 'disabled style="opacity:0.35;cursor:not-allowed;"' : ''}>
-    <i class="fa-solid fa-chevron-right"></i>
-  </button>`;
-
-  controls.innerHTML = html;
-}
-
-function goToPage(page) {
-  const totalPages = Math.ceil(ALL_LISTINGS.length / PAGE_SIZE);
-  if (page < 1 || page > totalPages) return;
-  currentPage = page;
-  renderPage(currentPage);
-  document.getElementById('allListingsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
 </script>
-

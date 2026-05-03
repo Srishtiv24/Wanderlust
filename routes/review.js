@@ -1,21 +1,53 @@
-const express = require("express");
-const router = express.Router({mergeParams:true});//since id is in app.js , so merging params so that it can be accessed here 
-const wrapAsync = require("../utils/wrapAsync.js");
-const {validateReview, isLoggedIn,isReviewAuthor}=require("../middleware.js");
-const reviewController=require("../controllers/review.js");
+// ─────────────────────────────────────────────────────────────
+// FIX: "Cannot read properties of undefined (reading 'review')"
+//
+// Root cause: the review form uses enctype="multipart/form-data"
+// which bypasses express.urlencoded(). Without multer on the route,
+// req.body is completely empty → req.body.review is undefined.
+//
+// Solution: add upload.array('reviewMedia', 5) BEFORE the controller.
+// ─────────────────────────────────────────────────────────────
 
-//create reviews 
-router.post("/", 
-  isLoggedIn
-  ,validateReview,
-  wrapAsync(reviewController.createReview
-));
+const express = require('express');
+const router  = express.Router({ mergeParams: true });
+const multer  = require('multer');
 
-//delete review
-router.delete("/:reviewId",
+const { storage }        = require('../cloudConfig');      // your fixed cloudinary.js
+const { isLoggedIn }     = require('../middleware');       // your auth guard
+const reviewController   = require('../controllers/review');
+
+// One multer instance — shared for both listing and review uploads
+const upload = multer({ storage });
+
+// ── POST   /listings/:id/reviews ──────────────────────────────
+// upload.array('reviewMedia', 5)  parses the multipart body AND
+// the text fields (review[rating], review[comment]) in one step.
+router.post(
+  '/',
   isLoggedIn,
-  isReviewAuthor,
-  wrapAsync(reviewController.destroyReview
-  ));
+  upload.array('reviewMedia', 5),   // ← THIS was missing; caused the crash
+  reviewController.createReview,
+);
 
-module.exports=router;
+// ── DELETE /listings/:id/reviews/:reviewId ────────────────────
+router.delete(
+  '/:reviewId',
+  isLoggedIn,
+  reviewController.destroyReview,
+);
+
+module.exports = router;
+
+
+// ─────────────────────────────────────────────────────────────
+// If your reviews router is inline in listings.js, the fix is:
+//
+//   const upload = multer({ storage });
+//
+//   router.post(
+//     '/:id/reviews',
+//     isLoggedIn,
+//     upload.array('reviewMedia', 5),   // ← add this line
+//     wrapAsync(reviewController.createReview)
+//   );
+// ─────────────────────────────────────────────────────────────

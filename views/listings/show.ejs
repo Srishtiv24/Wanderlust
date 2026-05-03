@@ -1,418 +1,492 @@
 <% layout('/layouts/boiler-plate') %>
 
-<div class="wl-show-layout">
+<%
+  const avgRating = listing.reviews.length > 0
+    ? (listing.reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / listing.reviews.length).toFixed(1)
+    : null;
+  const totalPerNight = Math.floor(listing.price * 1.18) + 500;
+  const allMedia = [
+    { url: listing.image.url, type: 'image' },
+    ...(listing.gallery || [])
+  ];
+%>
 
-  <!-- ════════════════════════════════
-       LEFT — Listing Details
-  ════════════════════════════════ -->
-  <div>
+<!-- BREADCRUMB -->
+<div style="max-width:1180px;margin:0 auto;padding:.9rem 1.5rem 0;display:flex;align-items:center;gap:.4rem;font-size:.76rem;color:var(--text-muted);">
+  <a href="/listings"
+    style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.3rem;transition:color .2s;"
+    onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+    <i class="fa-solid fa-house" style="font-size:.66rem;"></i> Listings
+  </a>
+  <i class="fa-solid fa-chevron-right" style="font-size:.5rem;"></i>
+  <span style="color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+    <%= listing.title.length > 52 ? listing.title.slice(0,52)+'…' : listing.title %>
+  </span>
+</div>
 
-    <!-- ── Hero Image ── -->
-    <div class="wl-show-img-hero">
-      <img src="<%= listing.image.url %>" alt="<%= listing.title %>">
-    </div>
 
-    <!-- ── Gallery (host photos/videos) ── -->
-    <% if (listing.gallery && listing.gallery.length > 0) { %>
-    <div style="margin-bottom:1.5rem;">
-      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap:0.6rem;">
-        <% for(let media of listing.gallery) { %>
-        <div style="position:relative; border-radius:10px; overflow:hidden; aspect-ratio:4/3; background:#f0f0f0;">
-          <% if(media.type === 'video') { %>
-          <video src="<%= media.url %>" controls style="width:100%; height:100%; object-fit:cover;"></video>
-          <% } else { %>
-          <img src="<%= media.url %>" alt="Gallery" style="width:100%; height:100%; object-fit:cover;">
-          <% } %>
+<div class="sp-wrap" style="padding-top:1rem;">
 
-          <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
-          <form method="post" action="/listings/<%= listing._id %>/gallery/<%= media._id %>?_method=DELETE"
-                style="position:absolute; top:0.4rem; right:0.4rem;">
-            <button type="submit"
-              style="width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;color:white;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </form>
-          <% } %>
-        </div>
+  <!-- TITLE ROW -->
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+    <div style="min-width:0;">
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.4rem,3vw,1.9rem);font-weight:700;line-height:1.15;margin-bottom:.4rem;">
+        <%= listing.title %>
+      </h1>
+      <div style="display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;font-size:.83rem;color:var(--text-muted);">
+        <% if(avgRating) { %>
+        <span style="display:flex;align-items:center;gap:.25rem;font-weight:700;color:var(--text);">
+          <i class="fa-solid fa-star" style="color:var(--primary);font-size:.78rem;"></i>
+          <%= avgRating %>
+          <span style="font-weight:400;color:var(--text-muted);">(<%= listing.reviews.length %> review<%= listing.reviews.length!==1?'s':'' %>)</span>
+        </span>
+        <span style="color:#ddd;">·</span>
         <% } %>
+        <span>
+          <i class="fa-solid fa-location-dot" style="color:var(--primary);font-size:.76rem;margin-right:.2rem;"></i>
+          <strong style="color:var(--text);"><%= listing.location %>, <%= listing.country %></strong>
+        </span>
+        <span style="color:#ddd;">·</span>
+        <span>Host: <strong style="color:var(--text);"><%= listing.owner.username %></strong></span>
       </div>
     </div>
-    <% } %>
-
-    <!-- ── Host: Add Gallery Media ── -->
     <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
-    <div style="background:white; border-radius:var(--radius); padding:1.25rem; margin-bottom:1.5rem; box-shadow:var(--card-shadow); border:1.5px dashed var(--border);">
-      <h4 style="font-size:0.9rem; font-weight:700; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem;">
-        <i class="fa-solid fa-images" style="color:var(--primary);"></i> Add Photos / Videos to Gallery
-      </h4>
-      <form method="post" action="/listings/<%= listing._id %>/gallery" enctype="multipart/form-data">
-        <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
-          <input type="file" name="gallery" multiple accept="image/*,video/*"
-            style="font-size:0.8rem; flex:1; min-width:0; border:1.5px solid var(--border); border-radius:8px; padding:0.45rem 0.7rem; font-family:'DM Sans',sans-serif;">
-          <button type="submit" class="wl-submit-btn" style="padding:0.5rem 1.1rem; font-size:0.82rem; white-space:nowrap;">
-            <i class="fa-solid fa-upload"></i> Upload
-          </button>
-        </div>
-        <p style="font-size:0.72rem; color:var(--text-muted); margin-top:0.4rem;">
-          <i class="fa-solid fa-circle-info"></i> Supports JPG, PNG, WebP, MP4, MOV. Max 10 files at once.
-        </p>
+    <div style="display:flex;gap:.45rem;flex-shrink:0;margin-top:.2rem;">
+      <form method="get" action="/listings/<%= listing._id %>/edit" style="margin:0;">
+        <button type="submit" class="wl-action-btn danger">
+          <i class="fa-regular fa-pen-to-square"></i> Edit
+        </button>
       </form>
-    </div>
-    <% } %>
-
-    <!-- ── Title + Actions ── -->
-    <div class="wl-show-meta">
-      <div>
-        <h1 class="wl-show-title"><%= listing.title %></h1>
-        <p style="color:var(--text-muted); font-size:0.88rem; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-          <i class="fa-solid fa-location-dot" style="color:var(--primary);"></i>
-          <%= listing.location %>, <%= listing.country %>
-          &nbsp;·&nbsp;
-          <i class="fa-regular fa-user"></i>
-          Hosted by <strong><%= listing.owner.username %></strong>
-        </p>
-      </div>
-
-      <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
-      <div class="wl-show-actions">
-        <form method="get" action="/listings/<%= listing._id %>/edit">
-          <button type="submit" class="wl-action-btn">
-            <i class="fa-regular fa-pen-to-square"></i> Edit
-          </button>
-        </form>
-        <form method="post" action="/listings/<%= listing._id %>?_method=Delete">
-          <button type="submit" class="wl-action-btn danger">
-            <i class="fa-regular fa-trash-can"></i> Delete
-          </button>
-        </form>
-      </div>
-      <% } %>
-    </div>
-
-    <!-- ── Info Cards ── -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:0.75rem; margin-bottom:1.5rem;">
-      <div style="background:white; border-radius:10px; padding:0.9rem; text-align:center; box-shadow:var(--card-shadow);">
-        <i class="fa-solid fa-indian-rupee-sign" style="font-size:1.3rem; color:var(--primary); margin-bottom:0.3rem; display:block;"></i>
-        <div style="font-weight:700; color:var(--primary); font-size:1rem;">₹<%= listing.price.toLocaleString('en-IN') %></div>
-        <div style="font-size:0.7rem; color:var(--text-muted);">per night</div>
-      </div>
-      <div style="background:white; border-radius:10px; padding:0.9rem; text-align:center; box-shadow:var(--card-shadow);">
-        <i class="fa-regular fa-comment-dots" style="font-size:1.3rem; color:#7c6af5; margin-bottom:0.3rem; display:block;"></i>
-        <div style="font-weight:700; font-size:1rem;"><%= listing.reviews.length %></div>
-        <div style="font-size:0.7rem; color:var(--text-muted);">Reviews</div>
-      </div>
-      <div style="background:white; border-radius:10px; padding:0.9rem; text-align:center; box-shadow:var(--card-shadow);">
-        <i class="fa-solid fa-earth-asia" style="font-size:1.3rem; color:#42a5f5; margin-bottom:0.3rem; display:block;"></i>
-        <div style="font-weight:700; font-size:0.88rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><%= listing.country %></div>
-        <div style="font-size:0.7rem; color:var(--text-muted);">Country</div>
-      </div>
-      <div style="background:white; border-radius:10px; padding:0.9rem; text-align:center; box-shadow:var(--card-shadow);">
-        <i class="fa-solid fa-shield-halved" style="font-size:1.3rem; color:#4caf9a; margin-bottom:0.3rem; display:block;"></i>
-        <div style="font-weight:700; font-size:0.88rem;">Verified</div>
-        <div style="font-size:0.7rem; color:var(--text-muted);">Safe Stay</div>
-      </div>
-      <%
-        // Real average rating from actual reviews
-        const avgRating = listing.reviews.length > 0
-          ? (listing.reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / listing.reviews.length).toFixed(1)
-          : null;
-      %>
-      <% if(avgRating) { %>
-      <div style="background:white; border-radius:10px; padding:0.9rem; text-align:center; box-shadow:var(--card-shadow);">
-        <i class="fa-solid fa-star" style="font-size:1.3rem; color:#f59e0b; margin-bottom:0.3rem; display:block;"></i>
-        <div style="font-weight:700; font-size:1rem;"><%= avgRating %></div>
-        <div style="font-size:0.7rem; color:var(--text-muted);">Avg Rating</div>
-      </div>
-      <% } %>
-    </div>
-
-    <!-- ── Description ── -->
-    <div style="background:white; border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--card-shadow);">
-      <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem;">
-        <i class="fa-regular fa-file-lines" style="color:var(--primary);"></i> About this stay
-      </h3>
-      <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.75;"><%= listing.description %></p>
-    </div>
-
-    <!-- ── Map ── -->
-    <div style="background:white; border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--card-shadow);">
-      <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;">
-        <i class="fa-solid fa-location-dot" style="color:var(--primary);"></i> Where you'll be
-      </h3>
-      <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.75rem;">
-        <%= listing.location %>, <%= listing.country %>
-      </p>
-      <div id="map"></div>
-      <script id="listing-coordinates" type="application/json">
-        <%- JSON.stringify({ lat, lng, title: listing.title }) %>
-      </script>
-    </div>
-
-    <!-- ── Review Form ── -->
-    <% if(currUser) { %>
-    <div style="background:white; border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--card-shadow);">
-      <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
-        <i class="fa-regular fa-pen-to-square" style="color:var(--primary);"></i> Leave a Review
-      </h3>
-      <form method="post" action="/listings/<%= listing._id %>/reviews"
-            class="needs-validation" novalidate enctype="multipart/form-data">
-
-        <!-- Star Rating -->
-        <div style="margin-bottom:1rem;">
-          <label class="wl-form-label">Your Rating</label>
-          <fieldset class="starability-slot">
-            <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
-            <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-            <label for="first-rate1" title="Terrible">1 star</label>
-            <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-            <label for="first-rate2" title="Not good">2 stars</label>
-            <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-            <label for="first-rate3" title="Average">3 stars</label>
-            <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-            <label for="first-rate4" title="Very good">4 stars</label>
-            <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-            <label for="first-rate5" title="Amazing">5 stars</label>
-          </fieldset>
-        </div>
-
-        <!-- Comment -->
-        <div style="margin-bottom:1rem;">
-          <label class="wl-form-label">Comment</label>
-          <textarea name="review[comment]" rows="3" class="wl-form-control" required
-            placeholder="Share your experience..."></textarea>
-          <div class="invalid-feedback">Please add a comment.</div>
-        </div>
-
-        <!-- Media Upload -->
-        <div style="margin-bottom:1rem;">
-          <label class="wl-form-label" style="display:flex; align-items:center; gap:0.4rem;">
-            <i class="fa-regular fa-image" style="color:var(--primary);"></i>
-            Add Photos / Videos <span style="font-weight:400; color:var(--text-muted);">(optional)</span>
-          </label>
-          <input type="file" name="reviewMedia" multiple accept="image/*,video/*"
-            style="font-size:0.8rem; width:100%; border:1.5px solid var(--border); border-radius:8px; padding:0.45rem 0.7rem; font-family:'DM Sans',sans-serif;">
-          <p style="font-size:0.72rem; color:var(--text-muted); margin-top:0.3rem;">
-            Up to 5 photos or videos from your stay.
-          </p>
-        </div>
-
-        <button type="submit" class="wl-submit-btn">
-          <i class="fa-regular fa-paper-plane"></i> Submit Review
+      <form method="post" action="/listings/<%= listing._id %>?_method=Delete" style="margin:0;">
+        <button type="submit" class="wl-action-btn danger">
+          <i class="fa-regular fa-trash-can"></i> Delete
         </button>
       </form>
     </div>
-    <% } else { %>
-    <div style="background:var(--primary-soft); border-radius:var(--radius); padding:1.1rem; margin-bottom:1.5rem; border:1.5px solid rgba(232,57,42,0.2);">
-      <p style="font-size:0.88rem; color:var(--primary); margin:0; display:flex; align-items:center; gap:0.5rem;">
-        <i class="fa-solid fa-lock"></i>
-        <a href="/login" style="color:var(--primary); font-weight:700;">Log in</a> to leave a review.
-      </p>
-    </div>
     <% } %>
+  </div>
 
-    <!-- ── All Reviews ── -->
-    <% if(listing.reviews.length > 0) { %>
-    <div style="background:white; border-radius:var(--radius); padding:1.5rem; box-shadow:var(--card-shadow);">
-      <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
-        <i class="fa-regular fa-comments" style="color:var(--primary);"></i>
-        Reviews
-        <span style="color:var(--text-muted); font-weight:400; font-size:0.85rem;">(<%= listing.reviews.length %>)</span>
-        <% if(avgRating) { %>
-        <span style="margin-left:auto; font-size:0.82rem; font-weight:600; color:#f59e0b; display:flex; align-items:center; gap:0.25rem;">
-          <i class="fa-solid fa-star"></i> <%= avgRating %> avg
-        </span>
-        <% } %>
-      </h3>
-
-      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:0.75rem;">
-        <% for(let review of listing.reviews) { %>
-        <div class="wl-review-card">
-
-          <!-- Author row -->
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
-            <div style="display:flex; align-items:center; gap:0.5rem;">
-              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:white;font-size:0.75rem;font-weight:700;flex-shrink:0;">
-                <%= review.author.username.charAt(0).toUpperCase() %>
-              </div>
-              <div>
-                <div style="font-size:0.82rem; font-weight:700;">@<%= review.author.username %></div>
-                <div style="font-size:0.68rem; color:var(--text-muted);">
-                  <%= new Date(review.createdAt).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
-                </div>
-              </div>
-            </div>
-
-            <% if(currUser && currUser._id.equals(review.author._id)) { %>
-            <form method="post" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=Delete">
-              <button type="submit"
-                style="background:none;border:none;color:var(--text-muted);font-size:0.75rem;cursor:pointer;padding:0.2rem 0.4rem;border-radius:4px;transition:color 0.2s;"
-                onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
-                <i class="fa-regular fa-trash-can"></i>
-              </button>
-            </form>
-            <% } %>
-          </div>
-
-          <!-- Stars -->
-          <p class="starability-result" data-rating="<%= review.rating %>" style="margin-bottom:0.4rem;"></p>
-
-          <!-- Comment -->
-          <p style="font-size:0.82rem; color:var(--text-muted); line-height:1.55; margin-bottom:0.5rem;">
-            <%= review.comment %>
-          </p>
-
-          <!-- Review media thumbnails -->
-          <% if(review.media && review.media.length > 0) { %>
-          <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.4rem;">
-            <% for(let m of review.media) { %>
-            <% if(m.type === 'video') { %>
-            <video src="<%= m.url %>"
-              style="width:72px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;"
-              onclick="openMediaViewer('<%= m.url %>','video')"></video>
-            <% } else { %>
-            <img src="<%= m.url %>" alt="review photo"
-              style="width:72px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;"
-              onclick="openMediaViewer('<%= m.url %>','image')">
-            <% } %>
-            <% } %>
-          </div>
-          <% } %>
-
-        </div>
-        <% } %>
-      </div>
-    </div>
-    <% } %>
-
-  </div><!-- end left column -->
-
-  <!-- ════════════════════════════════
-       RIGHT — Host Card only
-  ════════════════════════════════ -->
-  <div>
-
-    <!-- Price summary card (no booking button) -->
-    <div class="wl-booking-card" style="margin-bottom:1rem;">
-      <div class="wl-booking-price">
-        ₹<%= listing.price.toLocaleString('en-IN') %> <small>/ night</small>
-      </div>
-
-      <% if(listing.reviews.length > 0) { %>
-      <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:1rem; font-size:0.85rem;">
-        <i class="fa-solid fa-star" style="color:#f59e0b;"></i>
-        <strong><%= avgRating %></strong>
-        <span style="color:var(--text-muted);">· <%= listing.reviews.length %> review<%= listing.reviews.length !== 1 ? 's' : '' %></span>
-      </div>
+  <!-- PHOTO GRID -->
+  <div class="sp-photo-grid <%= allMedia.length >= 3 ? 'has-many' : '' %>"
+    style="<%= allMedia.length < 3 ? 'grid-template-columns:1fr;' : '' %>">
+    <% allMedia.slice(0, 3).forEach(function(m, i) { %>
+    <div class="sp-photo-cell <%= i === 0 && allMedia.length >= 3 ? 'sp-main' : '' %>" onclick="openLb(<%= i %>)">
+      <% if(m.type === 'video') { %>
+      <video src="<%= m.url %>" muted playsinline preload="metadata"></video>
+      <div class="sp-play-badge"><i class="fa-solid fa-play"></i></div>
       <% } else { %>
-      <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:1rem;">
-        <i class="fa-regular fa-star"></i> No reviews yet
+      <img src="<%= m.url %>" alt="<%= listing.title %> photo <%= i+1 %>">
+      <% } %>
+      <% if(i === 2 && allMedia.length > 3) { %>
+      <button class="sp-show-all" onclick="event.stopPropagation();openLb(2)">
+        <i class="fa-regular fa-images"></i> +<%= allMedia.length - 3 %> more
+      </button>
+      <% } %>
+    </div>
+    <% }); %>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="sp-grid">
+
+    <!-- LEFT COLUMN -->
+    <div>
+
+      <!-- About -->
+      <div class="sp-card">
+        <div class="sp-card-title">
+          <span class="icon"><i class="fa-regular fa-file-lines"></i></span>
+          About this stay
+        </div>
+        <p style="color:var(--text-muted);font-size:.88rem;line-height:1.9;white-space:pre-line;"><%= listing.description %></p>
+        <div class="sp-chips">
+          <span class="sp-chip primary">
+            <i class="fa-solid fa-indian-rupee-sign"></i> ₹<%= listing.price.toLocaleString('en-IN') %>/night
+          </span>
+          <span class="sp-chip verified">
+            <i class="fa-solid fa-shield-halved"></i> Verified Stay
+          </span>
+          <span class="sp-chip country">
+            <i class="fa-solid fa-earth-asia"></i> <%= listing.country %>
+          </span>
+          <% if(avgRating) { %>
+          <span class="sp-chip rating">
+            <i class="fa-solid fa-star"></i> <%= avgRating %> avg
+          </span>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Owner: Upload Gallery -->
+      <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
+      <div class="sp-card" style="border:2px dashed #e4e4e4;">
+        <div class="sp-card-title">
+          <span class="icon"><i class="fa-solid fa-camera"></i></span>
+          Add Photos &amp; Videos
+          <span style="font-size:.72rem;font-weight:400;color:var(--text-muted);margin-left:auto;">
+            <%= (listing.gallery||[]).length %> in gallery
+          </span>
+        </div>
+        <form method="post" action="/listings/<%= listing._id %>/gallery"
+          enctype="multipart/form-data" id="galleryUploadForm">
+          <div class="sp-drop" id="ownerDrop"
+            ondragover="event.preventDefault();this.classList.add('over')"
+            ondragleave="this.classList.remove('over')"
+            ondrop="ownerDrop(event)"
+            onclick="document.getElementById('ownerFileInput').click()">
+            <i class="fa-regular fa-images"></i>
+            <p>Drag &amp; drop or <strong>browse</strong> to add photos &amp; videos</p>
+            <p style="font-size:.7rem;margin-top:.2rem;opacity:.65;">JPG · PNG · WebP · MP4 · MOV · Max 10 files</p>
+          </div>
+          <input type="file" id="ownerFileInput" name="gallery" multiple
+            accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/*"
+            style="display:none;">
+          <div id="ownerPreview"></div>
+          <div style="display:flex;gap:.6rem;margin-top:.9rem;align-items:center;">
+            <button type="submit" class="wl-submit-btn" id="ownerUploadBtn" disabled
+              style="padding:.55rem 1.2rem;font-size:.85rem;display:inline-flex;align-items:center;gap:.4rem;opacity:.4;cursor:not-allowed;">
+              <i class="fa-solid fa-upload"></i> Upload
+            </button>
+            <span id="ownerFileCount" style="font-size:.78rem;color:var(--text-muted);"></span>
+          </div>
+        </form>
       </div>
       <% } %>
 
-      <hr style="border:none; border-top:1px solid var(--border); margin:0.75rem 0;">
+      <!-- Gallery Display -->
+      <% if(listing.gallery && listing.gallery.length > 0) { %>
+      <div class="sp-card">
+        <div class="sp-card-title">
+          <span class="icon"><i class="fa-regular fa-images"></i></span>
+          Gallery
+          <span style="font-size:.75rem;font-weight:400;color:var(--text-muted);">(<%= listing.gallery.length %>)</span>
+        </div>
+        <div class="sp-gallery-grid">
+          <% listing.gallery.forEach(function(m, gi) { %>
+          <div class="sp-gallery-cell">
+            <% if(m.type === 'video') { %>
+            <video src="<%= m.url %>" muted preload="metadata"
+              onclick="openLb(<%= gi + 1 %>)" style="cursor:pointer;"></video>
+            <div class="sp-play-badge" style="pointer-events:none;">
+              <i class="fa-solid fa-play" style="font-size:.9rem;"></i>
+            </div>
+            <% } else { %>
+            <img src="<%= m.url %>" alt="gallery <%= gi+1 %>"
+              onclick="openLb(<%= gi + 1 %>)" style="cursor:pointer;">
+            <% } %>
+            <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
+            <%
+              /* Store type on the form so JS can read it for Cloudinary resource_type */
+              const mediaType = (m.type === 'video') ? 'video' : 'image';
+            %>
+           <form
+           method="post"
+           action="/listings/<%= listing._id %>/gallery?_method=DELETE"
+           style="margin:0;position:absolute;top:.35rem;right:.35rem;z-index:3;">
+         
+           <input type="hidden" name="filename"     value="<%= m.filename %>">
+           <input type="hidden" name="resourceType" value="<%= mediaType %>">
+         
+           <button
+             type="button"
+             class="sp-gallery-del"
+             title="Delete"
+             onclick="confirmGalleryDelete(this)">
+             <i class="fa-solid fa-xmark"></i>
+           </button>
+         
+         </form>
+            <% } %>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
 
-      <div style="font-size:0.82rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-bottom:0.4rem;">
-        <span>Base price / night</span>
-        <span>₹<%= listing.price.toLocaleString('en-IN') %></span>
-      </div>
-      <div style="font-size:0.82rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-bottom:0.4rem;">
-        <span>GST (18%)</span>
-        <span>₹<%= Math.floor(listing.price * 0.18).toLocaleString('en-IN') %></span>
-      </div>
-      <hr style="border:none; border-top:1px solid var(--border); margin:0.75rem 0;">
-      <div style="font-size:0.88rem; font-weight:700; display:flex; justify-content:space-between;">
-        <span>Total / night</span>
-        <span>₹<%= Math.floor(listing.price * 1.18).toLocaleString('en-IN') %></span>
+      <!-- Map -->
+      <div class="sp-card">
+        <div class="sp-card-title">
+          <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+          Where you'll be
+        </div>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.85rem;">
+          <i class="fa-solid fa-map-pin" style="color:var(--primary);font-size:.72rem;margin-right:.3rem;"></i>
+          <%= listing.location %>, <%= listing.country %>
+        </p>
+        <div id="map"></div>
+        <%# ── map-data: NO spaces around the EJS tags ── %>
+        <script id="map-data" type="application/json"><%- JSON.stringify({ lat: lat, lng: lng, title: listing.title, location: listing.location, country: listing.country }) %></script>
       </div>
 
-      <p style="font-size:0.72rem; color:var(--text-muted); margin-top:0.75rem; text-align:center;">
-        <i class="fa-solid fa-circle-info"></i> Price includes 18% GST
-      </p>
+      <!-- Review form -->
+      <% if(currUser) { %>
+      <div class="sp-card">
+        <div class="sp-card-title">
+          <span class="icon"><i class="fa-regular fa-pen-to-square"></i></span>
+          Leave a Review
+        </div>
+        <form method="post" action="/listings/<%= listing._id %>/reviews"
+          class="needs-validation" novalidate enctype="multipart/form-data" id="reviewForm">
+          <div style="margin-bottom:1rem;">
+            <label class="wl-form-label">Your Rating</label>
+            <fieldset class="starability-slot">
+              <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating."/>
+              <input type="radio" id="rate1" name="review[rating]" value="1"/><label for="rate1" title="Terrible">1 star</label>
+              <input type="radio" id="rate2" name="review[rating]" value="2"/><label for="rate2" title="Not good">2 stars</label>
+              <input type="radio" id="rate3" name="review[rating]" value="3"/><label for="rate3" title="Average">3 stars</label>
+              <input type="radio" id="rate4" name="review[rating]" value="4"/><label for="rate4" title="Very good">4 stars</label>
+              <input type="radio" id="rate5" name="review[rating]" value="5"/><label for="rate5" title="Amazing">5 stars</label>
+            </fieldset>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label class="wl-form-label">Your Comment</label>
+            <textarea name="review[comment]" rows="3" class="wl-form-control" required
+              placeholder="Share your experience…"></textarea>
+            <div class="invalid-feedback">Please add a comment.</div>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label class="wl-form-label">
+              <i class="fa-regular fa-image" style="color:var(--primary);margin-right:.3rem;"></i>
+              Photos / Videos <span style="font-weight:400;color:var(--text-muted);">(optional · up to 5)</span>
+            </label>
+            <div class="sp-drop" id="reviewDrop"
+              ondragover="event.preventDefault();this.classList.add('over')"
+              ondragleave="this.classList.remove('over')"
+              ondrop="revDrop(event)"
+              onclick="document.getElementById('reviewFileInput').click()">
+              <i class="fa-regular fa-images" style="font-size:1.5rem;"></i>
+              <p>Drag &amp; drop or <strong>browse</strong></p>
+              <p style="font-size:.7rem;opacity:.65;margin-top:.15rem;">JPG · PNG · WebP · MP4 · MOV</p>
+            </div>
+            <input type="file" id="reviewFileInput" name="reviewMedia" multiple
+              accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/*"
+              style="display:none;">
+            <div id="reviewPreview"></div>
+          </div>
+          <button type="submit" class="wl-submit-btn"
+            style="display:inline-flex;align-items:center;gap:.4rem;">
+            <i class="fa-regular fa-paper-plane"></i> Submit Review
+          </button>
+        </form>
+      </div>
+      <% } else { %>
+      <div style="background:var(--primary-soft);border-radius:14px;padding:1.1rem 1.25rem;margin-bottom:1rem;border:1.5px solid rgba(232,57,42,.18);display:flex;align-items:center;gap:.85rem;">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="fa-solid fa-lock" style="color:white;font-size:.8rem;"></i>
+        </div>
+        <p style="font-size:.88rem;margin:0;">
+          <a href="/login" style="color:var(--primary);font-weight:700;">Log in</a> to leave a review.
+        </p>
+      </div>
+      <% } %>
+
+      <!-- Reviews list -->
+      <% if(listing.reviews.length > 0) { %>
+      <div class="sp-card">
+        <div class="sp-card-title">
+          <span class="icon"><i class="fa-solid fa-star"></i></span>
+          Reviews
+          <span style="font-size:.78rem;font-weight:500;color:var(--text-muted);">(<%= listing.reviews.length %>)</span>
+          <% if(avgRating) { %>
+          <span style="margin-left:auto;font-size:.85rem;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:.3rem;">
+            <i class="fa-solid fa-star"></i> <%= avgRating %> / 5
+          </span>
+          <% } %>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;">
+          <% for(let review of listing.reviews) { %>
+          <div class="sp-rev">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.55rem;">
+              <div style="display:flex;align-items:center;gap:.5rem;">
+                <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:white;font-size:.8rem;font-weight:700;flex-shrink:0;">
+                  <%= review.author.username.charAt(0).toUpperCase() %>
+                </div>
+                <div>
+                  <div style="font-size:.83rem;font-weight:700;">@<%= review.author.username %></div>
+                  <div style="font-size:.67rem;color:var(--text-muted);">
+                    <%= new Date(review.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) %>
+                  </div>
+                </div>
+              </div>
+              <% if(currUser && currUser._id.equals(review.author._id)) { %>
+              <form method="post" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=Delete" style="margin:0;">
+                <button type="submit"
+                  style="background:none;border:none;padding:.22rem .35rem;border-radius:6px;color:var(--text-muted);cursor:pointer;font-size:.75rem;transition:all .15s;"
+                  onmouseover="this.style.background='var(--primary-soft)';this.style.color='var(--primary)'"
+                  onmouseout="this.style.background='none';this.style.color='var(--text-muted)'">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </form>
+              <% } %>
+            </div>
+            <p class="starability-result" data-rating="<%= review.rating %>" style="margin-bottom:.45rem;"></p>
+            <p style="font-size:.83rem;color:var(--text-muted);line-height:1.65;margin-bottom:.45rem;"><%= review.comment %></p>
+            <% if(review.media && review.media.length > 0) { %>
+            <div style="display:flex;gap:.35rem;flex-wrap:wrap;">
+              <% for(let m of review.media) { %>
+              <div style="width:60px;height:48px;border-radius:6px;overflow:hidden;cursor:pointer;position:relative;flex-shrink:0;"
+                onclick="openLbSingle('<%= m.url %>','<%= m.type %>')">
+                <% if(m.type==='video') { %>
+                <video src="<%= m.url %>" muted style="width:100%;height:100%;object-fit:cover;"></video>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);">
+                  <i class="fa-solid fa-play" style="color:white;font-size:.6rem;"></i>
+                </div>
+                <% } else { %>
+                <img src="<%= m.url %>" style="width:100%;height:100%;object-fit:cover;">
+                <% } %>
+              </div>
+              <% } %>
+            </div>
+            <% } %>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+
+    </div><!-- /left -->
+
+    <!-- SIDEBAR -->
+    <div class="sp-sidebar">
+      <div class="sp-price-card">
+        <div style="display:flex;align-items:baseline;gap:.4rem;margin-bottom:.3rem;">
+          <span class="sp-price-big">₹<%= listing.price.toLocaleString('en-IN') %></span>
+          <small>/ night</small>
+        </div>
+        <% if(avgRating) { %>
+        <div style="display:flex;align-items:center;gap:.35rem;font-size:.83rem;margin-bottom:1rem;">
+          <i class="fa-solid fa-star" style="color:var(--primary);font-size:.75rem;"></i>
+          <strong><%= avgRating %></strong>
+          <span style="color:var(--text-muted);">· <%= listing.reviews.length %> review<%= listing.reviews.length!==1?'s':'' %></span>
+        </div>
+        <% } else { %>
+        <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;">No reviews yet</div>
+        <% } %>
+        <hr class="sp-divider">
+        <div class="sp-row">
+          <span style="color:var(--text-muted);">₹<%= listing.price.toLocaleString('en-IN') %> × 1 night</span>
+          <span>₹<%= listing.price.toLocaleString('en-IN') %></span>
+        </div>
+        <div class="sp-row">
+          <span style="color:var(--text-muted);">GST (18%)</span>
+          <span>₹<%= Math.floor(listing.price * 0.18).toLocaleString('en-IN') %></span>
+        </div>
+        <div class="sp-row">
+          <span style="color:var(--text-muted);">Cleaning fee</span>
+          <span>₹500</span>
+        </div>
+        <hr class="sp-divider" style="margin:.6rem 0;">
+        <div class="sp-row total">
+          <span>Total / night</span>
+          <span style="color:var(--primary);">₹<%= totalPerNight.toLocaleString('en-IN') %></span>
+        </div>
+        <a href="/ai-assistant?prompt=<%= encodeURIComponent('Tell me about ' + listing.title) %>&destination=<%= encodeURIComponent(listing.location) %>"
+          class="sp-cta primary">
+          <i class="fa-solid fa-robot"></i> Ask AI about this stay
+        </a>
+        <a href="/itinerary?destination=<%= encodeURIComponent(listing.location) %>" class="sp-cta outline">
+          <i class="fa-solid fa-map"></i> Plan a trip to <%= listing.location %>
+        </a>
+        <p style="font-size:.68rem;color:var(--text-muted);text-align:center;margin-top:.75rem;">
+          Includes 18% GST + ₹500 cleaning fee
+        </p>
+      </div>
+
+      <!-- Host card -->
+      <div class="sp-price-card">
+        <div style="font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-muted);margin-bottom:.85rem;">
+          Your Host
+        </div>
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;">
+          <div style="position:relative;flex-shrink:0;">
+            <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.05rem;">
+              <%= listing.owner.username.charAt(0).toUpperCase() %>
+            </div>
+            <div style="position:absolute;bottom:0;right:0;width:13px;height:13px;background:var(--primary);border-radius:50%;border:2px solid white;opacity:.75;"></div>
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:.9rem;"><%= listing.owner.username %></div>
+            <div style="font-size:.72rem;color:var(--text-muted);">Wanderlust Host</div>
+          </div>
+        </div>
+        <div class="sp-stat-row">
+          <span><i class="fa-solid fa-shield-halved"></i> Verified</span>
+          <span><i class="fa-regular fa-comment-dots"></i> <%= listing.reviews.length %> reviews</span>
+          <span><i class="fa-regular fa-clock"></i> Fast replies</span>
+          <span><i class="fa-solid fa-house"></i> Active host</span>
+        </div>
+      </div>
     </div>
 
-    <!-- Host card -->
-    <div style="background:white; border-radius:var(--radius); padding:1.25rem; box-shadow:var(--card-shadow);">
-      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
-        <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.1rem;flex-shrink:0;">
-          <%= listing.owner.username.charAt(0).toUpperCase() %>
-        </div>
-        <div>
-          <div style="font-weight:700; font-size:0.9rem;">Hosted by <%= listing.owner.username %></div>
-          <div style="font-size:0.75rem; color:var(--text-muted);">Wanderlust Host</div>
-        </div>
-      </div>
-      <div style="display:flex; gap:0.75rem; flex-wrap:wrap; font-size:0.78rem; color:var(--text-muted);">
-        <span><i class="fa-solid fa-shield-halved" style="color:#4caf9a;"></i> Verified host</span>
-        <span><i class="fa-regular fa-comment-dots" style="color:#7c6af5;"></i> <%= listing.reviews.length %> review<%= listing.reviews.length !== 1 ? 's' : '' %></span>
-      </div>
-    </div>
+  </div><!-- /sp-grid -->
+</div><!-- /sp-wrap -->
 
-  </div><!-- end right column -->
 
-</div><!-- end wl-show-layout -->
-
-<!-- ── Media Lightbox ── -->
-<div id="mediaViewerOverlay"
-  style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;align-items:center;justify-content:center;"
-  onclick="closeMediaViewer()">
-  <button onclick="closeMediaViewer()" style="position:absolute;top:1rem;right:1.25rem;background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">
-    <i class="fa-solid fa-xmark"></i>
-  </button>
-  <img id="mediaViewerImg" src="" alt="" style="max-width:90vw;max-height:85vh;border-radius:10px;display:none;">
-  <video id="mediaViewerVid" src="" controls style="max-width:90vw;max-height:85vh;border-radius:10px;display:none;"></video>
+<!-- LIGHTBOX -->
+<div id="sp-lb">
+  <button class="lb-close" onclick="closeLb()"><i class="fa-solid fa-xmark"></i></button>
+  <button class="lb-nav" id="lb-prev" onclick="lbStep(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+  <img id="lb-img" src="" alt="" style="display:none;">
+  <video id="lb-vid" controls style="display:none;"></video>
+  <button class="lb-nav" id="lb-next" onclick="lbStep(1)"><i class="fa-solid fa-chevron-right"></i></button>
+  <div class="lb-counter" id="lb-counter"></div>
 </div>
 
+<!-- DELETE CONFIRM MODAL -->
+<div class="sp-confirm-overlay" id="delConfirmOverlay">
+  <div class="sp-confirm-box">
+    <div class="sp-confirm-icon"><i class="fa-regular fa-trash-can"></i></div>
+    <h4>Delete this photo?</h4>
+    <p>This action cannot be undone. The photo will be permanently removed from the gallery.</p>
+    <div class="sp-confirm-btns">
+      <button class="sp-confirm-cancel" onclick="closeDelConfirm()">Cancel</button>
+      <button class="sp-confirm-delete" id="delConfirmBtn">Delete</button>
+    </div>
+  </div>
+</div>
 <script>
-// ── Form validation ──────────────────────────────────
-(function() {
-  'use strict';
-  document.querySelectorAll('.needs-validation').forEach(form => {
-    form.addEventListener('submit', e => {
-      if (!form.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
-      form.classList.add('was-validated');
-    });
-  });
-})();
+    /* ── Lightbox ─────────────────────────────── */
+    const MEDIA = <%- JSON.stringify(allMedia) %>;
+  let lbIdx = 0, lbSingle = false;
 
-// ── Map init ─────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
-  const raw = document.getElementById('listing-coordinates');
-  if (!raw) return;
-  try {
-    const { lat, lng, title } = JSON.parse(raw.textContent);
-    if (typeof L === 'undefined') return;
-    const map = L.map('map').setView([lat, lng], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-    L.marker([lat, lng])
-      .addTo(map)
-      .bindPopup(`<strong>${title}</strong>`)
-      .openPopup();
-  } catch(e) {
-    console.error('Map init failed:', e);
+  function openLb(idx) {
+    lbSingle = false; lbIdx = idx;
+    ['lb-prev','lb-next','lb-counter'].forEach(id => document.getElementById(id).style.display = '');
+    showLbItem();
+    document.getElementById('sp-lb').classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
-});
 
-// ── Lightbox ─────────────────────────────────────────
-function openMediaViewer(url, type) {
-  const overlay = document.getElementById('mediaViewerOverlay');
-  const img = document.getElementById('mediaViewerImg');
-  const vid = document.getElementById('mediaViewerVid');
-  img.style.display = 'none';
-  vid.style.display = 'none';
-  if (type === 'video') {
-    vid.src = url;
-    vid.style.display = 'block';
-  } else {
-    img.src = url;
-    img.style.display = 'block';
+  function openLbSingle(url, type) {
+    lbSingle = true;
+    const img = document.getElementById('lb-img'), vid = document.getElementById('lb-vid');
+    img.style.display = vid.style.display = 'none';
+    ['lb-prev','lb-next','lb-counter'].forEach(id => document.getElementById(id).style.display = 'none');
+    if (type === 'video') { vid.src = url; vid.style.display = 'block'; }
+    else { img.src = url; img.style.display = 'block'; }
+    document.getElementById('sp-lb').classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
-  overlay.style.display = 'flex';
-}
-function closeMediaViewer() {
-  const overlay = document.getElementById('mediaViewerOverlay');
-  document.getElementById('mediaViewerVid').pause();
-  overlay.style.display = 'none';
-}
+
+  function showLbItem() {
+    const m = MEDIA[lbIdx];
+    const img = document.getElementById('lb-img'), vid = document.getElementById('lb-vid');
+    img.style.display = 'none';
+    vid.pause(); vid.style.display = 'none';
+    if (m.type === 'video') { vid.src = m.url; vid.style.display = 'block'; }
+    else { img.src = m.url; img.style.display = 'block'; }
+    document.getElementById('lb-counter').textContent = `${lbIdx + 1} / ${MEDIA.length}`;
+  }
+
+  function lbStep(dir) {
+    lbIdx = (lbIdx + dir + MEDIA.length) % MEDIA.length;
+    showLbItem();
+  }
+
+  function closeLb() {
+    document.getElementById('lb-vid').pause();
+    document.getElementById('sp-lb').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
 </script>

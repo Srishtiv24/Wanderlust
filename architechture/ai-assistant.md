@@ -265,3 +265,6 @@ Frontend Rendering
 > It’s a hybrid RAG system where I extract structured filters using NLP, route the query to MongoDB or vector search, and inject results into an LLM to generate accurate and context-aware travel responses.
 
 ---
+
+
+dest->mongo full text search

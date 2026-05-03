@@ -3,32 +3,48 @@ const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
 const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
 const listingController = require("../controllers/listing.js");
-const multer=require("multer");
-const {storage}=require("../cloudConfig.js");
-const upload = multer({storage});
+const multer = require("multer");
+const { cloudinary, storage } = require("../cloudConfig.js");
+const upload = multer({ storage });
 
-//Index route
+// POST /listings/:id/gallery
+router.post(
+  "/:id/gallery",
+  isLoggedIn,
+  upload.array("gallery", 10),
+  listingController.addToGallery
+);
+
+// listing.js router — add this alongside your existing DELETE route
+router.delete("/:id/gallery", isLoggedIn,listingController.delFromGallery);
+
+// Index + Create
 router
   .route("/")
   .get(wrapAsync(listingController.index))
-  .post(upload.single('listing[image]'),validateListing, wrapAsync(listingController.createListing));
+  .post(
+    upload.single("listing[image]"),
+    validateListing,
+    wrapAsync(listingController.createListing)
+  );
 
-//new route
+// New form
 router.get("/new", isLoggedIn, listingController.renderNewForm);
 
+// Show + Update + Delete
 router
   .route("/:id")
-  .get(wrapAsync(listingController.showListing))//show route
-  .patch( //update route
+  .get(wrapAsync(listingController.showListing))
+  .patch(
     isLoggedIn,
     isOwner,
     upload.single("listing[image]"),
     validateListing,
     wrapAsync(listingController.editListing)
   )
-  .delete(isLoggedIn, isOwner, wrapAsync(listingController.destroyListing)); //delete route
+  .delete(isLoggedIn, isOwner, wrapAsync(listingController.destroyListing));
 
-//update route
+// Edit form
 router.get(
   "/:id/edit",
   isLoggedIn,
@@ -37,24 +53,3 @@ router.get(
 );
 
 module.exports = router;
-
-//serialize saves user id and deserilaize find by id and store in user
-
-// router.get("/testlistings",async (req,res)=>
-// {
-//   let l1 = new Listing(
-
-//     {
-//       title:"my title"  ,
-//       description:"my description",
-//       price:"1000",
-//       location:"my location",
-//       country:"my country"
-//     }
-//   );
-
-//   await l1.save().then((data)=>console.log(data));
-//   console.log("l1 is saved");
-//   res.send("successfull saving to db");
-// }
-// );

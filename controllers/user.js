@@ -32,17 +32,15 @@ module.exports.login=async (req, res) => { //app.js -serialize & deserilaize use
   }
 
   module.exports.logout = (req, res, next) => {
-    req.logout((err) => { //passposrt method
+    req.logout((err) => {
       if (err) return next(err);
   
-      //  Destroy session from MongoDB
+      req.flash("success", "Successfully logged out!");
+  
       req.session.destroy((err) => {
         if (err) return next(err);
   
-        // Clear cookie from browser
         res.clearCookie("connect.sid");
-  
-        req.flash("success", "Successfully logged out!");
         res.redirect("/listings");
       });
     });

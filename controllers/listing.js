@@ -1,10 +1,9 @@
 const Listing = require("../models/listing.js");
-const opencage = require('opencage-api-client');
 const { vectorSearch } = require("../utils/vectorSearch.js");
+const { cloudinary, storage } = require("../cloudConfig.js");
 
 // ─────────────────────────────────────────────
 // Mood → natural language query for vector search
-// Much richer than keyword matching
 // ─────────────────────────────────────────────
 const MOOD_QUERIES = {
   healing:     "peaceful wellness retreat spa nature calm serene yoga meditation quiet scenic",
@@ -30,7 +29,7 @@ const CATEGORY_QUERIES = {
 };
 
 module.exports.index = async (req, res) => {
-  const { search, mood, minPrice, maxPrice, category } = req.query;
+  const { search, mood, minPrice, maxPrice, category, allPage } = req.query;
 
   const priceFilter = {};
   if (minPrice) priceFilter.$gte = Number(minPrice);
@@ -38,59 +37,143 @@ module.exports.index = async (req, res) => {
 
   let allListings;
 
-  const hasQuery = search?.trim();
+  const hasQuery        = search?.trim();
   const hasVectorSignals = mood || category;
 
-  // ─────────────────────────────────────────────
-  // Decide search strategy
-  // ─────────────────────────────────────────────
   const isLongQuery = (text = "") => {
     const wordCount = text.trim().split(/\s+/).length;
     return wordCount > 4 || text.length > 30;
   };
 
-  const useVector =
-    hasVectorSignals ||
-    (hasQuery && isLongQuery(search));
+  const useVector = hasVectorSignals || (hasQuery && isLongQuery(search));
 
   if (useVector) {
-    // ───────── VECTOR SEARCH PATH ─────────
     const parts = [];
-
     if (search?.trim()) parts.push(search.trim());
-    if (mood && MOOD_QUERIES[mood]) parts.push(MOOD_QUERIES[mood]);
-    if (category && CATEGORY_QUERIES[category]) parts.push(CATEGORY_QUERIES[category]);
-
-    const combinedQuery = parts.join(". ");
-
-    allListings = await vectorSearch(combinedQuery, 30, priceFilter);
-
+    if (mood && MOOD_QUERIES[mood])                 parts.push(MOOD_QUERIES[mood]);
+    if (category && CATEGORY_QUERIES[category])     parts.push(CATEGORY_QUERIES[category]);
+    allListings = await vectorSearch(parts.join(". "), 30, priceFilter);
   } else {
-    // ───────── MONGO FULL-TEXT SEARCH PATH ─────────
     const filter = {};
-
-    if (search?.trim()) {
-      filter.$text = { $search: search.trim() };
-    }
-
-    if (minPrice || maxPrice) {
-      filter.price = priceFilter;
-    }
-
+    if (search?.trim()) filter.$text = { $search: search.trim() };
+    if (minPrice || maxPrice) filter.price = priceFilter;
     allListings = await Listing.find(filter);
   }
 
-  if (req.xhr) return res.json({ allListings });
+  // ── Explore-All pagination (only when no filters active) ──
+  const PAGE_SIZE      = 12;
+  const exploreOpen    = !!allPage;
+  const currentAllPage = Math.max(1, parseInt(allPage) || 1);
+
+  let exploreListings      = [];
+  let exploreTotalPages    = 1;
+  let exploreTotalListings = 0;
+
+  if (exploreOpen) {
+    const allUnfiltered  = await Listing.find({});
+    exploreTotalListings = allUnfiltered.length;
+    exploreTotalPages    = Math.ceil(exploreTotalListings / PAGE_SIZE);
+    const safePage       = Math.min(currentAllPage, exploreTotalPages);
+    exploreListings      = allUnfiltered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  }
+
+  // ── AJAX / XHR response — return everything the client needs ──
+  const isXhr = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest';
+  if (isXhr) {
+    return res.json({
+      allListings,
+      searchQuery:    search    || "",
+      activeMood:     mood      || "",
+      activeCategory: category  || "",
+      activeMinPrice: minPrice  || "",
+      activeMaxPrice: maxPrice  || "",
+      exploreOpen,
+      exploreListings,
+      exploreTotalListings,
+      exploreTotalPages,
+      currentAllPage: Math.min(currentAllPage, exploreTotalPages || 1),
+    });
+  }
 
   res.render("listings/index.ejs", {
     allListings,
-    searchQuery: search || "",
-    activeMood: mood || "",
-    activeCategory: category || "",
-    activeMinPrice: minPrice || "",
-    activeMaxPrice: maxPrice || "",
+    searchQuery:    search    || "",
+    activeMood:     mood      || "",
+    activeCategory: category  || "",
+    activeMinPrice: minPrice  || "",
+    activeMaxPrice: maxPrice  || "",
+    exploreOpen,
+    exploreListings,
+    exploreTotalListings,
+    exploreTotalPages,
+    currentAllPage: Math.min(currentAllPage, exploreTotalPages || 1),
   });
 };
+
+module.exports.addToGallery=async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) {
+      req.flash("error", "Listing not found.");
+      return res.redirect("/listings");
+    }
+    if (!listing.owner.equals(req.user._id)) {
+      req.flash("error", "You do not have permission.");
+      return res.redirect(`/listings/${req.params.id}`);
+    }
+    if (!req.files || req.files.length === 0) {
+      req.flash("error", "No files selected.");
+      return res.redirect(`/listings/${req.params.id}`);
+    }
+    const newMedia = req.files.map((f) => ({
+      url: f.path,
+      filename: f.filename,
+      type: f.mimetype.startsWith("video") ? "video" : "image",
+    }));
+    listing.gallery.push(...newMedia);
+    await listing.save();
+    req.flash(
+      "success",
+      `${newMedia.length} file${newMedia.length !== 1 ? "s" : ""} uploaded!`
+    );
+    res.redirect(`/listings/${req.params.id}`);
+  } catch (err) {
+    console.error("[Gallery upload error]", err);
+    req.flash("error", "Upload failed. Please try again.");
+    res.redirect(`/listings/${req.params.id}`);
+  }
+}
+
+module.exports.delFromGallery= async (req, res) => {
+  // exact same handler body as your DELETE route
+  try {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) {
+      req.flash("error", "Listing not found.");
+      return res.redirect("/listings");
+    }
+    if (!listing.owner.equals(req.user._id)) {
+      req.flash("error", "Permission denied.");
+      return res.redirect(`/listings/${req.params.id}`);
+    }
+    const { filename, resourceType } = req.body;
+    if (!filename) {
+      req.flash("error", "No file specified.");
+      return res.redirect(`/listings/${req.params.id}`);
+    }
+    await cloudinary.uploader.destroy(filename, {
+      resource_type: resourceType === "video" ? "video" : "image",
+    });
+    listing.gallery = listing.gallery.filter((m) => m.filename !== filename);
+    await listing.save();
+    req.flash("success", "Photo deleted.");
+    res.redirect(`/listings/${req.params.id}`);
+  } catch (err) {
+    console.error("[Gallery delete error]", err);
+    req.flash("error", "Delete failed. Please try again.");
+    res.redirect(`/listings/${req.params.id}`);
+  }
+}
 
 module.exports.renderNewForm = (req, res) => {
   res.render("listings/new.ejs");
@@ -104,7 +187,7 @@ module.exports.createListing = async (req, res, next) => {
   let newListing = new Listing(req.body.listing);
   newListing.owner = req.user._id;
   newListing.image = { url: req.file.path, filename: req.file.filename };
-  await newListing.save(); // pre-save hook generates embedding automatically
+  await newListing.save();
   req.flash("success", "New Listing Created!");
   res.redirect("/listings");
 };
@@ -122,15 +205,26 @@ module.exports.showListing = async (req, res, next) => {
   res.render("listings/show.ejs", { listing, lat, lng });
 };
 
+// ─────────────────────────────────────────────
+// Geocode using Nominatim (OpenStreetMap)
+// ─────────────────────────────────────────────
 async function getCoordinates(location, country) {
   try {
-    const data = await opencage.geocode({ q: `${location}, ${country}`, key: process.env.OPENCAGE_API_KEY });
-    if (data.status.code === 200 && data.results.length > 0) {
-      return data.results[0].geometry;
+    const query = encodeURIComponent(`${location}, ${country}`);
+    const url   = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`;
+    const res   = await fetch(url, {
+      headers: { "User-Agent": "WanderlustApp/1.0 (srishtiiv24@gmail.com)" },
+    });
+    if (!res.ok) throw new Error(`Nominatim HTTP ${res.status}`);
+    const data = await res.json();
+    if (data && data.length > 0) {
+      const { lat, lon } = data[0];
+      return { lat: parseFloat(lat), lng: parseFloat(lon) };
     }
-    return { lat: 28.644800, lng: 77.216721 };
-  } catch (error) {
-    return { lat: 28.644800, lng: 77.216721 };
+    return { lat: 28.6448, lng: 77.2167 };
+  } catch (err) {
+    console.error("[Geocode] Nominatim failed:", err.message);
+    return { lat: 28.6448, lng: 77.2167 };
   }
 }
 
@@ -152,7 +246,7 @@ module.exports.editListing = async (req, res, next) => {
   if (req.file) {
     listing.image = { url: req.file.path, filename: req.file.filename };
   }
-  await listing.save(); // triggers embedding regeneration if fields changed
+  await listing.save();
   req.flash("success", "Listing Updated!");
   res.redirect(`/listings/${id}`);
 };
