@@ -41,37 +41,38 @@ Built using the MERN stack, the project follows a scalable MVC architecture with
 
 ---
 
-## How to Run Locally
+# Environment Setup & Running the Project
 
-1. Clone the repository
-```bash
-git clone <repo-link>
-cd wanderlust
-```
+## 1. Create Environment Variables
 
-2. Install dependencies
-```bash
-npm install
-```
+Create a `.env` file in the root directory and add the following:
 
-3. Create a `.env` file and add required environment variables
-```
+```env
 MONGO_URI=your_mongodb_uri
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
-OPENCAGE_API_KEY=your_api_key
 SESSION_SECRET=your_secret
-```
 
-4. Start the server
-```bash
+2. Install Dependencies
+npm install
+3. Initialize Database
+cd init
+node index.js
+cd ..
+4. Run the Application
+Development mode
+npm run dev
+Using nodemon
+nodemon app.js
+Standard start
 npm start
-```
+5. Access the Application
 
-5. Open in browser
-```
-http://localhost:8080
+Open in browser:
+
+http://localhost:3000
+
 ```
 
 ---
