@@ -11,7 +11,7 @@ The platform features a hybrid search system that blends traditional keyword sea
 
 Wanderlust also includes rich media support (images/videos), wishlist management, reviews & ratings, interactive maps, and exportable itineraries—creating a complete end-to-end travel planning experience.
 
-Built using the MERN stack, the project follows a scalable MVC architecture with secure authentication, robust validation, and optimized performance.
+The project follows a scalable MVC architecture with secure authentication, robust validation, and optimized performance.
 
 ---
 ## Features
