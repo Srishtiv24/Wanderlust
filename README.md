@@ -46,7 +46,7 @@ Built using the MERN stack, the project follows a scalable MVC architecture with
 ```env
 # Getting Started
 
-## 1. Clone the Repository
+1. Clone the Repository
 git clone https://github.com/your-username/wanderlust.git
 cd wanderlust
 
