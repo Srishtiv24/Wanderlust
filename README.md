@@ -37,7 +37,7 @@ Built using the MERN stack, the project follows a scalable MVC architecture with
 **Database:** MongoDB, Mongoose  
 **Authentication:** Passport.js, Connect-Mongo  
 **AI / Search:** Vector Search, MongoDB Full-Text Indexing, Hugging Face Transformers, Kilo AI  
-**Services:** Cloudinary, Multer, OpenCage API
+**Services:** Cloudinary, Multer, Leaflet , OpenStreetsMap
 
 ---
 
