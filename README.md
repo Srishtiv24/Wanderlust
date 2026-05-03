@@ -25,7 +25,7 @@ Built using the MERN stack, the project follows a scalable MVC architecture with
 - Debounced search input for performance optimization
 - Pagination for efficient data loading
 - AI-powered travel assistant using RAG (MongoDB + Vector Search + LLM)
-- Location services using OpenCage API
+- Map services using OpenStreets API and Leaflet
 - Smart itinerary planner for day-wise travel planning
 
 ---
